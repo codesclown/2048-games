@@ -344,36 +344,44 @@ hr {
     z-index: 10;
     font-size: 55px;
     color: #ffffff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
   .tile.tile-2 .tile-inner {
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: #ffffff;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
   .tile.tile-4 .tile-inner {
     background: linear-gradient(135deg, #f093fb, #f5576c);
     color: #ffffff;
-    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
   .tile.tile-8 .tile-inner {
     background: linear-gradient(135deg, #4facfe, #00f2fe);
     color: #ffffff;
-    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
   .tile.tile-16 .tile-inner {
     background: linear-gradient(135deg, #43e97b, #38f9d7);
     color: #ffffff;
-    box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
   .tile.tile-32 .tile-inner {
     background: linear-gradient(135deg, #fa709a, #fee140);
     color: #ffffff;
-    box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
   .tile.tile-64 .tile-inner {
     background: linear-gradient(135deg, #a8edea, #fed6e3);
     color: #2d1b69;
-    box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
+    box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
   .tile.tile-128 .tile-inner {
     background: linear-gradient(135deg, #ffecd2, #fcb69f);
     color: #2d1b69;
     box-shadow: 0 6px 20px rgba(255, 236, 210, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    font-size: 45px; }
+    font-size: 45px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
     @media screen and (max-width: 520px) {
       .tile.tile-128 .tile-inner {
         font-size: 25px; } }
@@ -381,7 +389,8 @@ hr {
     background: linear-gradient(135deg, #ffd89b, #19547b);
     color: #ffffff;
     box-shadow: 0 6px 20px rgba(255, 216, 155, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    font-size: 45px; }
+    font-size: 45px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
     @media screen and (max-width: 520px) {
       .tile.tile-256 .tile-inner {
         font-size: 25px; } }
@@ -389,7 +398,8 @@ hr {
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: #ffffff;
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    font-size: 45px; }
+    font-size: 45px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
     @media screen and (max-width: 520px) {
       .tile.tile-512 .tile-inner {
         font-size: 25px; } }
@@ -398,7 +408,8 @@ hr {
     color: #1a1a3a;
     box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
     font-size: 35px;
-    font-weight: 900; }
+    font-weight: 900;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); }
     @media screen and (max-width: 520px) {
       .tile.tile-1024 .tile-inner {
         font-size: 15px; } }
@@ -408,7 +419,8 @@ hr {
     box-shadow: 0 10px 40px rgba(255, 107, 107, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.5);
     font-size: 35px;
     font-weight: 900;
-    animation: glow 2s ease-in-out infinite alternate; }
+    animation: glow 2s ease-in-out infinite alternate;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); }
     @media screen and (max-width: 520px) {
       .tile.tile-2048 .tile-inner {
         font-size: 15px; } }
@@ -417,7 +429,8 @@ hr {
     color: #ffd700;
     font-size: 30px;
     box-shadow: 0 10px 40px rgba(45, 27, 105, 0.8), inset 0 2px 0 rgba(255, 215, 0, 0.3);
-    font-weight: 900; }
+    font-weight: 900;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
     @media screen and (max-width: 520px) {
       .tile.tile-super .tile-inner {
         font-size: 10px; } }
