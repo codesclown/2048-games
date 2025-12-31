@@ -389,7 +389,16 @@
     <div id="gameScreen" class="screen">
         <div class="container">
             <div class="heading">
-                <h1 class="title">2048</h1>
+                <!-- Mobile header bar -->
+                <div class="mobile-header-bar">
+                    <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+                    <h1 class="title">2048</h1>
+                    <button class="mobile-refresh-btn">↻</button>
+                </div>
+                
+                <!-- Desktop title (hidden on mobile) -->
+                <h1 class="title desktop-title">2048</h1>
+                
                 <div class="scores-container">
                     <div class="score-container">0</div>
                     <div class="best-container">0</div>
@@ -400,7 +409,7 @@
                 <p class="game-intro">
                     Join the numbers and get to the <strong>2048 tile!</strong>
                 </p>
-                <a class="restart-button">New Game</a>
+                <!-- <a class="restart-button">New Game</a> -->
             </div>
 
             <div class="game-container">
@@ -574,6 +583,34 @@
         </style>
     </div>
 
+    <!-- Mobile Menu Popup -->
+    <div id="mobileMenu" class="mobile-menu-overlay">
+        <div class="mobile-menu-content">
+            <div class="mobile-menu-header">
+                <h2>Menu</h2>
+                <button class="mobile-menu-close" onclick="closeMobileMenu()">×</button>
+            </div>
+            <div class="mobile-menu-items">
+                <button class="mobile-menu-item" onclick="closeMobileMenu(); showInstructions();">
+                    <span class="menu-icon">📖</span>
+                    How to Play
+                </button>
+                <button class="mobile-menu-item" onclick="closeMobileMenu(); showHighScores();">
+                    <span class="menu-icon">🏆</span>
+                    High Scores
+                </button>
+                <button class="mobile-menu-item restart-button" onclick="closeMobileMenu(); if(window.gameManager) { window.gameManager.restart(); }">
+                    <span class="menu-icon">🎮</span>
+                    New Game
+                </button>
+                <button class="mobile-menu-item" onclick="closeMobileMenu(); showHome();">
+                    <span class="menu-icon">🏠</span>
+                    Home
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript for Screen Management and Modals -->
     <script>
         // Screen Management
@@ -584,6 +621,32 @@
             });
             // Show target screen
             document.getElementById(screenId).classList.add('active');
+        }
+
+        // Mobile Menu Functions
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu.classList.contains('active')) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
+        }
+
+        function openMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        function showHome() {
+            showScreen('homeScreen');
         }
 
         function showGame() {

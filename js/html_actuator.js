@@ -109,7 +109,11 @@ HTMLActuator.prototype.updateScore = function (score) {
   var difference = score - this.score;
   this.score = score;
 
-  this.scoreContainer.textContent = this.score;
+  // Create a span for the score number to preserve the CSS :after label
+  var scoreNumber = document.createElement("span");
+  scoreNumber.classList.add("score-number");
+  scoreNumber.textContent = this.score;
+  this.scoreContainer.appendChild(scoreNumber);
 
   if (difference > 0) {
     var addition = document.createElement("div");
@@ -121,7 +125,12 @@ HTMLActuator.prototype.updateScore = function (score) {
 };
 
 HTMLActuator.prototype.updateBestScore = function (bestScore) {
-  this.bestContainer.textContent = bestScore;
+  // Clear and create a span for the best score number to preserve the CSS :after label
+  this.bestContainer.innerHTML = '';
+  var bestNumber = document.createElement("span");
+  bestNumber.classList.add("score-number");
+  bestNumber.textContent = bestScore;
+  this.bestContainer.appendChild(bestNumber);
 };
 
 HTMLActuator.prototype.message = function (won) {
