@@ -393,7 +393,7 @@
                 <div class="mobile-header-bar">
                     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
                     <h1 class="title">2048</h1>
-                    <button class="mobile-refresh-btn">↻</button>
+                    <button class="mobile-refresh-btn" onclick="handleRestartClick(this)">↻</button>
                 </div>
                 
                 <!-- Desktop title (hidden on mobile) -->
@@ -599,7 +599,7 @@
                     <span class="menu-icon">🏆</span>
                     High Scores
                 </button>
-                <button class="mobile-menu-item restart-button" onclick="closeMobileMenu(); if(window.gameManager) { window.gameManager.restart(); }">
+                <button class="mobile-menu-item restart-button" onclick="closeMobileMenu(); restartGameWithAnimation();">
                     <span class="menu-icon">🎮</span>
                     New Game
                 </button>
@@ -609,6 +609,12 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- Restart Animation Overlay -->
+    <div id="restartAnimation" class="restart-animation-overlay">
+        <div class="restart-spinner"></div>
+        <div class="restart-text">Starting New Game...</div>
     </div>
 
     <!-- JavaScript for Screen Management and Modals -->
@@ -644,6 +650,90 @@
             menu.classList.remove('active');
             document.body.style.overflow = ''; // Restore scrolling
         }
+
+        // Make function globally accessible for debugging
+        window.restartGameWithAnimation = function() {
+            const overlay = document.getElementById('restartAnimation');
+            
+            if (!overlay) {
+                // Fallback to direct restart
+                if (window.gameManager) {
+                    window.gameManager.restart();
+                }
+                return;
+            }
+            
+            // Show animation
+            overlay.classList.add('active');
+            
+            // Show animation for 1.5 seconds then restart game
+            setTimeout(() => {
+                if (window.gameManager) {
+                    window.gameManager.restart();
+                }
+                // Hide animation after restart
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                }, 300);
+            }, 1500);
+        };
+
+        // Animate restart button and restart game
+        window.animateRestartButton = function(button) {
+            // Add spinning animation
+            button.classList.add('spinning');
+            
+            // Restart the game after animation
+            setTimeout(() => {
+                if (window.gameManager) {
+                    window.gameManager.restart();
+                }
+                // Remove animation class
+                button.classList.remove('spinning');
+            }, 1000);
+        };
+
+        // Handle restart button click with animation
+        window.handleRestartClick = function(button) {
+            // Test if function is called
+            button.style.backgroundColor = 'red';
+            
+            // Force animation with inline styles
+            button.style.animation = 'spinRestart 2s linear';
+            button.style.transform = 'rotate(720deg)';
+            
+            // Restart the game immediately
+            if (window.gameManager) {
+                window.gameManager.restart();
+            }
+            
+            // Reset styles after animation
+            setTimeout(() => {
+                button.style.animation = '';
+                button.style.transform = '';
+                button.style.backgroundColor = '';
+            }, 2000);
+        };
+
+        // Add click animation to mobile refresh button
+        document.addEventListener('DOMContentLoaded', function() {
+            const refreshBtn = document.querySelector('.mobile-refresh-btn');
+            console.log('Refresh button found:', refreshBtn);
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    console.log('Refresh button clicked');
+                    // Add spinning animation
+                    this.classList.add('spinning');
+                    console.log('Added spinning class');
+                    
+                    // Remove animation class after animation completes
+                    setTimeout(() => {
+                        this.classList.remove('spinning');
+                        console.log('Removed spinning class');
+                    }, 1000);
+                });
+            }
+        });
 
         function showHome() {
             showScreen('homeScreen');
