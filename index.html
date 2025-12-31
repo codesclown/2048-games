@@ -145,33 +145,46 @@
         
         .game-preview {
             display: grid;
-            grid-template-columns: repeat(4, 40px);
-            grid-gap: 15px;
+            grid-template-columns: repeat(4, 32px);
+            grid-gap: 8px;
             margin: 0;
             opacity: 0.8;
         }
         
         .preview-cell {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 3px;
             background: rgba(45, 27, 105, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 13px;
             font-weight: bold;
             color: #ffffff;
             -webkit-box-sizing: border-box;
             -moz-box-sizing: border-box;
             box-sizing: border-box;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         
-        .preview-cell.tile-2 { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .preview-cell.tile-4 { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .preview-cell.tile-8 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .preview-cell.tile-16 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .preview-cell.tile-2 { 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .preview-cell.tile-4 { 
+            background: linear-gradient(135deg, #f093fb, #f5576c); 
+            box-shadow: 0 3px 10px rgba(240, 147, 251, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .preview-cell.tile-8 { 
+            background: linear-gradient(135deg, #4facfe, #00f2fe); 
+            box-shadow: 0 3px 10px rgba(79, 172, 254, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .preview-cell.tile-16 { 
+            background: linear-gradient(135deg, #43e97b, #38f9d7); 
+            box-shadow: 0 3px 10px rgba(67, 233, 123, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
         
         .menu-buttons {
             display: flex;
@@ -273,14 +286,27 @@
                 text-align: center;
             }
             .game-preview {
-                grid-template-columns: repeat(4, 35px);
-                grid-gap: 10px;
+                grid-template-columns: repeat(4, 28px);
+                grid-gap: 6px;
                 margin: 0;
             }
             .preview-cell {
-                width: 35px;
-                height: 35px;
-                font-size: 13px;
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+            .preview-cell.tile-2 { 
+                box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+            .preview-cell.tile-4 { 
+                box-shadow: 0 2px 6px rgba(240, 147, 251, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+            .preview-cell.tile-8 { 
+                box-shadow: 0 2px 6px rgba(79, 172, 254, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+            .preview-cell.tile-16 { 
+                box-shadow: 0 2px 6px rgba(67, 233, 123, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
             }
             .menu-buttons {
                 gap: 8px;
@@ -382,7 +408,10 @@
                     <p></p>
                     <div class="lower">
                         <a class="keep-playing-button">Keep going</a>
-                        <a class="retry-button">Try again</a>
+                        <div class="game-over-buttons">
+                            <button class="home-button" onclick="showScreen('homeScreen')">🏠 Home</button>
+                            <a class="retry-button">🔄 Try again</a>
+                        </div>
                     </div>
                 </div>
 
@@ -416,6 +445,133 @@
                 <div class="tile-container"></div>
             </div>
         </div>
+
+        <style>
+            /* Game Over Screen Enhancements */
+            .game-message {
+                background: rgba(15, 15, 35, 0.95) !important;
+                backdrop-filter: blur(10px);
+                border: 2px solid rgba(255, 215, 0, 0.2);
+                border-radius: 12px;
+                margin: 10px;
+            }
+            
+            .game-message p {
+                color: #e6e6fa !important;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+                font-size: 48px !important;
+                margin-top: 180px !important;
+            }
+            
+            .game-message.game-won p {
+                background: linear-gradient(45deg, #ffd700, #ffb347);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: glow-title 2s ease-in-out infinite alternate;
+            }
+            
+            .game-message.game-over p {
+                color: #ff6b6b !important;
+                text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+            }
+            
+            .game-over-buttons {
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+            
+            .home-button {
+                display: inline-block;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                border: none;
+                border-radius: 8px;
+                padding: 12px 20px;
+                text-decoration: none;
+                color: #ffffff;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                min-width: 120px;
+                text-align: center;
+            }
+            
+            .home-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+                background: linear-gradient(135deg, #5a6fd8, #6a42a0);
+            }
+            
+            .retry-button {
+                background: linear-gradient(135deg, #ffd700, #ffb347) !important;
+                color: #1a1a3a !important;
+                border-radius: 8px !important;
+                padding: 12px 20px !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4) !important;
+                min-width: 120px !important;
+                text-align: center !important;
+                transition: all 0.3s ease !important;
+            }
+            
+            .retry-button:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5) !important;
+                background: linear-gradient(135deg, #ffdc00, #ffc107) !important;
+            }
+            
+            .keep-playing-button {
+                background: linear-gradient(135deg, #43e97b, #38f9d7) !important;
+                color: #ffffff !important;
+                border-radius: 8px !important;
+                padding: 12px 20px !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4) !important;
+                min-width: 140px !important;
+                text-align: center !important;
+                transition: all 0.3s ease !important;
+                margin-bottom: 15px !important;
+            }
+            
+            .keep-playing-button:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 20px rgba(67, 233, 123, 0.5) !important;
+                background: linear-gradient(135deg, #33d96b, #28e9c7) !important;
+            }
+            
+            /* Mobile Responsive for Game Over */
+            @media screen and (max-width: 520px) {
+                .game-message p {
+                    font-size: 32px !important;
+                    margin-top: 100px !important;
+                }
+                
+                .game-over-buttons {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                
+                .home-button, .retry-button {
+                    font-size: 14px !important;
+                    padding: 10px 16px !important;
+                    min-width: 100px !important;
+                }
+                
+                .keep-playing-button {
+                    font-size: 14px !important;
+                    padding: 10px 16px !important;
+                    min-width: 120px !important;
+                    margin-bottom: 10px !important;
+                }
+            }
+        </style>
     </div>
 
     <!-- JavaScript for Screen Management and Modals -->
