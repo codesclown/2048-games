@@ -799,7 +799,6 @@
                     // Compare states to avoid duplicates
                     if (lastState.score === currentState.score && 
                         JSON.stringify(lastState.grid) === JSON.stringify(currentState.grid)) {
-                        console.log('Duplicate state detected, not saving');
                         return;
                     }
                 }
@@ -810,8 +809,6 @@
                 if (window.gameStateHistory.length > MAX_HISTORY) {
                     window.gameStateHistory.shift();
                 }
-                
-                console.log('Game state saved, history length:', window.gameStateHistory.length);
             }
         }
 
@@ -819,8 +816,6 @@
         function restoreGameState() {
             if (window.gameStateHistory.length > 0 && window.gameManager) {
                 const previousState = window.gameStateHistory.pop();
-                
-                console.log('Restoring game state, remaining history:', window.gameStateHistory.length);
                 
                 // Store current tile positions for reverse animation
                 const currentTiles = new Map();
@@ -886,7 +881,6 @@
                 
                 return true;
             }
-            console.log('No game state to restore');
             return false;
         }
 
@@ -899,21 +893,18 @@
                     if (event === 'move' && !window.gameManager.isGameTerminated()) {
                         // Save state before move
                         saveGameState();
-                        console.log('State saved before move (input manager), history length:', window.gameStateHistory.length);
                     }
                     return originalEmit.call(this, event, data);
                 };
-                console.log('Input manager events hooked');
                 
                 // Save initial state if we don't have any history yet
                 if (window.gameStateHistory.length === 0) {
                     setTimeout(() => {
                         saveGameState();
-                        console.log('Initial state saved in hookGameMoves');
                     }, 100);
                 }
             } else {
-                console.log('Game manager or input manager not ready for hooking moves');
+                // Game manager not ready
             }
         }
 
@@ -952,7 +943,6 @@
             setTimeout(() => {
                 if (window.gameManager) {
                     saveGameState();
-                    console.log('Initial game state saved after reset');
                 }
             }, 100);
         }
@@ -1045,9 +1035,8 @@
                     originalRestart.call(this);
                     resetPowerUps();
                 };
-                console.log('Game restart hooked');
             } else {
-                console.log('Game manager not ready for hooking restart');
+                // Game manager not ready
             }
             // Also hook into moves for undo functionality
             hookGameMoves();
@@ -1060,22 +1049,18 @@
             
             const hookInterval = setInterval(() => {
                 attempts++;
-                console.log(`Hook attempt ${attempts}`);
                 
                 if (window.gameManager) {
                     hookGameRestart();
                     clearInterval(hookInterval);
-                    console.log('Successfully hooked game manager');
                     
                     // Save initial game state
                     setTimeout(() => {
                         saveGameState();
-                        console.log('Initial game state saved on hook');
                     }, 200);
                     
                 } else if (attempts >= maxAttempts) {
                     clearInterval(hookInterval);
-                    console.log('Failed to hook game manager after', maxAttempts, 'attempts');
                 }
             }, 500);
         }
@@ -1090,17 +1075,11 @@
         window.handleUndoClick = function(button) {
             // Check if button is disabled
             if (button.classList.contains('disabled') || window.powerUps.undo.uses <= 0) {
-                console.log('Undo button disabled or no uses left');
                 return; // Do nothing if disabled
             }
 
-            console.log('Undo button clicked, history length:', window.gameStateHistory.length);
-            console.log('Current game state - Score:', window.gameManager?.score, 'Over:', window.gameManager?.over);
-
             // If no history exists, this is the issue
             if (window.gameStateHistory.length === 0) {
-                console.log('No history found - this is why first undo fails');
-                console.log('Saving current state as emergency backup');
                 // Save current state as emergency backup, but don't use the undo
                 saveGameState();
                 return;
@@ -1122,9 +1101,6 @@
                     // If undo failed, refund the use
                     window.powerUps.undo.uses++;
                     updateButtonTitles();
-                    console.log('Undo failed, use refunded');
-                } else {
-                    console.log('Undo successful');
                 }
                 
                 // Check if player earned more uses
@@ -2052,13 +2028,12 @@
             }
         }
 
-        // Delete tile selection system (Fixed)
+        // Delete tile selection system (Cleaned)
         let deleteTileMode = {
             active: false,
             clickHandler: null,
             
             start: function() {
-                console.log('🗑️ Starting delete tile mode');
                 this.active = true;
                 
                 // Create a bound click handler
@@ -2078,8 +2053,7 @@
                 
                 // Fix all tiles for clicking
                 const tiles = document.querySelectorAll('.tile');
-                console.log('🗑️ Found', tiles.length, 'tiles to make clickable');
-                tiles.forEach((tile, index) => {
+                tiles.forEach((tile) => {
                     tile.style.setProperty('pointer-events', 'auto', 'important');
                     tile.style.setProperty('cursor', 'pointer', 'important');
                     tile.style.setProperty('z-index', '100', 'important');
@@ -2087,13 +2061,10 @@
                     // Add hover effects
                     tile.addEventListener('mouseenter', this.addHoverEffect.bind(this));
                     tile.addEventListener('mouseleave', this.removeHoverEffect.bind(this));
-                    
-                    console.log('🗑️ Made tile', index, 'clickable with value:', tile.querySelector('.tile-inner')?.textContent);
                 });
                 
                 // Show instruction message
                 showSelectionMessage('Click any tile to delete it');
-                console.log('✅ Delete tile mode activated with', tiles.length, 'clickable tiles');
             },
             
             addHoverEffect: function(event) {
@@ -2103,7 +2074,6 @@
                     tile.style.setProperty('border', '3px solid #ff4444', 'important');
                     tile.style.setProperty('box-shadow', '0 0 15px rgba(255, 68, 68, 0.8)', 'important');
                     tile.style.setProperty('transform', 'scale(1.05)', 'important');
-                    console.log('🗑️ Added hover effect to tile');
                 }
             },
             
@@ -2118,14 +2088,7 @@
             },
             
             handleClick: function(event) {
-                if (!this.active) {
-                    console.log('🗑️ Click ignored - delete mode not active');
-                    return;
-                }
-                
-                console.log('🗑️ CLICK DETECTED in delete mode!');
-                console.log('🗑️ Event target:', event.target);
-                console.log('🗑️ Event type:', event.type);
+                if (!this.active) return;
                 
                 // Stop all event propagation immediately
                 event.preventDefault();
@@ -2138,37 +2101,24 @@
                     tile = event.target.closest('.tile');
                 }
                 
-                if (!tile) {
-                    console.log('❌ No tile found from click');
-                    return;
-                }
-                
-                console.log('🗑️ Found tile to delete:', tile);
+                if (!tile) return;
                 
                 const tileInner = tile.querySelector('.tile-inner');
                 const tileValue = tileInner ? tileInner.textContent : '?';
                 
-                console.log('🗑️ Tile value:', tileValue);
-                
                 // Get tile position from classes
                 const classes = Array.from(tile.classList);
-                console.log('🗑️ Tile classes:', classes);
-                
                 const positionClass = classes.find(c => c.startsWith('tile-position-'));
                 
                 if (!positionClass) {
-                    console.log('❌ Could not find position class');
                     showSelectionMessage('Delete failed - invalid tile position');
                     setTimeout(() => this.end(), 1500);
                     return;
                 }
                 
-                console.log('🗑️ Position class:', positionClass);
-                
                 // Extract position (e.g., "tile-position-1-2" -> x=1, y=2)
                 const posMatch = positionClass.match(/tile-position-(\d+)-(\d+)/);
                 if (!posMatch) {
-                    console.log('❌ Could not parse position from:', positionClass);
                     showSelectionMessage('Delete failed - invalid position format');
                     setTimeout(() => this.end(), 1500);
                     return;
@@ -2177,8 +2127,6 @@
                 const x = parseInt(posMatch[1]);
                 const y = parseInt(posMatch[2]);
                 
-                console.log('🗑️ Deleting tile at position:', x, y, 'with value:', tileValue);
-                
                 // Save state before delete
                 saveGameState();
                 
@@ -2186,54 +2134,34 @@
                 if (window.gameManager && window.gameManager.grid) {
                     let gridTile = null;
                     
-                    console.log('🗑️ COORDINATE-BASED DELETION');
-                    console.log('🗑️ Target: value =', tileValue, 'at position =', x, y);
-                    
                     // Method 1: Direct coordinate lookup
                     gridTile = window.gameManager.grid.cellContent({x: x, y: y});
-                    if (gridTile) {
-                        console.log('🗑️ Found tile at', x, y, 'with value:', gridTile.value);
-                        if (gridTile.value.toString() === tileValue.toString()) {
-                            console.log('✅ PERFECT MATCH - Direct coordinates');
-                        } else {
-                            console.log('❌ Value mismatch at direct coordinates');
-                            gridTile = null;
-                        }
+                    if (gridTile && gridTile.value.toString() === tileValue.toString()) {
+                        // Perfect match
                     } else {
-                        console.log('❌ No tile found at direct coordinates', x, y);
+                        gridTile = null;
                     }
                     
                     // Method 2: Try swapped coordinates (x,y) -> (y,x)
                     if (!gridTile) {
                         gridTile = window.gameManager.grid.cellContent({x: y, y: x});
-                        if (gridTile) {
-                            console.log('🗑️ Found tile at swapped', y, x, 'with value:', gridTile.value);
-                            if (gridTile.value.toString() === tileValue.toString()) {
-                                console.log('✅ PERFECT MATCH - Swapped coordinates');
-                            } else {
-                                console.log('❌ Value mismatch at swapped coordinates');
-                                gridTile = null;
-                            }
+                        if (gridTile && gridTile.value.toString() === tileValue.toString()) {
+                            // Swapped coordinates match
                         } else {
-                            console.log('❌ No tile found at swapped coordinates', y, x);
+                            gridTile = null;
                         }
                     }
                     
                     // Method 3: Try zero-based vs one-based indexing
                     if (!gridTile) {
-                        // Try x-1, y-1 (convert from 1-based to 0-based)
                         const x0 = x - 1;
                         const y0 = y - 1;
                         if (x0 >= 0 && y0 >= 0) {
                             gridTile = window.gameManager.grid.cellContent({x: x0, y: y0});
-                            if (gridTile) {
-                                console.log('🗑️ Found tile at 0-based', x0, y0, 'with value:', gridTile.value);
-                                if (gridTile.value.toString() === tileValue.toString()) {
-                                    console.log('✅ PERFECT MATCH - Zero-based coordinates');
-                                } else {
-                                    console.log('❌ Value mismatch at zero-based coordinates');
-                                    gridTile = null;
-                                }
+                            if (gridTile && gridTile.value.toString() === tileValue.toString()) {
+                                // Zero-based coordinates match
+                            } else {
+                                gridTile = null;
                             }
                         }
                     }
@@ -2244,60 +2172,30 @@
                         const y0 = y - 1;
                         if (x0 >= 0 && y0 >= 0) {
                             gridTile = window.gameManager.grid.cellContent({x: y0, y: x0});
-                            if (gridTile) {
-                                console.log('🗑️ Found tile at swapped 0-based', y0, x0, 'with value:', gridTile.value);
-                                if (gridTile.value.toString() === tileValue.toString()) {
-                                    console.log('✅ PERFECT MATCH - Swapped zero-based coordinates');
-                                } else {
-                                    console.log('❌ Value mismatch at swapped zero-based coordinates');
-                                    gridTile = null;
-                                }
+                            if (gridTile && gridTile.value.toString() === tileValue.toString()) {
+                                // Swapped zero-based coordinates match
+                            } else {
+                                gridTile = null;
                             }
                         }
                     }
                     
-                    // If still not found, show debug info
-                    if (!gridTile) {
-                        console.log('❌ COORDINATE METHODS FAILED');
-                        console.log('🗑️ Grid contents:');
-                        window.gameManager.grid.eachCell(function(cellX, cellY, cellTile) {
-                            if (cellTile) {
-                                console.log('🗑️   Grid[' + cellX + '][' + cellY + '] = ' + cellTile.value);
-                            }
-                        });
-                        
-                        console.log('🗑️ DOM tiles:');
-                        const allTiles = document.querySelectorAll('.tile');
-                        allTiles.forEach((domTile, index) => {
-                            const classes = Array.from(domTile.classList);
-                            const posClass = classes.find(c => c.startsWith('tile-position-'));
-                            const value = domTile.querySelector('.tile-inner')?.textContent;
-                            console.log('🗑️   DOM[' + index + '] = ' + posClass + ' value=' + value);
-                        });
-                    }
-                    
                     // Execute deletion if found
                     if (gridTile) {
-                        console.log('🗑️ DELETING TILE:', gridTile.value, 'at grid position:', gridTile.x, gridTile.y);
-                        
                         // Final safety check
                         if (gridTile.value.toString() === tileValue.toString()) {
                             window.gameManager.grid.removeTile(gridTile);
                             window.gameManager.actuate();
                             
-                            console.log('✅ TILE DELETED SUCCESSFULLY');
                             showSelectionMessage(`Tile ${tileValue} deleted!`);
                             checkForTileReward(window.powerUps.delete.requiredTile, 'delete');
                         } else {
-                            console.log('❌ FINAL SAFETY CHECK FAILED - Value mismatch');
                             showSelectionMessage('Delete failed - value mismatch');
                         }
                     } else {
-                        console.log('❌ COULD NOT FIND TILE WITH COORDINATES');
-                        showSelectionMessage('Delete failed - coordinate mismatch');
+                        showSelectionMessage('Delete failed - tile not found');
                     }
                 } else {
-                    console.log('❌ Game manager not available');
                     showSelectionMessage('Delete failed - game not ready');
                 }
                 
@@ -2306,7 +2204,6 @@
             },
             
             end: function() {
-                console.log('🗑️ Ending delete tile mode');
                 this.active = false;
                 
                 // Remove event listeners
@@ -2334,18 +2231,13 @@
                 
                 // Hide message
                 hideSelectionUI();
-                
-                console.log('✅ Delete tile mode ended');
             }
         };
 
         // Handle delete tiles button click (updated for click-to-delete)
         window.handleMenuClick = function(button) {
-            console.log('🗑️ DELETE BUTTON CLICKED');
-            
             // Check if button is disabled
             if (button.classList.contains('disabled') || window.powerUps.delete.uses <= 0) {
-                console.log('Delete button disabled or no uses left');
                 return;
             }
 
@@ -2360,7 +2252,6 @@
             }
             
             if (tileCount < 3) {
-                console.log('❌ Not enough tiles - need at least 3 tiles to use delete');
                 showSelectionMessage('Need at least 3 tiles to delete');
                 
                 // Auto-hide message after 2 seconds
@@ -2370,8 +2261,6 @@
                 
                 return;
             }
-            
-            console.log('✅ Tile count check passed:', tileCount, 'tiles found');
 
             // Use one delete
             window.powerUps.delete.uses--;
