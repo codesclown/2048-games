@@ -955,16 +955,17 @@
                     if (event === 'move' && !window.gameManager.isGameTerminated()) {
                         // Save state before move
                         saveGameState();
+                        
+                        // Enable undo button after first move
+                        const undoButton = document.querySelector('.undo-btn');
+                        if (undoButton && undoButton.classList.contains('disabled')) {
+                            undoButton.classList.remove('disabled');
+                            updateButtonTitles(); // This will update the title properly
+                            console.log('✅ Undo button enabled after first move');
+                        }
                     }
                     return originalEmit.call(this, event, data);
                 };
-                
-                // Save initial state if we don't have any history yet
-                if (window.gameStateHistory.length === 0) {
-                    setTimeout(() => {
-                        saveGameState();
-                    }, 100);
-                }
             } else {
                 // Game manager not ready
             }
@@ -1001,12 +1002,14 @@
             window.gameStateHistory = [];
             updateButtonTitles();
             
-            // Save initial game state after a short delay to ensure game is fully initialized
-            setTimeout(() => {
-                if (window.gameManager) {
-                    saveGameState();
-                }
-            }, 100);
+            // Disable undo button until first move is made
+            const undoButton = document.querySelector('.undo-btn');
+            if (undoButton) {
+                undoButton.classList.add('disabled');
+                undoButton.title = 'Undo - Make a move first';
+            }
+            
+            console.log('✅ Power-ups reset, undo disabled until first move');
         }
 
         // Update button titles and counters to show current usage
@@ -1433,6 +1436,7 @@
         window.handleUndoClick = function(button) {
             // Check if button is disabled
             if (button.classList.contains('disabled') || window.powerUps.undo.uses <= 0) {
+                console.log('❌ Undo button is disabled or no uses left');
                 return; // Do nothing if disabled
             }
 
@@ -1441,10 +1445,9 @@
                 window.gameSounds.playUndo();
             }
 
-            // If no history exists, this is the issue
+            // Check if we have enough history (need at least 1 state to undo to)
             if (window.gameStateHistory.length === 0) {
-                // Save current state as emergency backup, but don't use the undo
-                saveGameState();
+                console.log('⚠️ No undo history available');
                 return;
             }
 
