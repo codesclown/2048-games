@@ -428,7 +428,10 @@
                 <div class="mobile-header-bar">
                     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
                     <h1 class="title">2048</h1>
-                    <button class="mobile-refresh-btn" onclick="handleRestartClick(this)">↻</button>
+                    <div class="mobile-header-buttons">
+                        <button class="mobile-sound-btn" onclick="toggleGameSounds(this)" title="Toggle Sound">🔊</button>
+                        <button class="mobile-refresh-btn" onclick="handleRestartClick(this)">↻</button>
+                    </div>
                 </div>
                 
                 <!-- Desktop title (hidden on mobile) -->
@@ -653,6 +656,41 @@
                 
                 .game-message p {
                     font-size: 32px !important;
+                }
+            }
+        </style>
+
+        <!-- Mobile Sound Button Styles -->
+        <style>
+            .mobile-sound-btn {
+                background: rgba(67, 233, 123, 0.2);
+                border: 1px solid rgba(67, 233, 123, 0.3);
+                border-radius: 8px;
+                color: #43e97b;
+                font-size: 16px;
+                width: 40px;
+                height: 40px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                margin-right: 8px;
+            }
+
+            .mobile-sound-btn:hover {
+                background: rgba(67, 233, 123, 0.3);
+                transform: scale(1.05);
+            }
+
+            .mobile-header-buttons {
+                display: flex;
+                align-items: center;
+            }
+
+            @media screen and (max-width: 520px) {
+                .mobile-sound-btn {
+                    display: flex !important;
                 }
             }
         </style>
@@ -1095,11 +1133,312 @@
         // Initialize counters when page loads
         setTimeout(updateButtonTitles, 500);
 
+        // Game Sound System
+        class GameSounds {
+            constructor() {
+                this.audioContext = null;
+                this.enabled = true;
+                this.volume = 0.4;
+                this.initAudio();
+            }
+
+            initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Web Audio API not supported');
+                    this.enabled = false;
+                }
+            }
+
+            // Create a complex tone with multiple oscillators
+            createComplexTone(frequencies, duration, type = 'sine', volume = this.volume, envelope = 'smooth') {
+                if (!this.enabled || !this.audioContext) return;
+
+                const gainNode = this.audioContext.createGain();
+                gainNode.connect(this.audioContext.destination);
+
+                frequencies.forEach((freq, index) => {
+                    const oscillator = this.audioContext.createOscillator();
+                    const oscGain = this.audioContext.createGain();
+                    
+                    oscillator.connect(oscGain);
+                    oscGain.connect(gainNode);
+                    
+                    oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+                    oscillator.type = type;
+                    
+                    // Different volume for harmonics
+                    const oscVolume = volume / (index + 1);
+                    oscGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    
+                    if (envelope === 'smooth') {
+                        oscGain.gain.linearRampToValueAtTime(oscVolume, this.audioContext.currentTime + 0.02);
+                        oscGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+                    } else if (envelope === 'sharp') {
+                        oscGain.gain.setValueAtTime(oscVolume, this.audioContext.currentTime);
+                        oscGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+                    }
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                });
+            }
+
+            // Enhanced tile slide sound - smooth whoosh
+            playSlide() {
+                if (!this.enabled) return;
+                // Smooth air whoosh sound with gentle frequency sweep
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.type = 'sine'; // Changed from sawtooth to sine for smoother sound
+                oscillator.frequency.setValueAtTime(300, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(150, this.audioContext.currentTime + 0.15);
+                
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.06, this.audioContext.currentTime + 0.02);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.15);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.15);
+            }
+
+            // Tile merge sound with specific sounds for different values
+            playMerge(tileValue) {
+                if (!this.enabled) return;
+                
+                if (tileValue === 4) {
+                    // Soft bell for 4
+                    this.createComplexTone([523, 659], 0.3, 'sine', 0.15);
+                } else if (tileValue === 8) {
+                    // Brighter chime for 8
+                    this.createComplexTone([659, 784, 988], 0.35, 'sine', 0.18);
+                } else if (tileValue === 16) {
+                    // Crystal chime for 16
+                    this.createComplexTone([784, 988, 1175], 0.4, 'triangle', 0.2);
+                } else if (tileValue === 32) {
+                    // Special magical sound for 32
+                    this.playSpecialMerge32();
+                } else if (tileValue === 64) {
+                    // Epic sound for 64
+                    this.playSpecialMerge64();
+                } else if (tileValue === 128) {
+                    // Triumphant chord for 128
+                    this.createComplexTone([523, 659, 784, 1047], 0.6, 'sine', 0.25);
+                    setTimeout(() => this.createComplexTone([587, 740, 880, 1175], 0.4, 'sine', 0.2), 200);
+                } else if (tileValue >= 256) {
+                    // Epic orchestral-like sound for high values
+                    this.createComplexTone([392, 523, 659, 784], 0.8, 'sine', 0.3);
+                    setTimeout(() => this.createComplexTone([440, 587, 740, 880], 0.6, 'triangle', 0.25), 300);
+                    setTimeout(() => this.createComplexTone([523, 659, 784, 1047], 0.4, 'sine', 0.2), 600);
+                } else {
+                    // Default pleasant chime
+                    const baseFreq = Math.min(600 + (tileValue / 8), 1200);
+                    this.createComplexTone([baseFreq, baseFreq * 1.25], 0.25, 'sine', 0.15);
+                }
+            }
+
+            // Special sound effect for merging to 32
+            playSpecialMerge32() {
+                // Magical sparkle effect
+                const sparkleFreqs = [1047, 1319, 1568, 1865];
+                sparkleFreqs.forEach((freq, i) => {
+                    setTimeout(() => {
+                        this.createComplexTone([freq, freq * 1.5], 0.2, 'sine', 0.2, 'sharp');
+                    }, i * 80);
+                });
+                
+                // Base harmonic
+                setTimeout(() => {
+                    this.createComplexTone([523, 659, 784], 0.5, 'triangle', 0.25);
+                }, 100);
+            }
+
+            // Special sound effect for merging to 64
+            playSpecialMerge64() {
+                // Epic rising arpeggio
+                const arpeggio = [523, 659, 784, 988, 1175, 1397];
+                arpeggio.forEach((freq, i) => {
+                    setTimeout(() => {
+                        this.createComplexTone([freq, freq * 0.5], 0.3, 'sine', 0.22);
+                    }, i * 100);
+                });
+                
+                // Final chord
+                setTimeout(() => {
+                    this.createComplexTone([523, 659, 784, 1047, 1319], 0.8, 'triangle', 0.3);
+                }, 700);
+            }
+
+            // Unique undo sound - gentle reverse/rewind effect
+            playUndo() {
+                if (!this.enabled) return;
+                // Gentle reverse swoosh with rising pitch
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.type = 'triangle'; // Changed from square to triangle for smoother sound
+                oscillator.frequency.setValueAtTime(250, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(450, this.audioContext.currentTime + 0.25);
+                
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.15, this.audioContext.currentTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.25);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.25);
+                
+                // Add a magical chime at the end
+                setTimeout(() => {
+                    this.createComplexTone([659, 784, 988], 0.2, 'sine', 0.15);
+                }, 200);
+            }
+
+            // Unique swap sound - exchange/teleport effect
+            playSwap() {
+                if (!this.enabled) return;
+                // Two-tone swap effect
+                this.createComplexTone([440, 880], 0.15, 'triangle', 0.2, 'sharp');
+                setTimeout(() => {
+                    this.createComplexTone([880, 440], 0.15, 'triangle', 0.2, 'sharp');
+                }, 150);
+                setTimeout(() => {
+                    // Confirmation chime
+                    this.createComplexTone([659, 784, 988], 0.25, 'sine', 0.18);
+                }, 300);
+            }
+
+            // Unique delete sound - smooth energy dissipation effect
+            playDelete() {
+                if (!this.enabled) return;
+                // Smooth energy dissipation sound
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.type = 'triangle'; // Changed from sawtooth to triangle for smoother sound
+                oscillator.frequency.setValueAtTime(600, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(200, this.audioContext.currentTime + 0.2);
+                
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.18, this.audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.2);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.2);
+                
+                // Add gentle sparkle effects instead of crackling
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        this.createComplexTone([800 + Math.random() * 400, 1200 + Math.random() * 400], 0.08, 'sine', 0.08, 'sharp');
+                    }, 50 + i * 40);
+                }
+            }
+
+            // Enhanced win sound - epic victory fanfare
+            playWin() {
+                if (!this.enabled) return;
+                // Victory fanfare
+                const fanfare = [
+                    [523, 659, 784], // C major
+                    [587, 740, 880], // D major
+                    [659, 831, 988], // E major
+                    [784, 988, 1175] // G major
+                ];
+                
+                fanfare.forEach((chord, i) => {
+                    setTimeout(() => {
+                        this.createComplexTone(chord, 0.4, 'sine', 0.3);
+                    }, i * 200);
+                });
+                
+                // Final triumphant chord
+                setTimeout(() => {
+                    this.createComplexTone([523, 659, 784, 1047, 1319], 1.0, 'triangle', 0.4);
+                }, 1000);
+            }
+
+            // Enhanced loss sound - dramatic descent
+            playLoss() {
+                if (!this.enabled) return;
+                // Dramatic descending sequence
+                const descent = [
+                    [523, 659, 784], // C major
+                    [466, 587, 698], // Bb major
+                    [415, 523, 622], // Ab major
+                    [349, 440, 523], // F major
+                    [294, 370, 440]  // D major
+                ];
+                
+                descent.forEach((chord, i) => {
+                    setTimeout(() => {
+                        this.createComplexTone(chord, 0.5, 'sine', 0.25);
+                    }, i * 300);
+                });
+            }
+
+            // Enhanced spawn sound - magical appearance
+            playSpawn() {
+                if (!this.enabled) return;
+                // Magical pop with sparkle
+                this.createComplexTone([1047, 1319], 0.1, 'sine', 0.12, 'sharp');
+                setTimeout(() => {
+                    this.createComplexTone([1319, 1568], 0.08, 'triangle', 0.1, 'sharp');
+                }, 80);
+            }
+
+            // Generic power-up sound (fallback)
+            playPowerUp() {
+                if (!this.enabled) return;
+                this.createComplexTone([523, 659, 784], 0.3, 'sine', 0.2);
+            }
+
+            // Toggle sound on/off
+            toggle() {
+                this.enabled = !this.enabled;
+                return this.enabled;
+            }
+
+            // Set volume (0-1)
+            setVolume(vol) {
+                this.volume = Math.max(0, Math.min(1, vol));
+            }
+        }
+
+        // Initialize game sounds
+        window.gameSounds = new GameSounds();
+
+        // Toggle game sounds function
+        window.toggleGameSounds = function(button) {
+            const isEnabled = window.gameSounds.toggle();
+            button.textContent = isEnabled ? '🔊' : '🔇';
+            button.title = isEnabled ? 'Turn Sound Off' : 'Turn Sound On';
+            
+            // Play a test sound when enabling
+            if (isEnabled && window.gameSounds) {
+                window.gameSounds.playSpawn();
+            }
+        };
+
         // Handle undo button click
         window.handleUndoClick = function(button) {
             // Check if button is disabled
             if (button.classList.contains('disabled') || window.powerUps.undo.uses <= 0) {
                 return; // Do nothing if disabled
+            }
+
+            // Play undo sound
+            if (window.gameSounds) {
+                window.gameSounds.playUndo();
             }
 
             // If no history exists, this is the issue
@@ -1342,6 +1681,11 @@
             if (button.classList.contains('disabled') || window.powerUps.swap.uses <= 0) {
                 console.log('Swap button disabled or no uses left');
                 return;
+            }
+
+            // Play swap sound
+            if (window.gameSounds) {
+                window.gameSounds.playSwap();
             }
 
             // Use one swap
@@ -2263,6 +2607,11 @@
             // Check if button is disabled
             if (button.classList.contains('disabled') || window.powerUps.delete.uses <= 0) {
                 return;
+            }
+
+            // Play delete sound
+            if (window.gameSounds) {
+                window.gameSounds.playDelete();
             }
 
             // Check if there are at least 3 tiles on the board

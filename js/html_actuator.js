@@ -69,10 +69,20 @@ HTMLActuator.prototype.addTile = function (tile) {
     window.requestAnimationFrame(function () {
       classes[2] = self.positionClass({ x: tile.x, y: tile.y });
       self.applyClasses(wrapper, classes); // Update the position
+      
+      // Play slide sound for tile movement
+      if (window.gameSounds) {
+        window.gameSounds.playSlide();
+      }
     });
   } else if (tile.mergedFrom) {
     classes.push("tile-merged");
     this.applyClasses(wrapper, classes);
+
+    // Play merge sound
+    if (window.gameSounds) {
+      window.gameSounds.playMerge(tile.value);
+    }
 
     // Render the tiles that merged
     tile.mergedFrom.forEach(function (merged) {
@@ -81,6 +91,11 @@ HTMLActuator.prototype.addTile = function (tile) {
   } else {
     classes.push("tile-new");
     this.applyClasses(wrapper, classes);
+    
+    // Play spawn sound for new tiles
+    if (window.gameSounds) {
+      window.gameSounds.playSpawn();
+    }
   }
 
   // Add the inner part of the tile to the wrapper
@@ -139,6 +154,15 @@ HTMLActuator.prototype.message = function (won) {
 
   this.messageContainer.classList.add(type);
   this.messageContainer.getElementsByTagName("p")[0].textContent = message;
+  
+  // Play win/loss sounds
+  if (window.gameSounds) {
+    if (won) {
+      window.gameSounds.playWin();
+    } else {
+      window.gameSounds.playLoss();
+    }
+  }
   
   // Show the full-screen modal for our custom game over screen
   if (!won) {
