@@ -139,10 +139,23 @@ HTMLActuator.prototype.message = function (won) {
 
   this.messageContainer.classList.add(type);
   this.messageContainer.getElementsByTagName("p")[0].textContent = message;
+  
+  // Show the full-screen modal for our custom game over screen
+  if (!won) {
+    var self = this;
+    setTimeout(function() {
+      self.messageContainer.classList.add('show-modal');
+      console.log('Game over screen shown');
+    }, 100);
+  }
 };
 
 HTMLActuator.prototype.clearMessage = function () {
   // IE only takes one value to remove at a time.
   this.messageContainer.classList.remove("game-won");
   this.messageContainer.classList.remove("game-over");
+  this.messageContainer.classList.remove("show-modal");
+  
+  // Also reset the display style for our custom full-screen modal
+  this.messageContainer.style.display = '';
 };

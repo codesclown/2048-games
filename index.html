@@ -449,12 +449,13 @@
 
             <div class="game-container">
                 <div class="game-message">
-                    <p></p>
-                    <div class="lower">
-                        <a class="keep-playing-button">Keep going</a>
-                        <div class="game-over-buttons">
-                            <button class="home-button" onclick="showScreen('homeScreen')">🏠 Home</button>
-                            <a class="retry-button">🔄 Try again</a>
+                    <div class="game-over-content">
+                        <p></p>
+                        <div class="lower">
+                            <div class="game-over-buttons">
+                                <button class="menu-button retry-button">🔄 Try again</button>
+                                <button class="menu-button secondary" id="homeBtn" onclick="console.log('🔥 ONCLICK FIRED!'); window.goToHome();">🏠 Home</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -519,20 +520,64 @@
         </div>
 
         <style>
-            /* Game Over Screen Enhancements */
+            /* Game Over Screen Enhancements - Full Screen Modal */
             .game-message {
-                background: rgba(15, 15, 35, 0.95) !important;
-                backdrop-filter: blur(10px);
-                border: 2px solid rgba(255, 215, 0, 0.2);
-                border-radius: 12px;
-                margin: 10px;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                background: rgba(15, 15, 35, 0.4) !important;
+                backdrop-filter: blur(15px) !important;
+                -webkit-backdrop-filter: blur(15px) !important;
+                z-index: 9999 !important;
+                display: none !important; /* Hidden by default */
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                margin: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+            }
+            
+            /* Show when game over modal is active */
+            .game-message.show-modal {
+                display: flex !important;
+            }
+            
+            /* Game Over Content Container */
+            .game-over-content {
+                background: linear-gradient(135deg, rgba(26, 26, 58, 0.75), rgba(15, 15, 35, 0.75)) !important;
+                border: 2px solid rgba(255, 215, 0, 0.3) !important;
+                border-radius: 20px !important;
+                padding: 40px 30px !important;
+                text-align: center !important;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+                backdrop-filter: blur(10px) !important;
+                max-width: 400px !important;
+                width: 90% !important;
+                animation: gameOverSlideIn 0.5s ease-out !important;
+                pointer-events: auto !important;
+                z-index: 10000 !important;
+            }
+            
+            @keyframes gameOverSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-50px) scale(0.9);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
             }
             
             .game-message p {
                 color: #e6e6fa !important;
-                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+                text-shadow: 0 4px 8px rgba(0, 0, 0, 0.7) !important;
                 font-size: 48px !important;
-                margin-top: 180px !important;
+                margin: 0 0 30px 0 !important;
+                font-weight: bold !important;
             }
             
             .game-message.game-won p {
@@ -545,7 +590,17 @@
             
             .game-message.game-over p {
                 color: #ff6b6b !important;
-                text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+                text-shadow: 0 0 30px rgba(255, 107, 107, 0.8) !important;
+                animation: pulse-red 2s ease-in-out infinite alternate !important;
+            }
+            
+            @keyframes pulse-red {
+                from {
+                    text-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+                }
+                to {
+                    text-shadow: 0 0 40px rgba(255, 107, 107, 1);
+                }
             }
             
             .game-over-buttons {
@@ -553,94 +608,51 @@
                 gap: 15px;
                 justify-content: center;
                 align-items: center;
-                flex-wrap: wrap;
+                flex-direction: column;
+                margin-top: 20px;
+                pointer-events: auto !important;
+                z-index: 10000 !important;
             }
             
-            .home-button {
-                display: inline-block;
-                background: linear-gradient(135deg, #667eea, #764ba2);
-                border: none;
-                border-radius: 8px;
-                padding: 12px 20px;
-                text-decoration: none;
-                color: #ffffff;
-                font-size: 16px;
-                font-weight: bold;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-                min-width: 120px;
-                text-align: center;
+            .game-over-buttons button {
+                pointer-events: auto !important;
+                z-index: 10001 !important;
+                cursor: pointer !important;
+                position: relative !important;
             }
             
-            .home-button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-                background: linear-gradient(135deg, #5a6fd8, #6a42a0);
-            }
-            
-            .retry-button {
-                background: linear-gradient(135deg, #ffd700, #ffb347) !important;
-                color: #1a1a3a !important;
-                border-radius: 8px !important;
-                padding: 12px 20px !important;
-                font-size: 16px !important;
-                font-weight: bold !important;
-                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4) !important;
-                min-width: 120px !important;
-                text-align: center !important;
-                transition: all 0.3s ease !important;
-            }
-            
-            .retry-button:hover {
-                transform: translateY(-2px) !important;
-                box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5) !important;
-                background: linear-gradient(135deg, #ffdc00, #ffc107) !important;
-            }
-            
-            .keep-playing-button {
-                background: linear-gradient(135deg, #43e97b, #38f9d7) !important;
-                color: #ffffff !important;
-                border-radius: 8px !important;
-                padding: 12px 20px !important;
-                font-size: 16px !important;
-                font-weight: bold !important;
-                box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4) !important;
-                min-width: 140px !important;
-                text-align: center !important;
-                transition: all 0.3s ease !important;
-                margin-bottom: 15px !important;
-            }
-            
-            .keep-playing-button:hover {
-                transform: translateY(-2px) !important;
-                box-shadow: 0 6px 20px rgba(67, 233, 123, 0.5) !important;
-                background: linear-gradient(135deg, #33d96b, #28e9c7) !important;
+            /* Make sure buttons are always clickable */
+            .game-message.show-modal .game-over-buttons button {
+                pointer-events: auto !important;
+                cursor: pointer !important;
             }
             
             /* Mobile Responsive for Game Over */
             @media screen and (max-width: 520px) {
+                .game-over-content {
+                    padding: 30px 20px !important;
+                    max-width: 350px !important;
+                }
+                
                 .game-message p {
-                    font-size: 32px !important;
-                    margin-top: 100px !important;
+                    font-size: 36px !important;
+                    margin-bottom: 25px !important;
                 }
                 
                 .game-over-buttons {
-                    flex-direction: column;
-                    gap: 10px;
+                    gap: 12px;
+                }
+            }
+            
+            /* Extra small screens */
+            @media screen and (max-width: 380px) {
+                .game-over-content {
+                    padding: 25px 15px !important;
+                    max-width: 320px !important;
                 }
                 
-                .home-button, .retry-button {
-                    font-size: 14px !important;
-                    padding: 10px 16px !important;
-                    min-width: 100px !important;
-                }
-                
-                .keep-playing-button {
-                    font-size: 14px !important;
-                    padding: 10px 16px !important;
-                    min-width: 120px !important;
-                    margin-bottom: 10px !important;
+                .game-message p {
+                    font-size: 32px !important;
                 }
             }
         </style>
@@ -684,12 +696,24 @@
     <script>
         // Screen Management
         function showScreen(screenId) {
+            console.log('📺 showScreen called with:', screenId);
+            
             // Hide all screens
             document.querySelectorAll('.screen').forEach(screen => {
+                console.log('  - Hiding screen:', screen.id);
                 screen.classList.remove('active');
             });
+            
             // Show target screen
-            document.getElementById(screenId).classList.add('active');
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                console.log('✅ Activated screen:', screenId);
+                console.log('  - Screen classes:', targetScreen.className);
+                console.log('  - Screen display:', window.getComputedStyle(targetScreen).display);
+            } else {
+                console.log('❌ Target screen not found:', screenId);
+            }
         }
 
         // Mobile Menu Functions
@@ -2273,25 +2297,138 @@
         // Add click animation to mobile refresh button
         document.addEventListener('DOMContentLoaded', function() {
             const refreshBtn = document.querySelector('.mobile-refresh-btn');
-            console.log('Refresh button found:', refreshBtn);
             if (refreshBtn) {
                 refreshBtn.addEventListener('click', function() {
-                    console.log('Refresh button clicked');
                     // Add spinning animation
                     this.classList.add('spinning');
-                    console.log('Added spinning class');
                     
                     // Remove animation class after animation completes
                     setTimeout(() => {
                         this.classList.remove('spinning');
-                        console.log('Removed spinning class');
                     }, 1000);
                 });
             }
+
+            // Initialize counters when page loads
+            setTimeout(updateButtonTitles, 500);
         });
 
         function showHome() {
             showScreen('homeScreen');
+        }
+
+        // Global function to go to home from game over screen
+        window.goToHome = function() {
+            console.log('🏠 goToHome function called!');
+            
+            // Check if home screen exists
+            const homeScreen = document.getElementById('homeScreen');
+            console.log('🏠 Home screen element:', homeScreen);
+            
+            if (!homeScreen) {
+                console.log('❌ Home screen element not found! Available screens:');
+                document.querySelectorAll('[id*="Screen"]').forEach(screen => {
+                    console.log('  - Found screen:', screen.id);
+                });
+            }
+            
+            // Hide game over modal
+            const gameMessage = document.querySelector('.game-message');
+            if (gameMessage) {
+                gameMessage.classList.remove('show-modal');
+                gameMessage.classList.remove('game-over');
+                gameMessage.style.display = 'none';
+                console.log('✅ Game over screen hidden');
+            }
+            
+            // Check if showScreen function exists
+            console.log('🔍 showScreen function:', typeof showScreen);
+            
+            // Try to show home screen
+            try {
+                showScreen('homeScreen');
+                console.log('✅ showScreen called successfully');
+                
+                // Verify the screen changed
+                setTimeout(() => {
+                    const activeScreen = document.querySelector('.screen.active');
+                    console.log('🎯 Currently active screen:', activeScreen ? activeScreen.id : 'none');
+                }, 100);
+                
+            } catch (error) {
+                console.log('❌ Error calling showScreen:', error);
+            }
+        };
+
+        // Add comprehensive debugging
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM loaded - setting up debugging');
+            
+            // Track ALL clicks on the document
+            document.addEventListener('click', function(e) {
+                console.log('🖱️ CLICK DETECTED:');
+                console.log('  - Target:', e.target);
+                console.log('  - Target ID:', e.target.id);
+                console.log('  - Target classes:', e.target.className);
+                console.log('  - Target text:', e.target.textContent);
+                console.log('  - Event phase:', e.eventPhase);
+                console.log('  - Bubbles:', e.bubbles);
+                console.log('  - Cancelable:', e.cancelable);
+                
+                // Check if it's our home button
+                if (e.target.id === 'homeBtn' || e.target.textContent.includes('Home')) {
+                    console.log('🎯 HOME BUTTON DETECTED!');
+                    console.log('  - Button element:', e.target);
+                    console.log('  - Button onclick:', e.target.onclick);
+                    console.log('  - Button disabled:', e.target.disabled);
+                    console.log('  - Button style:', e.target.style.cssText);
+                }
+            }, true); // Capture phase
+            
+            // Also track mousedown
+            document.addEventListener('mousedown', function(e) {
+                if (e.target.id === 'homeBtn' || e.target.textContent.includes('Home')) {
+                    console.log('🖱️ MOUSEDOWN on home button');
+                }
+            }, true);
+            
+            // Track when game over screen becomes visible
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        const target = mutation.target;
+                        if (target.classList.contains('show-modal')) {
+                            console.log('👁️ Game over modal is now visible');
+                            
+                            // Check if home button exists and is clickable
+                            setTimeout(function() {
+                                const homeBtn = document.getElementById('homeBtn');
+                                if (homeBtn) {
+                                    console.log('✅ Home button found:', homeBtn);
+                                    console.log('  - Onclick handler:', homeBtn.onclick);
+                                    console.log('  - Computed style:', window.getComputedStyle(homeBtn));
+                                    console.log('  - Pointer events:', window.getComputedStyle(homeBtn).pointerEvents);
+                                    console.log('  - Z-index:', window.getComputedStyle(homeBtn).zIndex);
+                                    console.log('  - Position:', window.getComputedStyle(homeBtn).position);
+                                } else {
+                                    console.log('❌ Home button NOT found');
+                                }
+                            }, 200);
+                        }
+                    }
+                });
+            });
+            
+            // Observe the game message element
+            const gameMessage = document.querySelector('.game-message');
+            if (gameMessage) {
+                observer.observe(gameMessage, { attributes: true });
+                console.log('👁️ Observer attached to game message');
+            }
+        });
+
+        function hideGameOverAndGoHome() {
+            window.goToHome();
         }
 
         function showGame() {
