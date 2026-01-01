@@ -743,6 +743,145 @@
             }, 2000);
         };
 
+        // Game state history for undo functionality
+        window.gameStateHistory = [];
+        const MAX_HISTORY = 5; // Keep last 5 moves for undo
+
+        // Save current game state for undo (with duplicate prevention)
+        function saveGameState() {
+            if (window.gameManager) {
+                const currentState = {
+                    grid: window.gameManager.grid.serialize(),
+                    score: window.gameManager.score,
+                    over: window.gameManager.over,
+                    won: window.gameManager.won,
+                    keepPlaying: window.gameManager.keepPlaying
+                };
+                
+                // Check if this state is different from the last saved state
+                const lastState = window.gameStateHistory[window.gameStateHistory.length - 1];
+                if (lastState) {
+                    // Compare states to avoid duplicates
+                    if (lastState.score === currentState.score && 
+                        JSON.stringify(lastState.grid) === JSON.stringify(currentState.grid)) {
+                        console.log('Duplicate state detected, not saving');
+                        return;
+                    }
+                }
+                
+                window.gameStateHistory.push(currentState);
+                
+                // Keep only last MAX_HISTORY states
+                if (window.gameStateHistory.length > MAX_HISTORY) {
+                    window.gameStateHistory.shift();
+                }
+                
+                console.log('Game state saved, history length:', window.gameStateHistory.length);
+            }
+        }
+
+        // Restore previous game state for undo with smooth animations
+        function restoreGameState() {
+            if (window.gameStateHistory.length > 0 && window.gameManager) {
+                const previousState = window.gameStateHistory.pop();
+                
+                console.log('Restoring game state, remaining history:', window.gameStateHistory.length);
+                
+                // Store current tile positions for reverse animation
+                const currentTiles = new Map();
+                window.gameManager.grid.eachCell(function(x, y, tile) {
+                    if (tile) {
+                        const key = `${tile.value}-${x}-${y}`;
+                        currentTiles.set(key, {
+                            tile: tile,
+                            x: x,
+                            y: y,
+                            value: tile.value
+                        });
+                    }
+                });
+                
+                // Create new grid from previous state
+                const newGrid = new Grid(previousState.grid.size, previousState.grid.cells);
+                
+                // Set up reverse animations by comparing current and previous positions
+                newGrid.eachCell(function(x, y, tile) {
+                    if (tile) {
+                        // Look for this tile in current state
+                        let foundCurrentTile = null;
+                        currentTiles.forEach((currentTile, key) => {
+                            if (currentTile.value === tile.value && !foundCurrentTile) {
+                                foundCurrentTile = currentTile;
+                                currentTiles.delete(key); // Remove so it's not used again
+                            }
+                        });
+                        
+                        if (foundCurrentTile) {
+                            // Set the tile's previous position to where it currently is
+                            tile.previousPosition = {
+                                x: foundCurrentTile.x,
+                                y: foundCurrentTile.y
+                            };
+                        } else {
+                            // This tile is appearing - set a random previous position for fade-in effect
+                            const remainingTiles = Array.from(currentTiles.values());
+                            if (remainingTiles.length > 0) {
+                                const randomTile = remainingTiles[Math.floor(Math.random() * remainingTiles.length)];
+                                tile.previousPosition = {
+                                    x: randomTile.x,
+                                    y: randomTile.y
+                                };
+                            }
+                        }
+                    }
+                });
+                
+                // Apply the new state
+                window.gameManager.grid = newGrid;
+                window.gameManager.score = previousState.score;
+                window.gameManager.over = previousState.over;
+                window.gameManager.won = previousState.won;
+                window.gameManager.keepPlaying = previousState.keepPlaying;
+                
+                // Prepare tiles for animation
+                window.gameManager.prepareTiles();
+                
+                // Update display with animations
+                window.gameManager.actuate();
+                
+                return true;
+            }
+            console.log('No game state to restore');
+            return false;
+        }
+
+        // Hook into game moves to save state before each move
+        function hookGameMoves() {
+            if (window.gameManager && window.gameManager.inputManager) {
+                // Use only the input manager hook (most reliable)
+                const originalEmit = window.gameManager.inputManager.emit;
+                window.gameManager.inputManager.emit = function(event, data) {
+                    if (event === 'move' && !window.gameManager.isGameTerminated()) {
+                        // Save state before move
+                        saveGameState();
+                        console.log('State saved before move (input manager), history length:', window.gameStateHistory.length);
+                    }
+                    return originalEmit.call(this, event, data);
+                };
+                console.log('Input manager events hooked');
+                
+                // Save initial state if we don't have any history yet
+                if (window.gameStateHistory.length === 0) {
+                    setTimeout(() => {
+                        saveGameState();
+                        console.log('Initial state saved in hookGameMoves');
+                    }, 100);
+                }
+            } else {
+                console.log('Game manager or input manager not ready for hooking moves');
+            }
+        }
+
         // Power-up usage tracking with max limits
         window.powerUps = {
             undo: { 
@@ -770,7 +909,17 @@
             window.powerUps.undo.uses = 2;
             window.powerUps.swap.uses = 1;
             window.powerUps.delete.uses = 0;
+            // Clear undo history on new game
+            window.gameStateHistory = [];
             updateButtonTitles();
+            
+            // Save initial game state after a short delay to ensure game is fully initialized
+            setTimeout(() => {
+                if (window.gameManager) {
+                    saveGameState();
+                    console.log('Initial game state saved after reset');
+                }
+            }, 100);
         }
 
         // Update button titles and counters to show current usage
@@ -861,11 +1010,43 @@
                     originalRestart.call(this);
                     resetPowerUps();
                 };
+                console.log('Game restart hooked');
+            } else {
+                console.log('Game manager not ready for hooking restart');
             }
+            // Also hook into moves for undo functionality
+            hookGameMoves();
         }
 
-        // Call hook when game manager is available
-        setTimeout(hookGameRestart, 1000);
+        // Try to hook multiple times to ensure it works
+        function tryHookGame() {
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            const hookInterval = setInterval(() => {
+                attempts++;
+                console.log(`Hook attempt ${attempts}`);
+                
+                if (window.gameManager) {
+                    hookGameRestart();
+                    clearInterval(hookInterval);
+                    console.log('Successfully hooked game manager');
+                    
+                    // Save initial game state
+                    setTimeout(() => {
+                        saveGameState();
+                        console.log('Initial game state saved on hook');
+                    }, 200);
+                    
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(hookInterval);
+                    console.log('Failed to hook game manager after', maxAttempts, 'attempts');
+                }
+            }, 500);
+        }
+
+        // Try to hook the game manager
+        tryHookGame();
         
         // Initialize counters when page loads
         setTimeout(updateButtonTitles, 500);
@@ -874,7 +1055,20 @@
         window.handleUndoClick = function(button) {
             // Check if button is disabled
             if (button.classList.contains('disabled') || window.powerUps.undo.uses <= 0) {
+                console.log('Undo button disabled or no uses left');
                 return; // Do nothing if disabled
+            }
+
+            console.log('Undo button clicked, history length:', window.gameStateHistory.length);
+            console.log('Current game state - Score:', window.gameManager?.score, 'Over:', window.gameManager?.over);
+
+            // If no history exists, this is the issue
+            if (window.gameStateHistory.length === 0) {
+                console.log('No history found - this is why first undo fails');
+                console.log('Saving current state as emergency backup');
+                // Save current state as emergency backup, but don't use the undo
+                saveGameState();
+                return;
             }
 
             // Add undo animation
@@ -884,17 +1078,31 @@
             window.powerUps.undo.uses--;
             updateButtonTitles();
             
+            // Add a slight delay to make the undo feel more deliberate
             setTimeout(() => {
-                // TODO: Implement actual undo functionality
-                alert(`UNDO used! ${window.powerUps.undo.uses} uses left\nMake a ${window.powerUps.undo.requiredTile} tile to get more uses`);
+                // Restore previous game state with animations
+                const undoSuccessful = restoreGameState();
                 
-                // Check if player earned more uses
-                if (checkForTileReward(window.powerUps.undo.requiredTile, 'undo')) {
-                    alert(`You made a ${window.powerUps.undo.requiredTile} tile! +1 Undo use earned! (${window.powerUps.undo.uses}/${window.powerUps.undo.maxUses})`);
+                if (!undoSuccessful) {
+                    // If undo failed, refund the use
+                    window.powerUps.undo.uses++;
+                    updateButtonTitles();
+                    console.log('Undo failed, use refunded');
+                } else {
+                    console.log('Undo successful');
                 }
                 
+                // Check if player earned more uses
+                checkForTileReward(window.powerUps.undo.requiredTile, 'undo');
+                
                 button.classList.remove('undoing');
-            }, 400);
+            }, 200); // Reduced delay for better responsiveness
+        };
+
+        // Manual function to save current state (for testing)
+        window.manualSaveState = function() {
+            saveGameState();
+            console.log('Manual state save, history length:', window.gameStateHistory.length);
         };
 
         // Handle swap tiles button click
@@ -922,6 +1130,9 @@
                     });
                     
                     if (tiles.length >= 2) {
+                        // Save state before swap for potential undo
+                        saveGameState();
+                        
                         // Swap two random tiles
                         const tile1 = tiles[Math.floor(Math.random() * tiles.length)];
                         let tile2 = tiles[Math.floor(Math.random() * tiles.length)];
@@ -937,20 +1148,20 @@
                         // Update the display
                         window.gameManager.actuate();
                         
-                        alert(`SWAP TWO TILES used! ${window.powerUps.swap.uses} uses left\nSwapped tiles with values ${tile2.tile.value} and ${tile1.tile.value}`);
+                        console.log('Swapped tiles:', tile1.tile.value, 'and', tile2.tile.value);
                     } else {
-                        alert('Need at least 2 tiles to swap!');
-                        window.powerUps.swap.uses++; // Refund the use
+                        // Refund the use if not enough tiles
+                        window.powerUps.swap.uses++;
                         updateButtonTitles();
                     }
                 } else {
-                    alert(`SWAP TWO TILES used! ${window.powerUps.swap.uses} uses left`);
+                    // Refund the use if game manager not available
+                    window.powerUps.swap.uses++;
+                    updateButtonTitles();
                 }
                 
                 // Check if player earned more uses
-                if (checkForTileReward(window.powerUps.swap.requiredTile, 'swap')) {
-                    alert(`You made a ${window.powerUps.swap.requiredTile} tile! +1 Swap use earned! (${window.powerUps.swap.uses}/${window.powerUps.swap.maxUses})`);
-                }
+                checkForTileReward(window.powerUps.swap.requiredTile, 'swap');
                 
                 button.classList.remove('replacing');
             }, 500);
@@ -981,35 +1192,34 @@
                     });
                     
                     if (tileValues.size > 0) {
+                        // Save state before delete for potential undo
+                        saveGameState();
+                        
                         const valuesArray = Array.from(tileValues).sort((a, b) => a - b);
                         const valueToDelete = valuesArray[Math.floor(Math.random() * valuesArray.length)];
                         
                         // Delete all tiles with this value
-                        let deletedCount = 0;
                         window.gameManager.grid.eachCell(function(x, y, tile) {
                             if (tile && tile.value === valueToDelete) {
                                 window.gameManager.grid.removeTile(tile);
-                                deletedCount++;
                             }
                         });
                         
                         // Update the display
                         window.gameManager.actuate();
-                        
-                        alert(`DELETE TILES BY NUMBER used! ${window.powerUps.delete.uses} uses left\nDeleted ${deletedCount} tiles with value ${valueToDelete}`);
                     } else {
-                        alert('No tiles to delete!');
-                        window.powerUps.delete.uses++; // Refund the use
+                        // Refund the use if no tiles to delete
+                        window.powerUps.delete.uses++;
                         updateButtonTitles();
                     }
                 } else {
-                    alert(`DELETE TILES BY NUMBER used! ${window.powerUps.delete.uses} uses left`);
+                    // Refund the use if game manager not available
+                    window.powerUps.delete.uses++;
+                    updateButtonTitles();
                 }
                 
                 // Check if player earned more uses
-                if (checkForTileReward(window.powerUps.delete.requiredTile, 'delete')) {
-                    alert(`You made a ${window.powerUps.delete.requiredTile} tile! +1 Delete use earned! (${window.powerUps.delete.uses}/${window.powerUps.delete.maxUses})`);
-                }
+                checkForTileReward(window.powerUps.delete.requiredTile, 'delete');
                 
                 button.classList.remove('pulsing');
             }, 400);
