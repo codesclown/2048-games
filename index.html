@@ -1748,7 +1748,7 @@
             tileSelectionMode.start();
         }
 
-        // Simple function to show selection messages
+        // Premium inline message notification system
         function showSelectionMessage(message) {
             console.log('📢 Message:', message);
             
@@ -1757,23 +1757,197 @@
             if (!messageEl) {
                 messageEl = document.createElement('div');
                 messageEl.id = 'selection-message';
-                messageEl.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: rgba(255, 215, 0, 0.95);
-                    color: #1a1a3a;
-                    padding: 12px 24px;
-                    border-radius: 8px;
-                    font-weight: bold;
-                    z-index: 1500;
-                    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-                `;
                 document.body.appendChild(messageEl);
+                
+                // Add premium animation styles if not already added
+                if (!document.getElementById('premium-notification-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'premium-notification-styles';
+                    style.textContent = `
+                        @keyframes premiumSlideIn {
+                            0% {
+                                opacity: 0;
+                                transform: translateX(-50%) translateY(-20px) scale(0.95);
+                                filter: blur(5px);
+                            }
+                            100% {
+                                opacity: 1;
+                                transform: translateX(-50%) translateY(0) scale(1);
+                                filter: blur(0px);
+                            }
+                        }
+                        @keyframes premiumPulse {
+                            0%, 100% {
+                                box-shadow: 
+                                    0 8px 32px rgba(0, 0, 0, 0.3),
+                                    0 4px 16px rgba(45, 27, 105, 0.4),
+                                    0 0 0 1px rgba(255, 255, 255, 0.1),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                            }
+                            50% {
+                                box-shadow: 
+                                    0 12px 40px rgba(0, 0, 0, 0.4),
+                                    0 6px 24px rgba(45, 27, 105, 0.5),
+                                    0 0 0 1px rgba(255, 255, 255, 0.15),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+                            }
+                        }
+                        @keyframes successGlow {
+                            0% {
+                                box-shadow: 
+                                    0 8px 32px rgba(0, 0, 0, 0.3),
+                                    0 4px 16px rgba(67, 233, 123, 0.4),
+                                    0 0 0 1px rgba(67, 233, 123, 0.3),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                            }
+                            100% {
+                                box-shadow: 
+                                    0 12px 40px rgba(0, 0, 0, 0.4),
+                                    0 6px 24px rgba(67, 233, 123, 0.6),
+                                    0 0 0 1px rgba(67, 233, 123, 0.5),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+                            }
+                        }
+                        @keyframes spinLoader {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
             }
-            messageEl.textContent = message;
-            messageEl.style.display = 'block';
+            
+            // Base premium styling
+            messageEl.style.cssText = `
+                position: fixed;
+                top: 25px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, rgba(15, 15, 35, 0.95), rgba(25, 25, 55, 0.95), rgba(35, 35, 75, 0.98));
+                backdrop-filter: blur(20px) saturate(1.4);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-radius: 16px;
+                padding: 16px 28px;
+                font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+                font-size: 15px;
+                font-weight: 600;
+                color: #ffffff;
+                z-index: 1500;
+                box-shadow: 
+                    0 8px 32px rgba(0, 0, 0, 0.3),
+                    0 4px 16px rgba(15, 15, 35, 0.6),
+                    0 0 0 1px rgba(255, 255, 255, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+                letter-spacing: 0.3px;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                animation: premiumSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 20px;
+                max-width: 90vw;
+            `;
+            
+            // Customize styling based on message content
+            if (message.includes('Swapping')) {
+                // Processing state - blue theme with spinner
+                messageEl.style.background = 'linear-gradient(135deg, rgba(15, 25, 45, 0.95), rgba(25, 35, 65, 0.95), rgba(35, 45, 85, 0.98))';
+                messageEl.style.borderColor = 'rgba(79, 172, 254, 0.3)';
+                messageEl.style.animation = 'premiumPulse 2s ease-in-out infinite';
+                messageEl.innerHTML = `
+                    <div style="
+                        width: 16px; 
+                        height: 16px; 
+                        border: 2px solid rgba(79, 172, 254, 0.3);
+                        border-top: 2px solid #4facfe;
+                        border-radius: 50%; 
+                        animation: spinLoader 1s linear infinite;
+                        margin-right: 10px;
+                        flex-shrink: 0;
+                    "></div>
+                    <span style="
+                        color: #ffffff;
+                        font-weight: 600;
+                        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+                    ">${message}</span>
+                `;
+            } else if (message.includes('second')) {
+                // Second tile selection - purple theme
+                messageEl.style.background = 'linear-gradient(135deg, rgba(25, 15, 35, 0.95), rgba(45, 25, 55, 0.95), rgba(65, 35, 75, 0.98))';
+                messageEl.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+                messageEl.innerHTML = `
+                    <div style="
+                        width: 8px;
+                        height: 8px;
+                        background: linear-gradient(45deg, #667eea, #764ba2);
+                        border-radius: 50%;
+                        margin-right: 8px;
+                        box-shadow: 0 0 8px rgba(102, 126, 234, 0.6);
+                    "></div>
+                    <span style="color: #e6e6fa;">${message}</span>
+                `;
+            } else if (message.includes('first')) {
+                // First tile selection - gold theme
+                messageEl.style.background = 'linear-gradient(135deg, rgba(35, 25, 15, 0.95), rgba(55, 45, 25, 0.95), rgba(75, 65, 35, 0.98))';
+                messageEl.style.borderColor = 'rgba(255, 215, 0, 0.3)';
+                messageEl.innerHTML = `
+                    <div style="
+                        width: 6px;
+                        height: 6px;
+                        background: #ffd700;
+                        border-radius: 50%;
+                        margin-right: 8px;
+                        box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+                    "></div>
+                    <span style="color: #fff8dc;">${message}</span>
+                `;
+            } else if (message.includes('swapped')) {
+                // Success state - green theme
+                messageEl.style.background = 'linear-gradient(135deg, rgba(15, 35, 25, 0.95), rgba(25, 55, 35, 0.95), rgba(35, 75, 45, 0.98))';
+                messageEl.style.borderColor = 'rgba(67, 233, 123, 0.4)';
+                messageEl.style.animation = 'successGlow 1s ease-in-out';
+                messageEl.innerHTML = `
+                    <div style="
+                        width: 18px;
+                        height: 18px;
+                        background: linear-gradient(45deg, #43e97b, #38f9d7);
+                        border-radius: 50%;
+                        margin-right: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        box-shadow: 0 0 10px rgba(67, 233, 123, 0.6);
+                        font-size: 10px;
+                        color: white;
+                        font-weight: bold;
+                    ">✓</div>
+                    <span style="
+                        color: #ffffff;
+                        font-weight: 600;
+                        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+                    ">${message}</span>
+                `;
+                
+                // Auto-hide success message
+                setTimeout(() => {
+                    if (messageEl) {
+                        messageEl.style.opacity = '0';
+                        messageEl.style.transform = 'translateX(-50%) translateY(-20px) scale(0.95)';
+                        setTimeout(() => {
+                            if (messageEl && messageEl.parentNode) {
+                                messageEl.remove();
+                            }
+                        }, 300);
+                    }
+                }, 2000);
+            } else {
+                // Default state
+                messageEl.innerHTML = `<span>${message}</span>`;
+            }
+            
+            messageEl.style.display = 'flex';
         }
 
         // Function to hide selection message
