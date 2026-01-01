@@ -31,6 +31,41 @@
             display: block;
         }
 
+        /* Tile Selection Animation */
+        @keyframes pulse {
+            0% { 
+                box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+                transform: scale(1.05);
+            }
+            50% { 
+                box-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff;
+                transform: scale(1.08);
+            }
+            100% { 
+                box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+                transform: scale(1.05);
+            }
+        }
+
+        /* Tile Selection Highlighting Classes - More Specific */
+        .tile-container .tile.tile-selected {
+            border: 4px solid #00ffff !important;
+            box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff !important;
+            z-index: 1000 !important;
+            outline: 2px solid #00ffff !important;
+            outline-offset: 2px !important;
+            background: rgba(0, 255, 255, 0.3) !important;
+            transform: scale(1.05) !important;
+            animation: pulse 1s infinite !important;
+            position: relative !important;
+        }
+
+        .tile-container .tile.tile-selected .tile-inner {
+            border: 2px solid #00ffff !important;
+            box-shadow: 0 0 15px #00ffff, 0 4px 15px rgba(0, 255, 255, 0.5) !important;
+            background: rgba(0, 255, 255, 0.2) !important;
+        }
+
         /* Loading Screen Styles */
         .loading-screen {
             display: flex;
@@ -1105,67 +1140,649 @@
             console.log('Manual state save, history length:', window.gameStateHistory.length);
         };
 
+        // Debug function to inspect grid state
+        window.debugGrid = function() {
+            if (!window.gameManager || !window.gameManager.grid) {
+                console.log('❌ Game manager or grid not available');
+                return;
+            }
+            
+            console.log('🔍 Grid Debug Info:');
+            console.log('🔍 Grid size:', window.gameManager.grid.size);
+            
+            window.gameManager.grid.eachCell(function(x, y, tile) {
+                if (tile) {
+                    console.log(`🔍 Cell (${x},${y}): value=${tile.value}, tilePos=(${tile.x},${tile.y})`);
+                }
+            });
+            
+            // Also check DOM tiles
+            const domTiles = document.querySelectorAll('.tile');
+            console.log('🔍 DOM tiles found:', domTiles.length);
+            domTiles.forEach((tile, index) => {
+                const classes = Array.from(tile.classList);
+                const value = tile.querySelector('.tile-inner')?.textContent || '?';
+                const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                console.log(`🔍 DOM Tile ${index}: value=${value}, classes=${positionClass}`);
+            });
+        };
+
+        // Check if any tiles are currently highlighted
+        window.checkHighlighted = function() {
+            const highlightedTiles = document.querySelectorAll('.currently-highlighted');
+            console.log('🔍 Currently highlighted tiles:', highlightedTiles.length);
+            
+            highlightedTiles.forEach((tile, index) => {
+                const tileInner = tile.querySelector('.tile-inner');
+                console.log(`🔍 Highlighted tile ${index}:`, {
+                    classes: Array.from(tile.classList),
+                    mainBackground: tile.style.background,
+                    innerBackground: tileInner ? tileInner.style.background : 'none'
+                });
+            });
+            
+            return highlightedTiles.length;
+        };
+
+        // Test highlighting function with premium thin neon border
+        window.testHighlight = function() {
+            console.log('🧪 Testing PREMIUM THIN NEON BORDER...');
+            
+            const tiles = document.querySelectorAll('.tile');
+            if (tiles.length === 0) {
+                console.log('❌ No tiles found');
+                return;
+            }
+            
+            const firstTile = tiles[0];
+            const tileInner = firstTile.querySelector('.tile-inner');
+            
+            console.log('🧪 Applying premium thin neon border...');
+            
+            // Apply thin neon border to main tile
+            firstTile.style.setProperty('border', '2px solid #00ffff', 'important');
+            firstTile.style.setProperty('box-shadow', '0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 15px rgba(0, 255, 255, 0.1)', 'important');
+            firstTile.style.setProperty('z-index', '1000', 'important');
+            
+            // Apply subtle thin border to tile-inner
+            if (tileInner) {
+                tileInner.style.setProperty('border', '1px solid rgba(0, 255, 255, 0.8)', 'important');
+                tileInner.style.setProperty('box-shadow', 'inset 0 0 10px rgba(0, 255, 255, 0.2), 0 0 8px rgba(0, 255, 255, 0.4)', 'important');
+            }
+            
+            console.log('✅ Applied PREMIUM THIN NEON BORDER - elegant and refined!');
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                firstTile.style.removeProperty('border');
+                firstTile.style.removeProperty('box-shadow');
+                firstTile.style.removeProperty('z-index');
+                
+                if (tileInner) {
+                    tileInner.style.removeProperty('border');
+                    tileInner.style.removeProperty('box-shadow');
+                }
+                
+                console.log('🧪 Premium thin neon border removed');
+            }, 3000);
+        };
+
+        // Simple click test function
+        window.testClicks = function() {
+            console.log('🧪 Testing click detection...');
+            
+            const gameContainer = document.querySelector('.game-container');
+            if (!gameContainer) {
+                console.log('❌ Game container not found');
+                return;
+            }
+            
+            // Add a simple test listener
+            gameContainer.addEventListener('click', function(event) {
+                console.log('🧪 TEST CLICK DETECTED!');
+                console.log('🧪 Target:', event.target);
+                console.log('🧪 Classes:', Array.from(event.target.classList));
+            }, true);
+            
+            console.log('✅ Test click listener added');
+            console.log('✅ Now click anywhere in the game area');
+        };
+
+        // Manual test function to force a swap
+        window.forceSwap = function() {
+            console.log('🧪 Force swap test starting...');
+            
+            // Find first two tiles in DOM
+            const tiles = document.querySelectorAll('.tile');
+            if (tiles.length < 2) {
+                console.log('❌ Need at least 2 tiles');
+                return;
+            }
+            
+            console.log('🧪 Found', tiles.length, 'tiles');
+            
+            // Start selection mode if not active
+            if (!tileSelectionMode.active) {
+                tileSelectionMode.start();
+            }
+            
+            // Clear any existing selection
+            tileSelectionMode.selectedTiles = [];
+            
+            // Select first two tiles
+            const tile1 = tiles[0];
+            const tile2 = tiles[1];
+            
+            const value1 = tile1.querySelector('.tile-inner')?.textContent || '?';
+            const value2 = tile2.querySelector('.tile-inner')?.textContent || '?';
+            
+            console.log('🧪 Force selecting tiles:', value1, 'and', value2);
+            
+            // Manually add to selection
+            tileSelectionMode.selectedTiles = [
+                { element: tile1, value: value1 },
+                { element: tile2, value: value2 }
+            ];
+            
+            // Add highlighting
+            tile1.style.setProperty('border', '4px solid #00ffff', 'important');
+            tile1.style.setProperty('box-shadow', '0 0 20px #00ffff', 'important');
+            tile2.style.setProperty('border', '4px solid #00ffff', 'important');
+            tile2.style.setProperty('box-shadow', '0 0 20px #00ffff', 'important');
+            
+            console.log('🧪 Calling performSwap directly...');
+            tileSelectionMode.performSwap();
+        };
+
+        // Test function for swap (for debugging)
+        window.testSwap = function() {
+            console.log('🧪 Testing swap functionality...');
+            
+            if (!window.gameManager || !window.gameManager.grid) {
+                console.log('❌ Game not ready');
+                return;
+            }
+            
+            // Find first two tiles
+            let tiles = [];
+            window.gameManager.grid.eachCell(function(x, y, tile) {
+                if (tile && tiles.length < 2) {
+                    tiles.push({tile: tile, pos: {x: x, y: y}});
+                }
+            });
+            
+            if (tiles.length < 2) {
+                console.log('❌ Need at least 2 tiles to test swap');
+                return;
+            }
+            
+            console.log('🧪 Before swap:');
+            console.log('🧪   Tile1: value=' + tiles[0].tile.value + ' at (' + tiles[0].pos.x + ',' + tiles[0].pos.y + ')');
+            console.log('🧪   Tile2: value=' + tiles[1].tile.value + ' at (' + tiles[1].pos.x + ',' + tiles[1].pos.y + ')');
+            
+            // Swap values
+            const tempValue = tiles[0].tile.value;
+            tiles[0].tile.value = tiles[1].tile.value;
+            tiles[1].tile.value = tempValue;
+            
+            console.log('🧪 After swap:');
+            console.log('🧪   Tile1: value=' + tiles[0].tile.value + ' at (' + tiles[0].pos.x + ',' + tiles[0].pos.y + ')');
+            console.log('🧪   Tile2: value=' + tiles[1].tile.value + ' at (' + tiles[1].pos.x + ',' + tiles[1].pos.y + ')');
+            
+            // Update display
+            window.gameManager.actuate();
+            console.log('🧪 Test swap completed');
+        };
+
         // Handle swap tiles button click
         window.handleReplaceClick = function(button) {
+            console.log('🔄 SWAP BUTTON CLICKED');
+            
             // Check if button is disabled
             if (button.classList.contains('disabled') || window.powerUps.swap.uses <= 0) {
-                return; // Do nothing if disabled
+                console.log('Swap button disabled or no uses left');
+                return;
             }
 
-            // Add swap animation
-            button.classList.add('replacing');
-            
             // Use one swap
             window.powerUps.swap.uses--;
             updateButtonTitles();
             
-            setTimeout(() => {
-                if (window.gameManager && window.gameManager.grid) {
-                    // Find all tiles for swapping
-                    const tiles = [];
+            // Start tile selection mode
+            startTileSelection();
+        };
+
+        // Restored working tile selection system with nuclear option + duplicate prevention
+        let tileSelectionMode = {
+            active: false,
+            selectedTiles: [],
+            processingClick: false, // Flag to prevent duplicate processing
+            
+            start: function() {
+                console.log('🎯 tileSelectionMode.start() called');
+                this.active = true;
+                this.selectedTiles = [];
+                this.processingClick = false;
+                
+                // NUCLEAR OPTION: Add multiple types of event listeners (this was working!)
+                console.log('🔧 Adding MULTIPLE event types with duplicate prevention...');
+                
+                const gameContainer = document.querySelector('.game-container');
+                if (gameContainer) {
+                    // Fix CSS blocking
+                    gameContainer.style.setProperty('touch-action', 'auto', 'important');
+                    gameContainer.style.setProperty('pointer-events', 'auto', 'important');
+                    gameContainer.style.setProperty('user-select', 'auto', 'important');
+                    
+                    // Add EVERY possible event type
+                    gameContainer.addEventListener('click', this.handleClick.bind(this), true);
+                    gameContainer.addEventListener('mousedown', this.handleClick.bind(this), true);
+                    gameContainer.addEventListener('mouseup', this.handleClick.bind(this), true);
+                    gameContainer.addEventListener('pointerdown', this.handleClick.bind(this), true);
+                    gameContainer.addEventListener('pointerup', this.handleClick.bind(this), true);
+                    gameContainer.addEventListener('touchstart', this.handleClick.bind(this), true);
+                    gameContainer.addEventListener('touchend', this.handleClick.bind(this), true);
+                    
+                    console.log('🔧 Added ALL event types to game container');
+                }
+                
+                // Also add to document as backup
+                document.addEventListener('click', this.handleClick.bind(this), true);
+                document.addEventListener('mousedown', this.handleClick.bind(this), true);
+                document.addEventListener('pointerdown', this.handleClick.bind(this), true);
+                console.log('🔧 Added backup events to document');
+                
+                // Fix all tiles
+                const tiles = document.querySelectorAll('.tile');
+                tiles.forEach((tile, index) => {
+                    tile.style.setProperty('touch-action', 'auto', 'important');
+                    tile.style.setProperty('pointer-events', 'auto', 'important');
+                    tile.style.setProperty('cursor', 'pointer', 'important');
+                    
+                    // Add direct listeners to each tile
+                    tile.addEventListener('click', this.handleClick.bind(this), true);
+                    tile.addEventListener('mousedown', this.handleClick.bind(this), true);
+                });
+                console.log('🔧 Fixed', tiles.length, 'tiles with direct listeners');
+                
+                // Show instruction message
+                showSelectionMessage('Click first tile to select');
+                console.log('✅ NUCLEAR OPTION activated with duplicate prevention');
+            },
+            
+            getTileId: function(tileElement) {
+                // Create a unique ID based on tile position classes
+                const classes = Array.from(tileElement.classList);
+                const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                return positionClass || 'tile-' + Math.random().toString(36).substr(2, 9);
+            },
+            
+            handleClick: function(event) {
+                // Prevent duplicate processing of the same click
+                if (this.processingClick) {
+                    console.log('🚫 Click ignored - already processing');
+                    return;
+                }
+                
+                console.log('🎯 Click detected in selection mode');
+                console.log('🎯 Active:', this.active);
+                
+                if (!this.active) {
+                    console.log('❌ Selection mode not active');
+                    return;
+                }
+                
+                // Set processing flag
+                this.processingClick = true;
+                
+                console.log('🎯 Click target:', event.target);
+                console.log('🎯 Target classes:', Array.from(event.target.classList));
+                
+                // Find clicked tile
+                let clickedTile = null;
+                let element = event.target;
+                let attempts = 0;
+                
+                // Check if we clicked on a tile or tile-inner
+                while (element && element !== document.body && attempts < 5) {
+                    console.log(`🎯 Checking element ${attempts}:`, element.tagName, Array.from(element.classList));
+                    
+                    if (element.classList.contains('tile')) {
+                        clickedTile = element;
+                        console.log('🎯 Found tile element!');
+                        break;
+                    }
+                    element = element.parentElement;
+                    attempts++;
+                }
+                
+                if (clickedTile) {
+                    const tileInner = clickedTile.querySelector('.tile-inner');
+                    const tileValue = tileInner ? tileInner.textContent : '?';
+                    console.log('🎯 Clicked tile with value:', tileValue);
+                    console.log('🎯 Tile element classes:', Array.from(clickedTile.classList));
+                    
+                    // Get unique tile ID
+                    const tileId = this.getTileId(clickedTile);
+                    console.log('🎯 Tile ID:', tileId);
+                    
+                    // Check if already selected by ID
+                    const alreadySelectedIndex = this.selectedTiles.findIndex(t => t.id === tileId);
+                    
+                    if (alreadySelectedIndex >= 0) {
+                        console.log('🎯 Tile already selected (by ID), deselecting...');
+                        this.deselectTile(alreadySelectedIndex);
+                    } else if (this.selectedTiles.length < 2) {
+                        console.log('🎯 Selecting tile...');
+                        this.selectTile(clickedTile, tileValue);
+                    } else {
+                        console.log('🎯 Already have 2 tiles selected, ignoring click');
+                    }
+                    
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    console.log('❌ No tile found at click location');
+                    console.log('❌ Final element checked:', element);
+                }
+                
+                // Clear processing flag after a short delay
+                setTimeout(() => {
+                    this.processingClick = false;
+                }, 100);
+            },
+            
+            selectTile: function(tileElement, tileValue) {
+                console.log('✅ Selecting tile with value:', tileValue);
+                console.log('✅ Tile element:', tileElement);
+                
+                // PREMIUM THIN NEON BORDER - Elegant highlighting
+                console.log('🔧 Applying PREMIUM THIN NEON BORDER...');
+                
+                // Apply thin neon cyan border to the main tile
+                tileElement.style.setProperty('border', '2px solid #00ffff', 'important');
+                tileElement.style.setProperty('box-shadow', '0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 15px rgba(0, 255, 255, 0.1)', 'important');
+                tileElement.style.setProperty('z-index', '1000', 'important');
+                
+                // Add subtle thin border to tile-inner for premium look
+                const tileInner = tileElement.querySelector('.tile-inner');
+                if (tileInner) {
+                    tileInner.style.setProperty('border', '1px solid rgba(0, 255, 255, 0.8)', 'important');
+                    tileInner.style.setProperty('box-shadow', 'inset 0 0 10px rgba(0, 255, 255, 0.2), 0 0 8px rgba(0, 255, 255, 0.4)', 'important');
+                    console.log('✅ Applied premium thin border to tile-inner');
+                } else {
+                    console.log('❌ No tile-inner found');
+                }
+                
+                // Force a visual update
+                tileElement.offsetHeight;
+                
+                // Add a marker class to track this tile
+                tileElement.classList.add('currently-highlighted');
+                
+                console.log('✅ Applied PREMIUM THIN NEON BORDER - elegant and subtle');
+                
+                // Force a visual update
+                tileElement.offsetHeight; // Trigger reflow
+                
+                console.log('✅ Applied neon highlighting styles to tile and tile-inner');
+                
+                // Add to selected list with unique identifier
+                const tileId = this.getTileId(tileElement);
+                this.selectedTiles.push({
+                    element: tileElement,
+                    value: tileValue,
+                    id: tileId
+                });
+                
+                console.log('✅ Selected tile:', tileValue, 'with ID:', tileId, '- Total selected:', this.selectedTiles.length);
+                
+                console.log('🔍 Checking selection count:', this.selectedTiles.length);
+                
+                if (this.selectedTiles.length === 1) {
+                    console.log('📝 One tile selected, showing message for second tile');
+                    showSelectionMessage('Click second tile to swap');
+                } else if (this.selectedTiles.length === 2) {
+                    console.log('🎯 Two tiles selected, starting swap process...');
+                    console.log('🎯 Tile 1:', this.selectedTiles[0].value, 'ID:', this.selectedTiles[0].id);
+                    console.log('🎯 Tile 2:', this.selectedTiles[1].value, 'ID:', this.selectedTiles[1].id);
+                    
+                    showSelectionMessage('Swapping tiles...');
+                    
+                    // Call performSwap immediately instead of using setTimeout
+                    console.log('🔄 About to call performSwap immediately...');
+                    this.performSwap();
+                    console.log('🔄 performSwap call completed');
+                } else {
+                    console.log('❓ Unexpected selection count:', this.selectedTiles.length);
+                }
+            },
+            
+            deselectTile: function(index) {
+                if (index >= 0 && index < this.selectedTiles.length) {
+                    const tile = this.selectedTiles[index];
+                    
+                    console.log('❌ Deselecting tile:', tile.value, 'with ID:', tile.id);
+                    
+                    // Remove premium thin neon border highlighting
+                    tile.element.style.removeProperty('border');
+                    tile.element.style.removeProperty('box-shadow');
+                    tile.element.style.removeProperty('z-index');
+                    
+                    // Remove thin border from tile-inner
+                    const tileInner = tile.element.querySelector('.tile-inner');
+                    if (tileInner) {
+                        tileInner.style.removeProperty('border');
+                        tileInner.style.removeProperty('box-shadow');
+                    }
+                    
+                    // Remove tracking class
+                    tile.element.classList.remove('currently-highlighted');
+                    
+                    console.log('❌ Removed premium thin neon border highlighting');
+                    
+                    // Remove from array
+                    this.selectedTiles.splice(index, 1);
+                    
+                    console.log('❌ Deselected tile, remaining:', this.selectedTiles.length);
+                    
+                    if (this.selectedTiles.length === 0) {
+                        showSelectionMessage('Click first tile to select');
+                    } else {
+                        showSelectionMessage('Click second tile to swap');
+                    }
+                }
+            },
+            
+            performSwap: function() {
+                console.log('🔄 performSwap called with', this.selectedTiles.length, 'tiles');
+                
+                if (this.selectedTiles.length !== 2) {
+                    console.log('❌ Need exactly 2 tiles to swap, have:', this.selectedTiles.length);
+                    return;
+                }
+                
+                const tile1 = this.selectedTiles[0];
+                const tile2 = this.selectedTiles[1];
+                
+                console.log('🔄 Starting swap process...');
+                console.log('🔄 Tile 1:', tile1.value, tile1.element);
+                console.log('🔄 Tile 2:', tile2.value, tile2.element);
+                
+                // Get tile positions from CSS classes
+                const pos1 = this.getTilePosition(tile1.element);
+                const pos2 = this.getTilePosition(tile2.element);
+                
+                console.log('🔄 Position 1:', pos1);
+                console.log('� Position  2:', pos2);
+                
+                if (!pos1 || !pos2) {
+                    console.log('❌ Could not determine tile positions');
+                    showSelectionMessage('Swap failed - invalid positions');
+                    setTimeout(() => this.end(), 1500);
+                    return;
+                }
+                
+                // Check if game manager exists
+                if (!window.gameManager || !window.gameManager.grid) {
+                    console.log('❌ Game manager not available');
+                    showSelectionMessage('Swap failed - game not ready');
+                    setTimeout(() => this.end(), 1500);
+                    return;
+                }
+                
+                // Save state before swap for undo
+                console.log('💾 Saving game state before swap...');
+                saveGameState();
+                
+                // Get actual tile objects from game grid
+                const tileObj1 = window.gameManager.grid.cellContent(pos1);
+                const tileObj2 = window.gameManager.grid.cellContent(pos2);
+                
+                console.log('🔄 Grid tile objects:');
+                console.log('🔄   TileObj1:', tileObj1);
+                console.log('🔄   TileObj2:', tileObj2);
+                
+                if (!tileObj1 || !tileObj2) {
+                    console.log('❌ Could not find tile objects in grid');
+                    console.log('❌ Grid size:', window.gameManager.grid.size);
+                    console.log('❌ Trying to access positions:', pos1, pos2);
+                    
+                    // Debug: show all tiles in grid
+                    console.log('🔍 All tiles in grid:');
                     window.gameManager.grid.eachCell(function(x, y, tile) {
                         if (tile) {
-                            tiles.push({x: x, y: y, tile: tile});
+                            console.log(`🔍   Cell (${x},${y}): value=${tile.value}`);
                         }
                     });
                     
-                    if (tiles.length >= 2) {
-                        // Save state before swap for potential undo
-                        saveGameState();
-                        
-                        // Swap two random tiles
-                        const tile1 = tiles[Math.floor(Math.random() * tiles.length)];
-                        let tile2 = tiles[Math.floor(Math.random() * tiles.length)];
-                        while (tile2 === tile1 && tiles.length > 1) {
-                            tile2 = tiles[Math.floor(Math.random() * tiles.length)];
-                        }
-                        
-                        // Swap their values
-                        const tempValue = tile1.tile.value;
-                        tile1.tile.value = tile2.tile.value;
-                        tile2.tile.value = tempValue;
-                        
-                        // Update the display
-                        window.gameManager.actuate();
-                        
-                        console.log('Swapped tiles:', tile1.tile.value, 'and', tile2.tile.value);
-                    } else {
-                        // Refund the use if not enough tiles
-                        window.powerUps.swap.uses++;
-                        updateButtonTitles();
-                    }
-                } else {
-                    // Refund the use if game manager not available
-                    window.powerUps.swap.uses++;
-                    updateButtonTitles();
+                    showSelectionMessage('Swap failed - tiles not found in grid');
+                    setTimeout(() => this.end(), 1500);
+                    return;
                 }
                 
-                // Check if player earned more uses
-                checkForTileReward(window.powerUps.swap.requiredTile, 'swap');
+                console.log('🔄 Before swap:');
+                console.log('🔄   Tile1: value=' + tileObj1.value + ' at (' + tileObj1.x + ',' + tileObj1.y + ')');
+                console.log('🔄   Tile2: value=' + tileObj2.value + ' at (' + tileObj2.x + ',' + tileObj2.y + ')');
                 
-                button.classList.remove('replacing');
-            }, 500);
+                // Perform the swap
+                const tempValue = tileObj1.value;
+                tileObj1.value = tileObj2.value;
+                tileObj2.value = tempValue;
+                
+                console.log('🔄 After swap:');
+                console.log('🔄   Tile1: value=' + tileObj1.value + ' at (' + tileObj1.x + ',' + tileObj1.y + ')');
+                console.log('🔄   Tile2: value=' + tileObj2.value + ' at (' + tileObj2.x + ',' + tileObj2.y + ')');
+                
+                // Force update display
+                console.log('🎨 Updating display...');
+                window.gameManager.actuate();
+                
+                console.log('✅ Swap completed successfully');
+                showSelectionMessage('Tiles swapped!');
+                
+                // Clean up after delay
+                setTimeout(() => {
+                    this.end();
+                }, 1500);
+            },
+            
+            getTilePosition: function(tileElement) {
+                const classes = Array.from(tileElement.classList);
+                console.log('🔍 Tile classes:', classes);
+                
+                for (let className of classes) {
+                    if (className.startsWith('tile-position-')) {
+                        const coords = className.replace('tile-position-', '').split('-');
+                        if (coords.length >= 2) {
+                            const position = {
+                                x: parseInt(coords[0]) - 1, // Convert from 1-based to 0-based
+                                y: parseInt(coords[1]) - 1
+                            };
+                            console.log('🔍 Found position:', className, '→', position);
+                            
+                            // Validate position
+                            if (position.x >= 0 && position.x < 4 && position.y >= 0 && position.y < 4) {
+                                return position;
+                            } else {
+                                console.log('❌ Invalid position coordinates:', position);
+                            }
+                        } else {
+                            console.log('❌ Invalid position class format:', className);
+                        }
+                    }
+                }
+                console.log('❌ No valid position class found');
+                return null;
+            },
+            
+            end: function() {
+                this.active = false;
+                
+                // Remove highlighting from all selected tiles
+                this.selectedTiles.forEach(tile => {
+                    if (tile.element) {
+                        tile.element.style.removeProperty('border');
+                        tile.element.style.removeProperty('box-shadow');
+                        tile.element.style.removeProperty('z-index');
+                    }
+                });
+                
+                this.selectedTiles = [];
+                
+                // Remove highlighting from all tiles (safety cleanup)
+                document.querySelectorAll('.tile').forEach(tile => {
+                    tile.style.removeProperty('border');
+                    tile.style.removeProperty('box-shadow');
+                    tile.style.removeProperty('z-index');
+                });
+                
+                hideSelectionUI();
+                console.log('✅ Tile selection mode ended');
+            }
         };
+        
+        // Function to start tile selection
+        function startTileSelection() {
+            console.log('🎯 Starting tile selection...');
+            tileSelectionMode.start();
+        }
+
+        // Simple function to show selection messages
+        function showSelectionMessage(message) {
+            console.log('📢 Message:', message);
+            
+            // Create or update message element
+            let messageEl = document.getElementById('selection-message');
+            if (!messageEl) {
+                messageEl = document.createElement('div');
+                messageEl.id = 'selection-message';
+                messageEl.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(255, 215, 0, 0.95);
+                    color: #1a1a3a;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    z-index: 1500;
+                    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+                `;
+                document.body.appendChild(messageEl);
+            }
+            messageEl.textContent = message;
+            messageEl.style.display = 'block';
+        }
+
+        // Function to hide selection message
+        function hideSelectionUI() {
+            const messageEl = document.getElementById('selection-message');
+            if (messageEl) {
+                messageEl.style.display = 'none';
+            }
+        }
 
         // Handle delete tiles button click (menu button repurposed)
         window.handleMenuClick = function(button) {
