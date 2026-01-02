@@ -749,12 +749,17 @@ hr {
 
 .tile {
   position: absolute;
-  -webkit-transition: 100ms ease-in-out;
-  -moz-transition: 100ms ease-in-out;
-  transition: 100ms ease-in-out;
+  -webkit-transition: 50ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  -moz-transition: 50ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: 50ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   -webkit-transition-property: -webkit-transform;
   -moz-transition-property: -moz-transform;
-  transition-property: transform; }
+  transition-property: transform;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform; }
   .tile .tile-inner {
     border-radius: 3px;
     background: linear-gradient(135deg, #4a4a6a, #6a6a8a);
@@ -903,9 +908,9 @@ hr {
   100% {
     box-shadow: 0 15px 50px rgba(255, 107, 107, 1), inset 0 2px 0 rgba(255, 255, 255, 0.7); } }
 .tile-new .tile-inner {
-  -webkit-animation: appear 200ms ease 100ms;
-  -moz-animation: appear 200ms ease 100ms;
-  animation: appear 200ms ease 100ms;
+  -webkit-animation: appear 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
+  -moz-animation: appear 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
+  animation: appear 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
   -webkit-animation-fill-mode: backwards;
   -moz-animation-fill-mode: backwards;
   animation-fill-mode: backwards; }
@@ -966,9 +971,9 @@ hr {
     transform: scale(1); } }
 .tile-merged .tile-inner {
   z-index: 20;
-  -webkit-animation: pop 200ms ease 100ms;
-  -moz-animation: pop 200ms ease 100ms;
-  animation: pop 200ms ease 100ms;
+  -webkit-animation: pop 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
+  -moz-animation: pop 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
+  animation: pop 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
   -webkit-animation-fill-mode: backwards;
   -moz-animation-fill-mode: backwards;
   animation-fill-mode: backwards; }
