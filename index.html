@@ -429,6 +429,7 @@
                     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
                     <h1 class="title">2048</h1>
                     <div class="mobile-header-buttons">
+                        <button class="mobile-level-btn" onclick="toggleLevelSelector()" title="Change Level">🎯</button>
                         <button class="mobile-sound-btn" onclick="toggleGameSounds(this)" title="Toggle Sound">🔊</button>
                         <button class="mobile-refresh-btn" onclick="handleRestartClick(this)">↻</button>
                     </div>
@@ -678,9 +679,29 @@
                 margin-right: 8px;
             }
 
-            .mobile-sound-btn:hover {
+            .mobile-level-btn {
+                background: rgba(255, 165, 0, 0.2);
+                border: 1px solid rgba(255, 165, 0, 0.3);
+                border-radius: 8px;
+                color: #ffa500;
+                font-size: 16px;
+                width: 40px;
+                height: 40px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                margin-right: 8px;
+            }
+
+            .mobile-sound-btn:hover, .mobile-level-btn:hover {
                 background: rgba(67, 233, 123, 0.3);
                 transform: scale(1.05);
+            }
+
+            .mobile-level-btn:hover {
+                background: rgba(255, 165, 0, 0.3);
             }
 
             .mobile-header-buttons {
@@ -689,9 +710,147 @@
             }
 
             @media screen and (max-width: 520px) {
-                .mobile-sound-btn {
+                .mobile-sound-btn, .mobile-level-btn {
                     display: flex !important;
                 }
+            }
+
+            /* Level Selector Popup */
+            .level-selector-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(15, 15, 35, 0.9);
+                backdrop-filter: blur(10px);
+                z-index: 10000;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .level-selector-content {
+                background: linear-gradient(135deg, rgba(26, 26, 58, 0.95), rgba(15, 15, 35, 0.95));
+                border: 2px solid rgba(255, 215, 0, 0.3);
+                border-radius: 20px;
+                padding: 30px;
+                max-width: 400px;
+                width: 90%;
+                text-align: center;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                animation: levelSelectorSlide 0.4s ease-out;
+            }
+
+            @keyframes levelSelectorSlide {
+                from {
+                    opacity: 0;
+                    transform: translateY(-30px) scale(0.95);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            .level-selector-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .level-selector-header h2 {
+                color: #ffd700;
+                margin: 0;
+                font-size: 24px;
+                background: linear-gradient(45deg, #ffd700, #ffb347);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .level-selector-close {
+                background: none;
+                border: none;
+                color: #fff;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 5px;
+                border-radius: 50%;
+                width: 35px;
+                height: 35px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+            }
+
+            .level-selector-close:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: scale(1.1);
+            }
+
+            .level-options {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .level-option {
+                display: flex;
+                align-items: center;
+                background: rgba(255, 255, 255, 0.05);
+                border: 2px solid rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                padding: 15px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-align: left;
+            }
+
+            .level-option:hover {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 215, 0, 0.5);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+            }
+
+            .level-option.active {
+                background: rgba(255, 215, 0, 0.1);
+                border-color: rgba(255, 215, 0, 0.6);
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            }
+
+            .level-icon {
+                font-size: 32px;
+                margin-right: 15px;
+                min-width: 40px;
+            }
+
+            .level-info {
+                flex: 1;
+            }
+
+            .level-title {
+                color: #fff;
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .level-desc {
+                color: #ccc;
+                font-size: 14px;
+                margin: 0;
+            }
+
+            .level-option.active .level-title {
+                color: #ffd700;
+            }
+
+            .level-option.active .level-desc {
+                color: #ffeb99;
             }
         </style>
     </div>
@@ -719,6 +878,39 @@
                 <button class="mobile-menu-item" onclick="closeMobileMenu(); showHome();">
                     <span class="menu-icon">🏠</span>
                     Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level Selector Popup -->
+    <div id="levelSelector" class="level-selector-overlay">
+        <div class="level-selector-content">
+            <div class="level-selector-header">
+                <h2>🎯 Select Level</h2>
+                <button class="level-selector-close" onclick="closeLevelSelector()">×</button>
+            </div>
+            <div class="level-options">
+                <button class="level-option active" data-level="1" onclick="selectLevel(1)">
+                    <div class="level-icon">🟦</div>
+                    <div class="level-info">
+                        <div class="level-title">Level 1</div>
+                        <div class="level-desc">4×4 Grid - Classic</div>
+                    </div>
+                </button>
+                <button class="level-option" data-level="2" onclick="selectLevel(2)">
+                    <div class="level-icon">🟩</div>
+                    <div class="level-info">
+                        <div class="level-title">Level 2</div>
+                        <div class="level-desc">5×5 Grid - Advanced</div>
+                    </div>
+                </button>
+                <button class="level-option" data-level="3" onclick="selectLevel(3)">
+                    <div class="level-icon">🟪</div>
+                    <div class="level-info">
+                        <div class="level-title">Level 3</div>
+                        <div class="level-desc">6×6 Grid - Expert</div>
+                    </div>
                 </button>
             </div>
         </div>
@@ -843,6 +1035,17 @@
         // Game state history for undo functionality
         window.gameStateHistory = [];
         const MAX_HISTORY = 5; // Keep last 5 moves for undo
+
+        // Level system configuration
+        window.gridSizes = {
+            1: 4, // Level 1: 4x4 grid
+            2: 5, // Level 2: 5x5 grid  
+            3: 6  // Level 3: 6x6 grid
+        };
+        
+        // Initialize current level
+        window.currentLevel = 1;
+        window.currentGridSize = 4;
 
         // Save current game state for undo (with duplicate prevention)
         function saveGameState() {
@@ -3415,6 +3618,1585 @@
                     randomCell.style.transform = 'scale(1)';
                 }, 200);
             }, 2000);
+        });
+    </script>
+
+    <!-- Level System JavaScript -->
+    <script>
+        // Level system variables
+        window.currentLevel = 1;
+        window.gridSizes = { 1: 4, 2: 5, 3: 6 };
+
+        // Toggle level selector popup
+        window.toggleLevelSelector = function() {
+            const levelSelector = document.getElementById('levelSelector');
+            if (levelSelector.style.display === 'flex') {
+                closeLevelSelector();
+            } else {
+                openLevelSelector();
+            }
+        };
+
+        // Open level selector popup
+        function openLevelSelector() {
+            const levelSelector = document.getElementById('levelSelector');
+            levelSelector.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            updateActiveLevelIndicator();
+        }
+
+        // Close level selector popup
+        window.closeLevelSelector = function() {
+            const levelSelector = document.getElementById('levelSelector');
+            levelSelector.style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        // Update active level indicator
+        function updateActiveLevelIndicator() {
+            const levelOptions = document.querySelectorAll('.level-option');
+            levelOptions.forEach(option => {
+                const level = parseInt(option.dataset.level);
+                if (level === window.currentLevel) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+        }
+
+        // Select a level and restart game with new grid size
+        window.selectLevel = function(level) {
+            console.log('🎯 Selecting level:', level);
+            
+            if (level < 1 || level > 3) {
+                console.log('❌ Invalid level:', level);
+                return;
+            }
+            
+            // Update current level
+            window.currentLevel = level;
+            const newGridSize = window.gridSizes[level];
+            window.currentGridSize = newGridSize;
+            
+            console.log('🎯 New grid size:', newGridSize);
+            
+            // Close level selector
+            closeLevelSelector();
+            
+            // Clean up any layout issues first
+            if (window.cleanupGridLayout) {
+                window.cleanupGridLayout();
+            }
+            
+            // CRITICAL: Update grid structure FIRST
+            updateGridStructure(newGridSize);
+            
+            // CRITICAL: Ensure CSS is applied BEFORE creating GameManager
+            console.log('🔧 Ensuring CSS is applied for size:', newGridSize);
+            updateGridCSS(newGridSize);
+            
+            // Force CSS to be processed
+            document.body.offsetHeight; // Trigger reflow
+            
+            // CRITICAL: Clear cached state BEFORE creating GameManager
+            console.log('🔧 Clearing cached game state BEFORE creating GameManager...');
+            if (window.LocalStorageManager) {
+                const storageManager = new LocalStorageManager();
+                storageManager.clearGameState();
+                console.log('✅ Cleared cached game state');
+            }
+            
+            // CRITICAL: Create completely new game manager with correct size
+            console.log('🔧 Creating NEW GameManager with size:', newGridSize);
+            console.log('🔧 About to call: new GameManager(' + newGridSize + ', ...)');
+            window.gameManager = new GameManager(newGridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+            
+            // IMMEDIATELY verify the game manager was created correctly
+            console.log('✅ GameManager created - IMMEDIATE verification:');
+            console.log('  - Constructor parameter passed:', newGridSize);
+            console.log('  - GameManager.size:', window.gameManager.size);
+            console.log('  - GameManager.grid:', window.gameManager.grid);
+            console.log('  - GameManager.grid.size:', window.gameManager.grid.size);
+            console.log('  - GameManager.grid.cells.length:', window.gameManager.grid.cells.length);
+            console.log('  - GameManager.grid.cells[0].length:', window.gameManager.grid.cells[0] ? window.gameManager.grid.cells[0].length : 'undefined');
+            
+            // Verify the grid is actually 5x5
+            if (window.gameManager.grid.size !== newGridSize) {
+                console.log('❌ CRITICAL ERROR: GameManager grid size mismatch!');
+                console.log('  Expected:', newGridSize);
+                console.log('  Actual:', window.gameManager.grid.size);
+                console.log('  This means cached state is still interfering!');
+            } else {
+                console.log('✅ GameManager grid size is correct:', window.gameManager.grid.size);
+            }
+            
+            // Reset power-ups
+            if (window.resetPowerUps) {
+                window.resetPowerUps();
+            }
+            
+            // Force immediate actuate to show tiles
+            setTimeout(() => {
+                if (window.gameManager) {
+                    console.log('🔄 About to actuate - checking CSS first...');
+                    
+                    // Debug CSS before actuating
+                    if (newGridSize === 5) {
+                        window.check5x5CSS();
+                    }
+                    
+                    window.gameManager.actuate();
+                    console.log('🔄 Forced actuate - tiles should now appear in', newGridSize + 'x' + newGridSize, 'grid');
+                    
+                    // Auto-apply perfect alignment for 5x5
+                    if (newGridSize === 5) {
+                        setTimeout(() => {
+                            console.log('🎯 Auto-applying perfect 5x5 alignment...');
+                            window.perfectAlign5x5();
+                            
+                            // Also adjust win condition for 5x5
+                            console.log('🎯 Adjusting win condition for 5x5...');
+                            window.adjustWinCondition5x5();
+                            
+                            // Fix game over logic for 5x5
+                            console.log('🔧 Fixing game over logic for 5x5...');
+                            window.fixGameOverLogic5x5();
+                            
+                            // Debug and fix any game over issues
+                            setTimeout(() => {
+                                console.log('🔍 Checking for game over issues...');
+                                window.debugFalseGameOver();
+                                window.fixGameOverState();
+                            }, 500);
+                        }, 300);
+                    }
+                    
+                    // Debug tile positions after actuating
+                    let tileCount = 0;
+                    window.gameManager.grid.eachCell(function(x, y, tile) {
+                        if (tile) {
+                            tileCount++;
+                            console.log(`  Tile at (${x},${y}): value=${tile.value}`);
+                        }
+                    });
+                    console.log(`  Total tiles: ${tileCount}`);
+                    
+                    // Check actual DOM tiles
+                    const domTiles = document.querySelectorAll('.tile');
+                    console.log(`  DOM tiles found: ${domTiles.length}`);
+                    domTiles.forEach((tile, index) => {
+                        const classes = Array.from(tile.classList);
+                        const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                        const value = tile.querySelector('.tile-inner')?.textContent || '?';
+                        const computedStyle = window.getComputedStyle(tile);
+                        console.log(`  DOM Tile ${index}: value=${value}, class=${positionClass}, transform=${computedStyle.transform}`);
+                    });
+                }
+            }, 200); // Increased timeout to ensure CSS is fully applied
+            
+            // Show confirmation message
+            showLevelChangeMessage(level, newGridSize);
+        };
+
+        // Update grid structure for different sizes (preserves 4x4, creates proper 5x5 and 6x6)
+        // Update grid structure for different sizes (preserves 4x4, creates proper 5x5 and 6x6)
+        function updateGridStructure(size) {
+            console.log('🔧 Updating grid structure to', size + 'x' + size);
+            
+            const gridContainer = document.querySelector('.grid-container');
+            if (!gridContainer) {
+                console.log('❌ Grid container not found');
+                return;
+            }
+            
+            // Clear existing grid completely
+            gridContainer.innerHTML = '';
+            
+            // Remove any existing inline styles that might interfere
+            gridContainer.removeAttribute('style');
+            
+            // Create new grid structure with EXACTLY the right number of rows and columns
+            console.log(`🔧 Creating ${size} rows with ${size} cells each...`);
+            
+            for (let row = 0; row < size; row++) {
+                const gridRow = document.createElement('div');
+                gridRow.className = 'grid-row';
+                
+                for (let col = 0; col < size; col++) {
+                    const gridCell = document.createElement('div');
+                    gridCell.className = 'grid-cell';
+                    gridRow.appendChild(gridCell);
+                }
+                
+                gridContainer.appendChild(gridRow);
+                console.log(`✅ Created row ${row + 1} with ${size} cells`);
+            }
+            
+            // Verify the grid was created correctly
+            const createdRows = gridContainer.querySelectorAll('.grid-row');
+            const createdCells = gridContainer.querySelectorAll('.grid-cell');
+            console.log(`🔍 Verification: Created ${createdRows.length} rows and ${createdCells.length} cells (expected: ${size} rows, ${size * size} cells)`);
+            
+            // Clear and reset tile container
+            const tileContainer = document.querySelector('.tile-container');
+            if (tileContainer) {
+                tileContainer.innerHTML = '';
+                tileContainer.removeAttribute('style');
+            }
+            
+            // Apply size-specific CSS AFTER creating the structure
+            updateGridCSS(size);
+            
+            // Force layout recalculation and visual update
+            setTimeout(() => {
+                gridContainer.offsetHeight; // Trigger reflow
+                
+                // Double-check the grid is visible
+                const finalRows = gridContainer.querySelectorAll('.grid-row');
+                const finalCells = gridContainer.querySelectorAll('.grid-cell');
+                console.log(`🔍 Final check: ${finalRows.length} rows, ${finalCells.length} cells visible`);
+                
+                // Log grid container dimensions
+                const containerStyle = window.getComputedStyle(gridContainer);
+                console.log(`📏 Grid container: ${containerStyle.width} x ${containerStyle.height}`);
+                
+                console.log('✅ Grid structure updated and layout recalculated');
+            }, 100);
+            
+            console.log('✅ Grid structure updated to', size + 'x' + size);
+        }
+
+        // Debug function to check current grid state
+        window.debugCurrentGrid = function() {
+            console.log('🔍 DEBUGGING CURRENT GRID STATE:');
+            
+            const gridContainer = document.querySelector('.grid-container');
+            if (!gridContainer) {
+                console.log('❌ No grid container found');
+                return;
+            }
+            
+            const rows = gridContainer.querySelectorAll('.grid-row');
+            const cells = gridContainer.querySelectorAll('.grid-cell');
+            
+            console.log(`📊 Grid structure: ${rows.length} rows, ${cells.length} total cells`);
+            
+            rows.forEach((row, index) => {
+                const rowCells = row.querySelectorAll('.grid-cell');
+                console.log(`  Row ${index + 1}: ${rowCells.length} cells`);
+            });
+            
+            const containerStyle = window.getComputedStyle(gridContainer);
+            console.log(`📏 Container dimensions: ${containerStyle.width} x ${containerStyle.height}`);
+            console.log(`📏 Container padding: ${containerStyle.padding}`);
+            
+            if (window.gameManager) {
+                console.log(`🎮 Game manager size: ${window.gameManager.size}x${window.gameManager.size}`);
+                console.log(`🎮 Game manager grid size: ${window.gameManager.grid.size}x${window.gameManager.grid.size}`);
+                
+                // Count actual tiles in game
+                let tileCount = 0;
+                window.gameManager.grid.eachCell(function(x, y, tile) {
+                    if (tile) tileCount++;
+                });
+                console.log(`🎮 Active tiles in game: ${tileCount}`);
+            }
+            
+            console.log(`🎯 Current level: ${window.currentLevel}, Grid size: ${window.currentGridSize}`);
+        };
+
+        // Force 5x5 game for testing
+        window.force5x5Game = function() {
+            console.log('🔧 FORCING 5x5 GAME...');
+            
+            // Update variables
+            window.currentLevel = 2;
+            window.currentGridSize = 5;
+            
+            // Update grid structure
+            updateGridStructure(5);
+            
+            // Create new game manager with size 5
+            console.log('🔧 Creating GameManager with size 5...');
+            window.gameManager = new GameManager(5, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+            
+            // Verify creation
+            console.log('✅ GameManager verification:');
+            console.log('  - Size:', window.gameManager.size);
+            console.log('  - Grid size:', window.gameManager.grid.size);
+            console.log('  - Grid cells:', window.gameManager.grid.cells.length, 'x', window.gameManager.grid.cells[0].length);
+            
+            // Reset power-ups
+            if (window.resetPowerUps) {
+                window.resetPowerUps();
+            }
+            
+            // Force actuate
+            window.gameManager.actuate();
+            
+            console.log('✅ Forced 5x5 game created - tiles should now use full 5x5 grid');
+            
+            // Debug the result
+            setTimeout(() => {
+                window.debugCurrentGrid();
+            }, 200);
+        };
+
+        // Quick test function to switch to 5x5
+        window.test5x5 = function() {
+            console.log('🧪 TESTING 5x5 SWITCH...');
+            window.selectLevel(2);
+        };
+
+        // Debug function to check if 5x5 CSS classes exist
+        window.check5x5CSS = function() {
+            console.log('🔍 CHECKING 5x5 CSS CLASSES...');
+            
+            // Check if dynamic styles exist
+            const dynamicStyle = document.getElementById('dynamic-grid-styles');
+            if (dynamicStyle) {
+                console.log('✅ Dynamic grid styles found');
+                console.log('📄 Dynamic CSS content preview:');
+                console.log(dynamicStyle.textContent.substring(0, 1000) + '...');
+                
+                // Check if 5x5 positions are in the CSS
+                const has5x5Positions = dynamicStyle.textContent.includes('tile-position-5-5');
+                console.log('🔍 Contains 5x5 positions:', has5x5Positions);
+            } else {
+                console.log('❌ No dynamic grid styles found');
+            }
+            
+            // Test if specific 5x5 position classes work
+            const testPositions = ['1-5', '5-1', '5-5', '3-5', '5-3'];
+            console.log('🧪 Testing 5x5 position classes:');
+            
+            testPositions.forEach(pos => {
+                const className = `tile-position-${pos}`;
+                const testElement = document.createElement('div');
+                testElement.className = `tile ${className}`;
+                testElement.style.position = 'absolute';
+                testElement.style.visibility = 'hidden';
+                document.body.appendChild(testElement);
+                
+                const computedStyle = window.getComputedStyle(testElement);
+                const transform = computedStyle.transform;
+                
+                console.log(`  .tile.${className}: transform = ${transform}`);
+                
+                document.body.removeChild(testElement);
+            });
+            
+            // Check current game state
+            if (window.gameManager) {
+                console.log('🎮 Current game state:');
+                console.log('  - Game size:', window.gameManager.size);
+                console.log('  - Grid size:', window.gameManager.grid.size);
+                
+                // Check where tiles actually are
+                let tilePositions = [];
+                window.gameManager.grid.eachCell(function(x, y, tile) {
+                    if (tile) {
+                        tilePositions.push(`(${x},${y}):${tile.value}`);
+                    }
+                });
+                console.log('  - Tile positions:', tilePositions.join(', '));
+            }
+        };
+
+        // Function to measure actual grid positions and align tiles perfectly
+        window.measureAndAlignGrid = function() {
+            console.log('📏 MEASURING ACTUAL GRID POSITIONS...');
+            
+            const gridCells = document.querySelectorAll('.grid-cell');
+            const gridContainer = document.querySelector('.grid-container');
+            
+            if (gridCells.length === 0) {
+                console.log('❌ No grid cells found');
+                return;
+            }
+            
+            const containerRect = gridContainer.getBoundingClientRect();
+            console.log('📦 Grid container position:', containerRect.left, containerRect.top);
+            
+            // Measure first 5 cells in first row to get horizontal spacing
+            const horizontalPositions = [];
+            const verticalPositions = [];
+            
+            for (let i = 0; i < Math.min(5, gridCells.length); i++) {
+                const cell = gridCells[i];
+                const cellRect = cell.getBoundingClientRect();
+                const relativeLeft = cellRect.left - containerRect.left;
+                const relativeTop = cellRect.top - containerRect.top;
+                
+                horizontalPositions.push(relativeLeft);
+                console.log(`📍 Cell ${i + 1}: left=${relativeLeft}px, top=${relativeTop}px, size=${cellRect.width}x${cellRect.height}`);
+            }
+            
+            // Measure first cell in each row to get vertical spacing
+            for (let row = 0; row < 5; row++) {
+                const cellIndex = row * 5; // First cell in each row
+                if (cellIndex < gridCells.length) {
+                    const cell = gridCells[cellIndex];
+                    const cellRect = cell.getBoundingClientRect();
+                    const relativeTop = cellRect.top - containerRect.top;
+                    verticalPositions.push(relativeTop);
+                }
+            }
+            
+            console.log('📊 Horizontal positions:', horizontalPositions);
+            console.log('📊 Vertical positions:', verticalPositions);
+            
+            // Generate CSS based on actual measurements
+            let css = '';
+            for (let x = 0; x < 5; x++) {
+                for (let y = 0; y < 5; y++) {
+                    const left = horizontalPositions[x] || 0;
+                    const top = verticalPositions[y] || 0;
+                    const positionClass = `tile-position-${x + 1}-${y + 1}`;
+                    
+                    css += `
+                        .tile-container .tile.${positionClass},
+                        .game-container .tile.${positionClass},
+                        .tile.${positionClass} {
+                            -webkit-transform: translate(${left}px, ${top}px) !important;
+                            -moz-transform: translate(${left}px, ${top}px) !important;
+                            -ms-transform: translate(${left}px, ${top}px) !important;
+                            transform: translate(${left}px, ${top}px) !important;
+                        }
+                    `;
+                }
+            }
+            
+            // Apply the measured CSS
+            const existingStyle = document.getElementById('measured-grid-positions');
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+            
+            const style = document.createElement('style');
+            style.id = 'measured-grid-positions';
+            style.textContent = css;
+            document.head.appendChild(style);
+            
+            console.log('✅ Applied measured grid positions');
+            
+            // Force re-render tiles
+            if (window.gameManager) {
+                window.gameManager.actuate();
+            }
+            
+            return {
+                horizontal: horizontalPositions,
+                vertical: verticalPositions
+            };
+        };
+
+        // Debug function to compare 4x4 vs 5x5 positioning
+        window.debug4x4vs5x5 = function() {
+            console.log('🔍 COMPARING 4x4 vs 5x5 POSITIONING:');
+            
+            console.log('📊 4x4 Original Pattern (from CSS):');
+            console.log('  Position 1-1: translate(0px, 0px)');
+            console.log('  Position 2-1: translate(121px, 0px)');
+            console.log('  Position 3-1: translate(242px, 0px)');
+            console.log('  Position 4-1: translate(363px, 0px)');
+            console.log('  → Spacing: 121px between positions');
+            
+            console.log('📊 5x5 Current Pattern:');
+            const cellSize = 56, cellGap = 10;
+            const tileSpacing = cellSize + cellGap + 1; // 67px
+            
+            for (let x = 0; x < 5; x++) {
+                const left = x * tileSpacing;
+                console.log(`  Position ${x + 1}-1: translate(${left}px, 0px)`);
+            }
+            console.log(`  → Spacing: ${tileSpacing}px between positions`);
+            
+            console.log('🎯 Grid Cell Analysis:');
+            const gridCells = document.querySelectorAll('.grid-cell');
+            if (gridCells.length > 0) {
+                const firstCell = gridCells[0];
+                const cellRect = firstCell.getBoundingClientRect();
+                console.log(`  Grid cell size: ${cellRect.width}px x ${cellRect.height}px`);
+                
+                if (gridCells.length >= 2) {
+                    const secondCell = gridCells[1];
+                    const secondRect = secondCell.getBoundingClientRect();
+                    const actualSpacing = secondRect.left - cellRect.left;
+                    console.log(`  Actual spacing between cells: ${actualSpacing}px`);
+                }
+            }
+            
+            console.log('🎯 Tile Analysis:');
+            const tiles = document.querySelectorAll('.tile');
+            tiles.forEach((tile, index) => {
+                const classes = Array.from(tile.classList);
+                const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                const computedStyle = window.getComputedStyle(tile);
+                const tileRect = tile.getBoundingClientRect();
+                console.log(`  Tile ${index}: ${positionClass}, size: ${tileRect.width}px x ${tileRect.height}px, transform: ${computedStyle.transform}`);
+            });
+        };
+
+        // Function to manually verify GameManager creation
+        window.verifyGameManager = function() {
+            console.log('🔍 VERIFYING GAMEMANAGER STATE:');
+            
+            if (!window.gameManager) {
+                console.log('❌ No GameManager found');
+                return;
+            }
+            
+            console.log('📊 GameManager Properties:');
+            console.log('  - gameManager.size:', window.gameManager.size);
+            console.log('  - gameManager.grid:', window.gameManager.grid);
+            console.log('  - gameManager.grid.size:', window.gameManager.grid.size);
+            console.log('  - gameManager.grid.cells:', window.gameManager.grid.cells);
+            console.log('  - gameManager.grid.cells.length:', window.gameManager.grid.cells.length);
+            
+            // Check each row
+            for (let i = 0; i < window.gameManager.grid.cells.length; i++) {
+                const row = window.gameManager.grid.cells[i];
+                console.log(`  - Row ${i}: length=${row.length}, content=[${row.map(cell => cell ? cell.value : 'null').join(', ')}]`);
+            }
+            
+            // Test grid methods
+            console.log('🧪 Testing Grid Methods:');
+            console.log('  - availableCells():', window.gameManager.grid.availableCells().length, 'cells');
+            console.log('  - cellsAvailable():', window.gameManager.grid.cellsAvailable());
+            
+            // Show available cell positions
+            const availableCells = window.gameManager.grid.availableCells();
+            console.log('  - Available positions:', availableCells.map(cell => `(${cell.x},${cell.y})`).join(', '));
+            
+            return {
+                size: window.gameManager.size,
+                gridSize: window.gameManager.grid.size,
+                cellsLength: window.gameManager.grid.cells.length,
+                availableCells: availableCells.length
+            };
+        };
+
+        // Function to fix tile sizes to match grid cells exactly
+        window.fixTileSizes = function() {
+            console.log('🔧 FIXING TILE SIZES TO MATCH GRID CELLS...');
+            
+            const gridCells = document.querySelectorAll('.grid-cell');
+            if (gridCells.length === 0) {
+                console.log('❌ No grid cells found');
+                return;
+            }
+            
+            const firstCell = gridCells[0];
+            const cellRect = firstCell.getBoundingClientRect();
+            const cellWidth = cellRect.width;
+            const cellHeight = cellRect.height;
+            
+            console.log(`📏 Grid cell size: ${cellWidth}px x ${cellHeight}px`);
+            
+            // Create CSS to make tiles exactly the same size as grid cells
+            const tileSizeCSS = `
+                .tile {
+                    width: ${cellWidth}px !important;
+                    height: ${cellHeight}px !important;
+                }
+                
+                .tile .tile-inner {
+                    width: ${cellWidth}px !important;
+                    height: ${cellHeight}px !important;
+                    line-height: ${cellHeight}px !important;
+                    font-size: 20px !important;
+                    box-sizing: border-box !important;
+                }
+            `;
+            
+            // Apply the CSS
+            const existingStyle = document.getElementById('exact-tile-sizes');
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+            
+            const style = document.createElement('style');
+            style.id = 'exact-tile-sizes';
+            style.textContent = tileSizeCSS;
+            document.head.appendChild(style);
+            
+            console.log('✅ Applied exact tile sizes');
+            
+            // Force re-render
+            if (window.gameManager) {
+                window.gameManager.actuate();
+            }
+        };
+
+        // Function to completely override and fix the game over logic for 5x5
+        window.fixGameOverLogic5x5 = function() {
+            console.log('🔧 FIXING GAME OVER LOGIC FOR 5x5...');
+            
+            if (!window.gameManager) {
+                console.log('❌ No game manager found');
+                return;
+            }
+            
+            // Override the movesAvailable function to fix the bug
+            const originalMovesAvailable = window.gameManager.movesAvailable;
+            const originalTileMatchesAvailable = window.gameManager.tileMatchesAvailable;
+            
+            window.gameManager.movesAvailable = function() {
+                console.log('🔍 Checking moves available (FIXED VERSION)...');
+                
+                // First check: Are there empty cells?
+                const cellsAvailable = this.grid.cellsAvailable();
+                console.log('  - Empty cells available:', cellsAvailable);
+                
+                if (cellsAvailable) {
+                    console.log('  ✅ Moves available: Empty cells exist');
+                    return true;
+                }
+                
+                // Second check: Are there tile matches?
+                const tileMatches = this.tileMatchesAvailableFixed();
+                console.log('  - Tile matches available:', tileMatches);
+                
+                if (tileMatches) {
+                    console.log('  ✅ Moves available: Tile matches exist');
+                    return true;
+                }
+                
+                console.log('  ❌ No moves available: Grid full and no matches');
+                return false;
+            };
+            
+            // Override tileMatchesAvailable with a fixed version
+            window.gameManager.tileMatchesAvailableFixed = function() {
+                console.log('🔍 Checking tile matches (FIXED VERSION)...');
+                
+                for (let x = 0; x < this.size; x++) {
+                    for (let y = 0; y < this.size; y++) {
+                        const tile = this.grid.cellContent({ x: x, y: y });
+                        
+                        if (tile) {
+                            // Check all 4 directions
+                            const directions = [
+                                { x: 0, y: -1 }, // Up
+                                { x: 1, y: 0 },  // Right
+                                { x: 0, y: 1 },  // Down
+                                { x: -1, y: 0 }  // Left
+                            ];
+                            
+                            for (let dir of directions) {
+                                const neighborX = x + dir.x;
+                                const neighborY = y + dir.y;
+                                
+                                // Check bounds
+                                if (neighborX >= 0 && neighborX < this.size && 
+                                    neighborY >= 0 && neighborY < this.size) {
+                                    
+                                    const neighbor = this.grid.cellContent({ x: neighborX, y: neighborY });
+                                    
+                                    if (neighbor && neighbor.value === tile.value) {
+                                        console.log(`  ✅ Match found: (${x},${y}):${tile.value} can merge with (${neighborX},${neighborY}):${neighbor.value}`);
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                console.log('  ❌ No tile matches found');
+                return false;
+            };
+            
+            // Override the move function to prevent false game overs
+            const originalMove = window.gameManager.move;
+            window.gameManager.move = function(direction) {
+                console.log('🎮 Move called, direction:', direction);
+                
+                // Call original move
+                const result = originalMove.call(this, direction);
+                
+                // After move, double-check game over logic
+                if (this.over) {
+                    console.log('🔍 Game marked as over, double-checking...');
+                    
+                    const cellsAvailable = this.grid.cellsAvailable();
+                    const availableCells = this.grid.availableCells();
+                    
+                    console.log('  - Cells available:', cellsAvailable);
+                    console.log('  - Available cell count:', availableCells.length);
+                    
+                    if (cellsAvailable && availableCells.length > 0) {
+                        console.log('🔧 FALSE GAME OVER DETECTED! Fixing...');
+                        this.over = false;
+                        
+                        // Clear the game over message
+                        if (this.actuator && this.actuator.clearMessage) {
+                            this.actuator.clearMessage();
+                        }
+                        
+                        // Force re-actuate
+                        setTimeout(() => {
+                            this.actuate();
+                        }, 100);
+                    }
+                }
+                
+                return result;
+            };
+            
+            console.log('✅ Game over logic fixed for 5x5!');
+            
+            // Test the fix immediately
+            setTimeout(() => {
+                console.log('🧪 Testing fixed logic...');
+                const movesAvailable = window.gameManager.movesAvailable();
+                console.log('  - Moves available (fixed):', movesAvailable);
+                
+                if (movesAvailable && window.gameManager.over) {
+                    console.log('🔧 Applying immediate fix...');
+                    window.gameManager.over = false;
+                    window.forceCloseGameOver();
+                }
+            }, 200);
+        };
+
+        // Function to completely override and fix the game over logic for 5x5
+        window.forceCloseGameOver = function() {
+            console.log('🔧 FORCEFULLY CLEARING GAME OVER SCREEN...');
+            
+            // Method 1: Clear using actuator
+            if (window.gameManager && window.gameManager.actuator && window.gameManager.actuator.clearMessage) {
+                window.gameManager.actuator.clearMessage();
+                console.log('✅ Cleared via actuator.clearMessage()');
+            }
+            
+            // Method 2: Direct DOM manipulation
+            const gameMessage = document.querySelector('.game-message');
+            if (gameMessage) {
+                gameMessage.classList.remove('game-won');
+                gameMessage.classList.remove('game-over');
+                gameMessage.classList.remove('show-modal');
+                gameMessage.style.display = 'none';
+                console.log('✅ Cleared via direct DOM manipulation');
+            }
+            
+            // Method 3: Hide any visible game over modals
+            const gameOverModals = document.querySelectorAll('.game-message, .game-over-content, [class*="game-over"]');
+            gameOverModals.forEach((modal, index) => {
+                modal.style.display = 'none';
+                modal.style.visibility = 'hidden';
+                modal.classList.remove('show-modal', 'active', 'visible');
+                console.log(`✅ Hidden modal ${index + 1}`);
+            });
+            
+            // Method 4: Force re-actuate to refresh the display
+            if (window.gameManager) {
+                setTimeout(() => {
+                    window.gameManager.actuate();
+                    console.log('✅ Forced re-actuate');
+                }, 100);
+            }
+            
+            console.log('🎯 Game over screen should now be cleared!');
+        };
+
+        // Enhanced fix function that also clears the screen
+        window.fixGameOverState = function() {
+            console.log('🔧 FIXING GAME OVER STATE...');
+            
+            if (!window.gameManager) {
+                console.log('❌ No game manager found');
+                return;
+            }
+            
+            const debug = window.debugFalseGameOver();
+            
+            // If there are empty cells, the game should NOT be over
+            if (debug.emptyCells > 0 && window.gameManager.over) {
+                console.log('🔧 Fixing: Setting game.over = false (empty cells available)');
+                window.gameManager.over = false;
+                
+                // Clear the game over message
+                window.forceCloseGameOver();
+                
+                console.log('✅ Game over state fixed!');
+                return true;
+            } else if (debug.emptyCells === 0 && debug.tileMatches && window.gameManager.over) {
+                console.log('🔧 Fixing: Setting game.over = false (tile matches available)');
+                window.gameManager.over = false;
+                
+                // Clear the game over message
+                window.forceCloseGameOver();
+                
+                console.log('✅ Game over state fixed!');
+                return true;
+            } else if (debug.emptyCells > 0 && !window.gameManager.over) {
+                console.log('🔧 Game logic is correct, but screen still showing. Clearing screen...');
+                window.forceCloseGameOver();
+                return true;
+            } else {
+                console.log('🟢 Game over state appears correct');
+                return false;
+            }
+        };
+
+        // Function to debug false game over in 5x5
+        window.debugFalseGameOver = function() {
+            console.log('🔍 DEBUGGING FALSE GAME OVER...');
+            
+            if (!window.gameManager) {
+                console.log('❌ No game manager found');
+                return;
+            }
+            
+            console.log('📊 Game State:');
+            console.log('  - Grid size:', window.gameManager.size);
+            console.log('  - Game over flag:', window.gameManager.over);
+            console.log('  - Won flag:', window.gameManager.won);
+            console.log('  - Terminated:', window.gameManager.isGameTerminated());
+            
+            // Check grid cells
+            const totalCells = window.gameManager.size * window.gameManager.size;
+            let occupiedCells = 0;
+            let emptyCells = 0;
+            
+            console.log('📊 Grid Analysis:');
+            for (let x = 0; x < window.gameManager.size; x++) {
+                for (let y = 0; y < window.gameManager.size; y++) {
+                    const tile = window.gameManager.grid.cellContent({x: x, y: y});
+                    if (tile) {
+                        occupiedCells++;
+                        console.log(`  - Cell (${x},${y}): ${tile.value}`);
+                    } else {
+                        emptyCells++;
+                        console.log(`  - Cell (${x},${y}): EMPTY`);
+                    }
+                }
+            }
+            
+            console.log(`📊 Summary: ${occupiedCells} occupied, ${emptyCells} empty, ${totalCells} total`);
+            
+            // Test the specific functions
+            const cellsAvailable = window.gameManager.grid.cellsAvailable();
+            const availableCells = window.gameManager.grid.availableCells();
+            const tileMatches = window.gameManager.tileMatchesAvailable();
+            const movesAvailable = window.gameManager.movesAvailable();
+            
+            console.log('🧪 Function Tests:');
+            console.log('  - cellsAvailable():', cellsAvailable);
+            console.log('  - availableCells().length:', availableCells.length);
+            console.log('  - tileMatchesAvailable():', tileMatches);
+            console.log('  - movesAvailable():', movesAvailable);
+            
+            // Show available cell positions
+            console.log('📍 Available cells:', availableCells.map(cell => `(${cell.x},${cell.y})`).join(', '));
+            
+            // The bug analysis
+            if (emptyCells > 0 && !movesAvailable) {
+                console.log('🔴 BUG DETECTED: Empty cells exist but movesAvailable() returns false!');
+                console.log('🔴 This should never happen - if cells are available, moves should be available');
+            } else if (emptyCells > 0 && window.gameManager.over) {
+                console.log('🔴 BUG DETECTED: Empty cells exist but game is marked as over!');
+            } else if (emptyCells === 0 && !tileMatches && !window.gameManager.over) {
+                console.log('🟡 Grid is full and no matches - game should be over');
+            } else if (emptyCells > 0 && !window.gameManager.over) {
+                console.log('✅ Correct: Empty cells exist and game continues');
+            }
+            
+            return {
+                totalCells,
+                occupiedCells,
+                emptyCells,
+                cellsAvailable,
+                tileMatches,
+                movesAvailable,
+                gameOver: window.gameManager.over
+            };
+        };
+
+        // Function to force fix the game over state
+        window.fixGameOverState = function() {
+            console.log('🔧 FIXING GAME OVER STATE...');
+            
+            if (!window.gameManager) {
+                console.log('❌ No game manager found');
+                return;
+            }
+            
+            const debug = window.debugFalseGameOver();
+            
+            // If there are empty cells, the game should NOT be over
+            if (debug.emptyCells > 0 && window.gameManager.over) {
+                console.log('🔧 Fixing: Setting game.over = false (empty cells available)');
+                window.gameManager.over = false;
+                
+                // Clear the game over message
+                if (window.gameManager.actuator && window.gameManager.actuator.clearMessage) {
+                    window.gameManager.actuator.clearMessage();
+                }
+                
+                // Force re-actuate
+                window.gameManager.actuate();
+                
+                console.log('✅ Game over state fixed!');
+                return true;
+            } else if (debug.emptyCells === 0 && debug.tileMatches && window.gameManager.over) {
+                console.log('🔧 Fixing: Setting game.over = false (tile matches available)');
+                window.gameManager.over = false;
+                
+                // Clear the game over message
+                if (window.gameManager.actuator && window.gameManager.actuator.clearMessage) {
+                    window.gameManager.actuator.clearMessage();
+                }
+                
+                // Force re-actuate
+                window.gameManager.actuate();
+                
+                console.log('✅ Game over state fixed!');
+                return true;
+            } else {
+                console.log('🟢 Game over state appears correct');
+                return false;
+            }
+        };
+
+        // Function to test game over logic for 5x5
+        window.testGameOver5x5 = function() {
+            console.log('🧪 TESTING GAME OVER LOGIC FOR 5x5...');
+            
+            if (!window.gameManager || window.gameManager.size !== 5) {
+                console.log('❌ Need a 5x5 game to test. Run forceCreate5x5() first.');
+                return;
+            }
+            
+            console.log('📊 Current game state:');
+            console.log('  - Grid size:', window.gameManager.size);
+            console.log('  - Game over:', window.gameManager.over);
+            console.log('  - Won:', window.gameManager.won);
+            
+            // Test movesAvailable function
+            const movesAvailable = window.gameManager.movesAvailable();
+            console.log('  - Moves available:', movesAvailable);
+            
+            // Test cellsAvailable
+            const cellsAvailable = window.gameManager.grid.cellsAvailable();
+            const availableCells = window.gameManager.grid.availableCells();
+            console.log('  - Cells available:', cellsAvailable, '(' + availableCells.length + ' cells)');
+            
+            // Test tileMatchesAvailable
+            const tileMatches = window.gameManager.tileMatchesAvailable();
+            console.log('  - Tile matches available:', tileMatches);
+            
+            // Show all tiles
+            let tileCount = 0;
+            const tileValues = [];
+            window.gameManager.grid.eachCell(function(x, y, tile) {
+                if (tile) {
+                    tileCount++;
+                    tileValues.push(`(${x},${y}):${tile.value}`);
+                }
+            });
+            console.log('  - Total tiles:', tileCount, '/', (window.gameManager.size * window.gameManager.size));
+            console.log('  - Tile positions:', tileValues.join(', '));
+            
+            // Check if game should be over
+            if (tileCount === (window.gameManager.size * window.gameManager.size) && !tileMatches) {
+                console.log('🔴 Game should be OVER (grid full, no matches)');
+            } else if (tileCount < (window.gameManager.size * window.gameManager.size)) {
+                console.log('🟢 Game should CONTINUE (empty cells available)');
+            } else if (tileMatches) {
+                console.log('🟢 Game should CONTINUE (tile matches available)');
+            }
+            
+            return {
+                size: window.gameManager.size,
+                over: window.gameManager.over,
+                won: window.gameManager.won,
+                movesAvailable: movesAvailable,
+                cellsAvailable: cellsAvailable,
+                tileMatches: tileMatches,
+                tileCount: tileCount,
+                maxTiles: window.gameManager.size * window.gameManager.size
+            };
+        };
+
+        // Function to simulate a full 5x5 grid for testing
+        window.simulateFullGrid5x5 = function() {
+            console.log('🧪 SIMULATING FULL 5x5 GRID...');
+            
+            if (!window.gameManager || window.gameManager.size !== 5) {
+                console.log('❌ Need a 5x5 game. Run forceCreate5x5() first.');
+                return;
+            }
+            
+            // Fill the grid with random values to test game over
+            const values = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
+            
+            for (let x = 0; x < 5; x++) {
+                for (let y = 0; y < 5; y++) {
+                    if (!window.gameManager.grid.cellContent({x: x, y: y})) {
+                        const randomValue = values[Math.floor(Math.random() * values.length)];
+                        const tile = new Tile({x: x, y: y}, randomValue);
+                        window.gameManager.grid.insertTile(tile);
+                    }
+                }
+            }
+            
+            // Force actuate to show the full grid
+            window.gameManager.actuate();
+            
+            console.log('✅ Grid filled. Testing game over logic...');
+            setTimeout(() => {
+                window.testGameOver5x5();
+            }, 500);
+        };
+
+        // Function to adjust win condition for 5x5
+        window.adjustWinCondition5x5 = function() {
+            console.log('🎯 ADJUSTING WIN CONDITION FOR 5x5...');
+            
+            if (!window.gameManager) {
+                console.log('❌ No game manager found');
+                return;
+            }
+            
+            // For 5x5, maybe the win condition should be higher than 2048
+            // Let's make it 4096 for 5x5 grids to make it more challenging
+            const originalMove = window.gameManager.move;
+            
+            window.gameManager.move = function(direction) {
+                // Call original move function
+                const result = originalMove.call(this, direction);
+                
+                // Override win condition for 5x5
+                if (this.size === 5) {
+                    // Reset won flag if it was set for 2048
+                    if (this.won && this.getHighestTileValue() < 4096) {
+                        this.won = false;
+                        console.log('🎯 2048 reached in 5x5, but continuing to 4096...');
+                    }
+                    
+                    // Check for 4096 win condition
+                    if (this.getHighestTileValue() >= 4096 && !this.won) {
+                        this.won = true;
+                        console.log('🎉 4096 reached in 5x5! You win!');
+                    }
+                }
+                
+                return result;
+            };
+            
+            // Add helper function to get highest tile value
+            window.gameManager.getHighestTileValue = function() {
+                let highest = 0;
+                this.grid.eachCell(function(x, y, tile) {
+                    if (tile && tile.value > highest) {
+                        highest = tile.value;
+                    }
+                });
+                return highest;
+            };
+            
+            console.log('✅ Win condition adjusted: 4096 for 5x5 grids');
+        };
+
+        // Complete fix function that measures and aligns everything
+        window.perfectAlign5x5 = function() {
+            console.log('🎯 PERFECT ALIGNING 5x5 GRID...');
+            
+            // Step 1: Fix tile sizes
+            window.fixTileSizes();
+            
+            // Step 2: Measure and align positions
+            setTimeout(() => {
+                window.measureAndAlignGrid();
+                console.log('✅ Perfect 5x5 alignment complete!');
+            }, 100);
+        };
+
+        // Function to force create a 5x5 GameManager
+        window.forceCreate5x5 = function() {
+            console.log('🔧 FORCE CREATING 5x5 GAMEMANAGER...');
+            
+            // Clear everything FIRST
+            console.log('🔧 Clearing localStorage...');
+            if (window.LocalStorageManager) {
+                const storageManager = new LocalStorageManager();
+                storageManager.clearGameState();
+                storageManager.clearBestScore(); // Also clear best score
+                console.log('✅ Cleared all localStorage data');
+            }
+            
+            // Also clear localStorage directly to be sure
+            localStorage.removeItem('gameState');
+            localStorage.removeItem('bestScore');
+            console.log('✅ Cleared localStorage directly');
+            
+            // Create with explicit size 5
+            console.log('🔧 Creating GameManager(5, ...)');
+            window.gameManager = new GameManager(5, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+            
+            // Verify immediately
+            const verification = window.verifyGameManager();
+            
+            if (verification.gridSize === 5) {
+                console.log('✅ SUCCESS: 5x5 GameManager created!');
+                window.gameManager.actuate();
+            } else {
+                console.log('❌ FAILED: GameManager is still', verification.gridSize + 'x' + verification.gridSize);
+                console.log('❌ This suggests the GameManager constructor has a bug');
+            }
+            
+            return verification;
+        };
+
+        // Clean up any layout issues
+        window.cleanupGridLayout = function() {
+            console.log('🧹 Cleaning up grid layout...');
+            
+            // Remove any stray grid elements
+            const strayGrids = document.querySelectorAll('.grid-container:not(.game-container .grid-container)');
+            strayGrids.forEach(grid => {
+                console.log('🧹 Removing stray grid element');
+                grid.remove();
+            });
+            
+            // Ensure proper container structure
+            const gameContainer = document.querySelector('.game-container');
+            const gridContainer = document.querySelector('.grid-container');
+            
+            if (gameContainer && gridContainer && !gameContainer.contains(gridContainer)) {
+                console.log('🧹 Moving grid container to proper parent');
+                gameContainer.appendChild(gridContainer);
+            }
+            
+            console.log('✅ Grid layout cleaned up');
+        };
+
+        // Update CSS for different grid sizes (keeps 4x4 unchanged, optimizes 5x5 and 6x6)
+        function updateGridCSS(size) {
+            // Remove existing dynamic styles
+            const existingStyle = document.getElementById('dynamic-grid-styles');
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+            
+            // Only add CSS for 5x5 and 6x6 - leave 4x4 as default
+            if (size === 4) {
+                console.log('✅ Using default 4x4 styling');
+                return; // Use existing CSS for 4x4
+            }
+            
+            let cellSize, cellGap, fontSize, containerPadding, tileCSS = '';
+            
+            if (size === 5) {
+                // 5x5 - Perfect square cells with equal spacing + 1px right margin
+                cellSize = 56;  // Square cells
+                cellGap = 10;   // Equal row and column spacing
+                fontSize = 20;  // Readable font size
+                containerPadding = 15; // Standard padding
+                
+                // No custom tile sizing - use the same size as grid cells
+                tileCSS = '';
+            } else if (size === 6) {
+                // 6x6 - Perfect square cells with equal spacing
+                cellSize = 45;
+                cellGap = 8;    // Equal row and column spacing
+                fontSize = 16;
+                containerPadding = 12;
+            }
+            
+            // Calculate exact container size
+            let totalCellWidth, totalGapWidth, containerSize;
+            
+            if (size === 5) {
+                // Account for 1px right margin in calculations
+                const cellWithMargin = cellSize + 1; // 57px effective width per cell
+                totalCellWidth = cellWithMargin * size - 1; // Remove last margin: 57*5-1 = 284px
+                totalGapWidth = cellGap * (size - 1); // 10*4 = 40px
+                containerSize = totalCellWidth + totalGapWidth + (containerPadding * 2); // 284+40+30 = 354px
+            } else {
+                totalCellWidth = cellSize * size;
+                totalGapWidth = cellGap * (size - 1);
+                containerSize = totalCellWidth + totalGapWidth + (containerPadding * 2);
+            }
+            
+            console.log(`🔧 ${size}x${size} Grid: cellSize=${cellSize}px, gap=${cellGap}px, container=${containerSize}px`);
+            
+            // Create dynamic styles with EQUAL row and column spacing
+            const style = document.createElement('style');
+            style.id = 'dynamic-grid-styles';
+            style.textContent = `
+                /* ${size}x${size} Grid Styling - EQUAL ROW AND COLUMN SPACING */
+                .grid-container {
+                    width: ${containerSize}px !important;
+                    height: ${containerSize}px !important;
+                    padding: ${containerPadding}px !important;
+                    box-sizing: border-box !important;
+                    margin: 0 auto !important;
+                }
+                
+                .grid-cell {
+                    width: ${cellSize}px !important;
+                    height: ${cellSize}px !important;
+                    flex-shrink: 0 !important;
+                    flex-grow: 0 !important;
+                    ${size === 5 ? 'margin-right: 1px !important;' : ''}
+                }
+                
+                .grid-row {
+                    display: flex !important;
+                    gap: ${cellGap}px !important;
+                    margin-bottom: ${cellGap}px !important;
+                    width: 100% !important;
+                    height: ${cellSize}px !important;
+                    justify-content: flex-start !important;
+                    align-items: flex-start !important;
+                }
+                
+                .grid-row:last-child {
+                    margin-bottom: 0 !important;
+                }
+                
+                .tile-container {
+                    position: absolute !important;
+                    top: ${containerPadding}px !important;
+                    left: ${containerPadding}px !important;
+                    width: ${totalCellWidth + totalGapWidth}px !important;
+                    height: ${size === 5 ? cellSize * size + totalGapWidth : totalCellWidth + totalGapWidth}px !important;
+                }
+                
+                /* Custom tile sizing for ${size}x${size} */
+                ${tileCSS}
+                
+                /* Default tile styling if no custom size */
+                ${!tileCSS ? `
+                .tile {
+                    position: absolute !important;
+                    width: ${cellSize}px !important;
+                    height: ${cellSize}px !important;
+                }
+                
+                .tile .tile-inner {
+                    width: ${cellSize}px !important;
+                    height: ${cellSize}px !important;
+                    line-height: ${cellSize}px !important;
+                    font-size: ${fontSize}px !important;
+                    box-sizing: border-box !important;
+                }` : ''}
+                
+                /* Tile positions for ${size}x${size} with EQUAL spacing */
+                ${generateCorrectPositions(size, cellSize, cellGap)}
+                
+                /* Mobile responsive with EQUAL spacing */
+                @media screen and (max-width: 520px) {
+                    .grid-container {
+                        width: 300px !important;
+                        height: 300px !important;
+                        padding: 10px !important;
+                    }
+                    
+                    .grid-cell {
+                        width: ${Math.floor((280 - (size - 1) * 8) / size)}px !important;
+                        height: ${Math.floor((280 - (size - 1) * 8) / size)}px !important;
+                    }
+                    
+                    .grid-row {
+                        gap: 8px !important;
+                        margin-bottom: 8px !important;
+                        height: ${Math.floor((280 - (size - 1) * 8) / size)}px !important;
+                    }
+                    
+                    .tile-container {
+                        top: 10px !important;
+                        left: 10px !important;
+                        width: 280px !important;
+                        height: 280px !important;
+                    }
+                    
+                    .tile {
+                        width: ${Math.floor((280 - (size - 1) * 8) / size)}px !important;
+                        height: ${Math.floor((280 - (size - 1) * 8) / size)}px !important;
+                    }
+                    
+                    .tile .tile-inner {
+                        width: ${Math.floor((280 - (size - 1) * 8) / size)}px !important;
+                        height: ${Math.floor((280 - (size - 1) * 8) / size)}px !important;
+                        line-height: ${Math.floor((280 - (size - 1) * 8) / size)}px !important;
+                        font-size: ${Math.max(12, fontSize - 4)}px !important;
+                    }
+                    
+                    /* Mobile tile positions with EQUAL spacing */
+                    ${size === 5 ? generateMobile5x5Positions() : generateCorrectPositions(size, Math.floor((280 - (size - 1) * 8) / size), 8)}
+                }
+            `;
+            
+            document.head.appendChild(style);
+            console.log('✅ Applied', size + 'x' + size, 'grid CSS with EQUAL row and column spacing');
+        }
+
+        // Generate mobile 5x5 positions
+        function generateMobile5x5Positions() {
+            let css = '';
+            const mobileCellSize = Math.floor((280 - 4 * 8) / 5); // ~48px
+            const mobileGap = 8;
+            
+            for (let x = 0; x < 5; x++) {
+                for (let y = 0; y < 5; y++) {
+                    const left = x * (mobileCellSize + mobileGap);
+                    const top = y * (mobileCellSize + mobileGap);
+                    
+                    css += `
+                        .tile.tile-position-${x + 1}-${y + 1} {
+                            -webkit-transform: translate(${left}px, ${top}px) !important;
+                            -moz-transform: translate(${left}px, ${top}px) !important;
+                            -ms-transform: translate(${left}px, ${top}px) !important;
+                            transform: translate(${left}px, ${top}px) !important;
+                        }
+                    `;
+                }
+            }
+            
+            return css;
+        }
+
+        // Generate correct tile positions that match the grid exactly
+        function generateCorrectPositions(size, cellSize, cellGap) {
+            let css = '';
+            
+            console.log(`🎯 Generating CORRECT positions for ${size}x${size}: cell=${cellSize}px, gap=${cellGap}px`);
+            
+            for (let x = 0; x < size; x++) {
+                for (let y = 0; y < size; y++) {
+                    // Calculate exact position to match grid cells
+                    let left, top;
+                    
+                    if (size === 5) {
+                        // For 5x5, match the EXACT grid cell positions
+                        // Grid cells: 56px width + 1px margin-right + 10px gap
+                        // But we need to position tiles to sit exactly where grid cells are
+                        
+                        // Horizontal: account for cell width + margin + gap
+                        left = x * (cellSize + 1 + cellGap); // 56 + 1 + 10 = 67px spacing
+                        
+                        // Vertical: account for cell height + gap (no margin vertically)
+                        top = y * (cellSize + cellGap); // 56 + 10 = 66px spacing
+                        
+                        console.log(`  Position (${x + 1},${y + 1}): left=${left}px, top=${top}px`);
+                    } else {
+                        // Standard calculation for other sizes
+                        left = x * (cellSize + cellGap);
+                        top = y * (cellSize + cellGap);
+                    }
+                    
+                    // Use 1-based indexing like original 4x4
+                    const positionClass = `tile-position-${x + 1}-${y + 1}`;
+                    
+                    // Use VERY HIGH specificity to override static CSS
+                    css += `
+                        .tile-container .tile.${positionClass},
+                        .game-container .tile.${positionClass},
+                        .tile.${positionClass} {
+                            -webkit-transform: translate(${left}px, ${top}px) !important;
+                            -moz-transform: translate(${left}px, ${top}px) !important;
+                            -ms-transform: translate(${left}px, ${top}px) !important;
+                            transform: translate(${left}px, ${top}px) !important;
+                        }
+                    `;
+                }
+            }
+            
+            console.log(`✅ Generated ${size * size} position classes with EXACT grid alignment`);
+            return css;
+        }
+
+        // Generate exact position classes that match the grid layout
+        function generateExactPositionClasses(size, cellSize, cellGap) {
+            return generateCorrectPositions(size, cellSize, cellGap);
+        }
+
+        // Generate position classes for tile animations (legacy function)
+        function generatePositionClasses(size, tileSpacing) {
+            return generateCorrectPositions(size, tileSpacing - 10, 10);
+        }
+
+        // Debug function to test current grid positioning
+        window.debugGridPositions = function() {
+            const currentSize = window.gameManager ? window.gameManager.size : 4;
+            console.log('🔍 Current grid size:', currentSize);
+            
+            // Check grid cells
+            const gridCells = document.querySelectorAll('.grid-cell');
+            console.log('🔍 Grid cells found:', gridCells.length, 'Expected:', currentSize * currentSize);
+            
+            // Check tiles
+            const tiles = document.querySelectorAll('.tile');
+            console.log('🔍 Tiles found:', tiles.length);
+            
+            tiles.forEach((tile, index) => {
+                const classes = Array.from(tile.classList);
+                const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                const value = tile.querySelector('.tile-inner')?.textContent || '?';
+                const computedStyle = window.getComputedStyle(tile);
+                
+                console.log(`🔍 Tile ${index}: value=${value}, position=${positionClass}, transform=${computedStyle.transform}`);
+            });
+        };
+
+        // Reinitialize game with new size
+        function reinitializeGame(newSize) {
+            console.log('🎮 Reinitializing game with size:', newSize);
+            
+            try {
+                // Create new game manager with new size
+                window.gameManager = new GameManager(newSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+                
+                // Reset power-ups if they exist
+                if (window.resetPowerUps) {
+                    window.resetPowerUps();
+                }
+                
+                console.log('✅ Game reinitialized with', newSize + 'x' + newSize, 'grid');
+                
+                // Force actuate to ensure tiles are positioned correctly
+                setTimeout(() => {
+                    if (window.gameManager) {
+                        window.gameManager.actuate();
+                        console.log('🔄 Forced tile position update');
+                    }
+                }, 100);
+                
+            } catch (error) {
+                console.log('❌ Error reinitializing game:', error);
+            }
+        }
+
+        // Test function to verify 5x5 grid fitting
+        window.test5x5Fit = function() {
+            console.log('🧪 Testing 5x5 grid fit calculations:');
+            
+            const cellSize = 87;
+            const cellGap = 10;
+            const containerPadding = 15;
+            const size = 5;
+            
+            const totalCellWidth = cellSize * size; // 87 * 5 = 435
+            const totalGapWidth = cellGap * (size - 1); // 10 * 4 = 40
+            const containerSize = totalCellWidth + totalGapWidth + (containerPadding * 2); // 435 + 40 + 30 = 505
+            
+            console.log('📏 5x5 Calculations:');
+            console.log('  Cell size:', cellSize + 'px');
+            console.log('  Gap size:', cellGap + 'px');
+            console.log('  Container padding:', containerPadding + 'px');
+            console.log('  Total cell width:', totalCellWidth + 'px');
+            console.log('  Total gap width:', totalGapWidth + 'px');
+            console.log('  Final container size:', containerSize + 'px');
+            
+            console.log('📍 5x5 Tile Positions:');
+            for (let x = 0; x < 5; x++) {
+                for (let y = 0; y < 5; y++) {
+                    const left = x * (cellSize + cellGap);
+                    const top = y * (cellSize + cellGap);
+                    console.log(`  (${x + 1},${y + 1}): translate(${left}px, ${top}px)`);
+                }
+            }
+            
+            console.log('✅ 5x5 should fit in approximately 505px container');
+        };
+
+        // Test function to verify grid positioning
+        window.testGridPositioning = function() {
+            const currentSize = window.gameManager ? window.gameManager.size : 4;
+            console.log('🧪 Testing grid positioning for', currentSize + 'x' + currentSize);
+            
+            // Test position calculations
+            let tileSpacing;
+            if (currentSize === 4) {
+                tileSpacing = 121; // 4x4 uses 121px spacing
+                console.log('📏 Using default 4x4 positioning: 121px spacing');
+            } else if (currentSize === 5) {
+                tileSpacing = 80; // 70px + 10px
+                console.log('📏 5x5 spacing: 80px (70px tile + 10px gap)');
+            } else if (currentSize === 6) {
+                tileSpacing = 66; // 58px + 8px
+                console.log('📏 6x6 spacing: 66px (58px tile + 8px gap)');
+            }
+            
+            // Test first few positions
+            for (let x = 0; x < Math.min(currentSize, 3); x++) {
+                for (let y = 0; y < Math.min(currentSize, 3); y++) {
+                    const left = x * tileSpacing;
+                    const top = y * tileSpacing;
+                    console.log(`📍 Position (${x + 1},${y + 1}): ${left}px, ${top}px`);
+                }
+            }
+        };
+
+        // Show level change confirmation message
+        function showLevelChangeMessage(level, gridSize) {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, rgba(255, 165, 0, 0.95), rgba(255, 140, 0, 0.95));
+                color: white;
+                padding: 20px 30px;
+                border-radius: 12px;
+                font-weight: bold;
+                font-size: 16px;
+                z-index: 10001;
+                animation: levelChangeSlide 0.5s ease-out;
+                box-shadow: 0 10px 30px rgba(255, 165, 0, 0.4);
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                text-align: center;
+                backdrop-filter: blur(10px);
+            `;
+            
+            const levelNames = { 1: 'Classic', 2: 'Advanced', 3: 'Expert' };
+            const levelIcons = { 1: '🟦', 2: '🟩', 3: '🟪' };
+            
+            message.innerHTML = `
+                <div style="font-size: 32px; margin-bottom: 8px;">${levelIcons[level]}</div>
+                <div style="font-size: 18px;">Level ${level} - ${levelNames[level]}</div>
+                <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">${gridSize}×${gridSize} Grid</div>
+            `;
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes levelChangeSlide {
+                    from { opacity: 0; transform: translate(-50%, -50%) scale(0.8) translateY(-20px); }
+                    to { opacity: 1; transform: translate(-50%, -50%) scale(1) translateY(0); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(message);
+            
+            // Remove message after 3 seconds
+            setTimeout(() => {
+                message.style.animation = 'levelChangeSlide 0.3s ease-out reverse';
+                setTimeout(() => {
+                    message.remove();
+                    style.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Close level selector when clicking outside
+        document.addEventListener('DOMContentLoaded', function() {
+            const levelSelector = document.getElementById('levelSelector');
+            if (levelSelector) {
+                levelSelector.addEventListener('click', function(e) {
+                    if (e.target === levelSelector) {
+                        closeLevelSelector();
+                    }
+                });
+            }
         });
     </script>
 
