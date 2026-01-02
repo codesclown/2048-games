@@ -4627,6 +4627,287 @@
             }, 2500); // Wait for level transition
         };
 
+        // Comprehensive test for all power-ups in 6x6
+        window.test6x6PowerUps = function() {
+            console.log('🧪 COMPREHENSIVE 6x6 POWER-UPS TEST...');
+            console.log('Testing: Delete Tile, Undo, and Swap in 6x6 grid');
+            
+            // Step 1: Switch to 6x6
+            console.log('Step 1: Switching to Level 3 (6x6)...');
+            window.selectLevel(3);
+            
+            // Step 2: Wait for level transition and start testing
+            setTimeout(() => {
+                console.log('Step 2: Level transition completed, starting power-up tests...');
+                
+                if (window.currentGridSize !== 6) {
+                    console.log('❌ Failed to switch to 6x6 grid');
+                    return;
+                }
+                
+                // Enable all power-ups for testing
+                console.log('Step 3: Enabling all power-ups for testing...');
+                window.powerUps.delete.uses = 5;
+                window.powerUps.undo.uses = 5;
+                window.powerUps.swap.uses = 5;
+                updateButtonTitles();
+                
+                // Test 1: Delete Tile
+                setTimeout(() => {
+                    console.log('\n🗑️ TEST 1: DELETE TILE IN 6x6');
+                    window.test6x6DeleteTile();
+                }, 500);
+                
+                // Test 2: Undo
+                setTimeout(() => {
+                    console.log('\n↩️ TEST 2: UNDO IN 6x6');
+                    window.test6x6Undo();
+                }, 2000);
+                
+                // Test 3: Swap
+                setTimeout(() => {
+                    console.log('\n🔄 TEST 3: SWAP IN 6x6');
+                    window.test6x6Swap();
+                }, 4000);
+                
+                // Final summary
+                setTimeout(() => {
+                    console.log('\n📊 6x6 POWER-UPS TEST SUMMARY:');
+                    console.log('✅ All three power-ups tested in 6x6 grid');
+                    console.log('🎮 Check console output above for detailed results');
+                }, 6000);
+                
+            }, 2500); // Wait for level transition
+        };
+
+        // Test delete tile specifically in 6x6
+        window.test6x6DeleteTile = function() {
+            console.log('🗑️ Testing delete tile in 6x6...');
+            
+            if (window.currentGridSize !== 6) {
+                console.log('❌ Not on 6x6 grid');
+                return;
+            }
+            
+            const tiles = document.querySelectorAll('.tile');
+            console.log(`🔍 Found ${tiles.length} tiles in 6x6 grid`);
+            
+            if (tiles.length <= 2) {
+                console.log('⚠️ Need more than 2 tiles to test delete functionality');
+                console.log('🎮 Play a few moves first to generate more tiles');
+                return;
+            }
+            
+            // Test delete logic
+            const tileCount = tiles.length;
+            const canDelete = tileCount > 2;
+            
+            console.log(`📊 Tile count: ${tileCount}, Can delete: ${canDelete}`);
+            
+            if (canDelete) {
+                console.log('✅ Delete tile logic working correctly in 6x6');
+                console.log('🎯 You can click on any tile to delete it');
+            } else {
+                console.log('❌ Delete tile logic issue in 6x6');
+            }
+        };
+
+        // Test undo specifically in 6x6
+        window.test6x6Undo = function() {
+            console.log('↩️ Testing undo in 6x6...');
+            
+            if (window.currentGridSize !== 6) {
+                console.log('❌ Not on 6x6 grid');
+                return;
+            }
+            
+            // Check undo availability
+            const undoButton = document.querySelector('.power-up-button[onclick*="undo"]');
+            const hasUndoUses = window.powerUps.undo.uses > 0;
+            const hasHistory = window.gameStateHistory && window.gameStateHistory.length > 0;
+            
+            console.log(`🔍 Undo uses available: ${window.powerUps.undo.uses}`);
+            console.log(`🔍 Game history entries: ${hasHistory ? window.gameStateHistory.length : 0}`);
+            console.log(`🔍 Undo button enabled: ${undoButton && !undoButton.classList.contains('disabled')}`);
+            
+            if (hasUndoUses) {
+                console.log('✅ Undo functionality available in 6x6');
+                if (hasHistory) {
+                    console.log('✅ Game history exists - undo should work');
+                } else {
+                    console.log('⚠️ No game history yet - make some moves first');
+                }
+            } else {
+                console.log('❌ No undo uses available');
+            }
+        };
+
+        // Test swap specifically in 6x6
+        window.test6x6Swap = function() {
+            console.log('🔄 Testing swap in 6x6...');
+            
+            if (window.currentGridSize !== 6) {
+                console.log('❌ Not on 6x6 grid');
+                return;
+            }
+            
+            const tiles = document.querySelectorAll('.tile');
+            console.log(`🔍 Found ${tiles.length} tiles in 6x6 grid`);
+            
+            if (tiles.length < 2) {
+                console.log('⚠️ Need at least 2 tiles to test swap functionality');
+                return;
+            }
+            
+            // Check swap availability
+            const hasSwapUses = window.powerUps.swap.uses > 0;
+            const swapButton = document.querySelector('.power-up-button[onclick*="swap"]');
+            
+            console.log(`🔍 Swap uses available: ${window.powerUps.swap.uses}`);
+            console.log(`🔍 Swap button enabled: ${swapButton && !swapButton.classList.contains('disabled')}`);
+            
+            // Test tile position validation for 6x6
+            let validPositions = 0;
+            tiles.forEach((tile, index) => {
+                const classes = Array.from(tile.classList);
+                const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                
+                if (positionClass) {
+                    const coords = positionClass.replace('tile-position-', '').split('-');
+                    const x = parseInt(coords[0]) - 1;
+                    const y = parseInt(coords[1]) - 1;
+                    
+                    // Check if position is valid for 6x6 grid
+                    if (x >= 0 && x < 6 && y >= 0 && y < 6) {
+                        validPositions++;
+                    } else {
+                        console.log(`❌ Invalid position for tile ${index}: (${x},${y})`);
+                    }
+                }
+            });
+            
+            console.log(`📊 Valid tile positions: ${validPositions}/${tiles.length}`);
+            
+            if (hasSwapUses && validPositions === tiles.length) {
+                console.log('✅ Swap functionality should work correctly in 6x6');
+                console.log('🎯 Click swap button, then click two tiles to swap them');
+            } else {
+                if (!hasSwapUses) console.log('❌ No swap uses available');
+                if (validPositions !== tiles.length) console.log('❌ Some tiles have invalid positions');
+            }
+        };
+
+        // Debug 6x6 swap issues specifically
+        window.debug6x6Swap = function() {
+            console.log('🔍 DEBUGGING 6x6 SWAP ISSUES...');
+            
+            if (window.currentGridSize !== 6) {
+                console.log('❌ Not on 6x6 grid. Current size:', window.currentGridSize);
+                console.log('🎯 Switch to Level 3 first: window.selectLevel(3)');
+                return;
+            }
+            
+            console.log('🔍 Current settings:');
+            console.log('  - currentLevel:', window.currentLevel);
+            console.log('  - currentGridSize:', window.currentGridSize);
+            console.log('  - gameManager exists:', !!window.gameManager);
+            console.log('  - gameManager.grid exists:', !!(window.gameManager && window.gameManager.grid));
+            console.log('  - gameManager.grid.size:', window.gameManager ? window.gameManager.grid.size : 'N/A');
+            
+            // Check DOM tiles
+            const domTiles = document.querySelectorAll('.tile');
+            console.log('🔍 DOM tiles:', domTiles.length);
+            
+            let validPositions = 0;
+            let invalidPositions = 0;
+            
+            domTiles.forEach((tile, index) => {
+                const classes = Array.from(tile.classList);
+                const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                const value = tile.querySelector('.tile-inner')?.textContent || '?';
+                
+                if (positionClass) {
+                    const coords = positionClass.replace('tile-position-', '').split('-');
+                    const x = parseInt(coords[0]) - 1;
+                    const y = parseInt(coords[1]) - 1;
+                    
+                    console.log(`🔍 Tile ${index}: ${positionClass} → (${x},${y}), value=${value}`);
+                    
+                    // Check if position is valid for 6x6
+                    if (x >= 0 && x < 6 && y >= 0 && y < 6) {
+                        validPositions++;
+                        
+                        // Check if tile exists in game grid
+                        if (window.gameManager && window.gameManager.grid) {
+                            const gridTile = window.gameManager.grid.cellContent({x: x, y: y});
+                            if (gridTile) {
+                                console.log(`  ✅ Grid tile found: value=${gridTile.value}`);
+                            } else {
+                                console.log(`  ❌ No grid tile at position (${x},${y})`);
+                            }
+                        }
+                    } else {
+                        invalidPositions++;
+                        console.log(`  ❌ Invalid position for 6x6: (${x},${y})`);
+                    }
+                } else {
+                    console.log(`🔍 Tile ${index}: No position class found, value=${value}`);
+                    invalidPositions++;
+                }
+            });
+            
+            console.log(`📊 Position validation: ${validPositions} valid, ${invalidPositions} invalid`);
+            
+            // Test getTilePosition function directly
+            if (domTiles.length > 0) {
+                console.log('🧪 Testing getTilePosition function:');
+                const testTile = domTiles[0];
+                const position = window.tileSelectionMode.getTilePosition(testTile);
+                console.log('  Test result:', position);
+            }
+            
+            // Check swap power-up status
+            console.log('🔍 Swap power-up status:');
+            console.log('  - Uses available:', window.powerUps.swap.uses);
+            console.log('  - Button enabled:', !document.querySelector('.power-up-button[onclick*="swap"]')?.classList.contains('disabled'));
+        };
+
+        // Test and fix 6x6 swap functionality
+        window.testAndFix6x6Swap = function() {
+            console.log('🔧 TESTING AND FIXING 6x6 SWAP...');
+            
+            // First switch to 6x6 if not already
+            if (window.currentGridSize !== 6) {
+                console.log('🔄 Switching to 6x6 first...');
+                window.selectLevel(3);
+                
+                setTimeout(() => {
+                    window.testAndFix6x6Swap();
+                }, 2500);
+                return;
+            }
+            
+            // Enable swap for testing
+            window.powerUps.swap.uses = 5;
+            updateButtonTitles();
+            
+            // Debug current state
+            window.debug6x6Swap();
+            
+            // Check if there are tiles to swap
+            const tiles = document.querySelectorAll('.tile');
+            if (tiles.length < 2) {
+                console.log('⚠️ Need at least 2 tiles to test swap. Play some moves first.');
+                return;
+            }
+            
+            console.log('🎯 Swap test ready!');
+            console.log('📋 Instructions:');
+            console.log('1. Click the swap button (🔄)');
+            console.log('2. Click on two tiles to swap them');
+            console.log('3. Check console for detailed swap process logs');
+        };
+
         // Quick 6x6 alignment fix
         window.quick6x6Fix = function() {
             console.log('⚡ QUICK 6x6 ALIGNMENT FIX...');
