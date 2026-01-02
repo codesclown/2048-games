@@ -613,7 +613,7 @@
                     </svg>
                     <span class="power-up-counter" id="swap-counter">1</span>
                 </button>
-                <button class="game-action-btn menu-btn" onclick="handleMenuClick(this)" title="Delete Tiles by Number - 0 uses left (Max: 2)">
+                <button class="game-action-btn menu-btn" onclick="handleMenuClick(this)" title="Delete One Tile - 0 uses left (Max: 2)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 32 32" class="action-icon">
                         <rect width="12" height="12" x="15" y="15" fill="currentColor" rx="4" style="fill:currentColor;fill-opacity:1" transform="rotate(180 15 15)"></rect>
                         <rect width="9.5" height="9.5" x="13.75" y="27.75" stroke="currentColor" stroke-linecap="round" stroke-width="2.5" rx="2.75" style="stroke:currentColor;stroke-opacity:1" transform="rotate(180 13.75 27.75)"></rect>
@@ -1430,7 +1430,7 @@
                 }
             }
             if (deleteBtn) {
-                deleteBtn.title = `Delete Tiles by Number - ${window.powerUps.delete.uses} uses left (Max: ${window.powerUps.delete.maxUses})`;
+                deleteBtn.title = `Delete One Tile - ${window.powerUps.delete.uses} uses left (Max: ${window.powerUps.delete.maxUses})`;
                 // Disable button if no uses left
                 if (window.powerUps.delete.uses === 0) {
                     deleteBtn.classList.add('disabled');
@@ -2381,14 +2381,28 @@
                 if (!tileObj1 || !tileObj2) {
                     console.log('❌ Could not find tile objects in grid');
                     console.log('❌ Grid size:', window.gameManager.grid.size);
+                    console.log('❌ Current grid size setting:', window.currentGridSize);
                     console.log('❌ Trying to access positions:', pos1, pos2);
                     
                     // Debug: show all tiles in grid
                     console.log('🔍 All tiles in grid:');
+                    let gridTileCount = 0;
                     window.gameManager.grid.eachCell(function(x, y, tile) {
                         if (tile) {
+                            gridTileCount++;
                             console.log(`🔍   Cell (${x},${y}): value=${tile.value}`);
                         }
+                    });
+                    console.log('🔍 Total tiles in grid:', gridTileCount);
+                    
+                    // Debug: show all DOM tiles
+                    const domTiles = document.querySelectorAll('.tile');
+                    console.log('🔍 DOM tiles found:', domTiles.length);
+                    domTiles.forEach((tile, index) => {
+                        const classes = Array.from(tile.classList);
+                        const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                        const value = tile.querySelector('.tile-inner')?.textContent || '?';
+                        console.log(`🔍   DOM Tile ${index}: ${positionClass}, value=${value}`);
                     });
                     
                     showSelectionMessage('Swap failed - tiles not found in grid');
@@ -2436,11 +2450,16 @@
                             };
                             console.log('🔍 Found position:', className, '→', position);
                             
-                            // Validate position
-                            if (position.x >= 0 && position.x < 4 && position.y >= 0 && position.y < 4) {
+                            // Validate position based on current grid size
+                            const currentGridSize = window.currentGridSize || 4;
+                            console.log('🔍 Validating against grid size:', currentGridSize);
+                            
+                            if (position.x >= 0 && position.x < currentGridSize && 
+                                position.y >= 0 && position.y < currentGridSize) {
+                                console.log('✅ Valid position for', currentGridSize + 'x' + currentGridSize, 'grid');
                                 return position;
                             } else {
-                                console.log('❌ Invalid position coordinates:', position);
+                                console.log('❌ Invalid position coordinates:', position, 'for grid size:', currentGridSize);
                             }
                         } else {
                             console.log('❌ Invalid position class format:', className);
@@ -2869,6 +2888,13 @@
                 const classes = Array.from(tile.classList);
                 const positionClass = classes.find(c => c.startsWith('tile-position-'));
                 
+                console.log('🎯 Clicked tile:', {
+                    element: tile,
+                    value: tileValue,
+                    positionClass: positionClass,
+                    classes: classes
+                });
+                
                 if (!positionClass) {
                     showSelectionMessage('Delete failed - invalid tile position');
                     setTimeout(() => this.end(), 1500);
@@ -2886,73 +2912,166 @@
                 const x = parseInt(posMatch[1]);
                 const y = parseInt(posMatch[2]);
                 
+                console.log('🎯 Extracted position:', {x, y, positionClass});
+                
                 // Save state before delete
                 saveGameState();
                 
-                // Delete the tile from the game grid - COORDINATE-BASED APPROACH
+                // Use enhanced tile deletion with precise matching
+                this.deleteSpecificTile(tile, tileValue, x, y, positionClass);
+            },
+            
+            deleteSpecificTile: function(domTileElement, tileValue, x, y, positionClass) {
+                console.log('🗑️ Attempting to delete specific tile:', {
+                    domElement: domTileElement,
+                    value: tileValue,
+                    position: {x, y},
+                    positionClass: positionClass
+                });
+                
+                // Delete the tile from the game grid - ENHANCED PRECISE MATCHING
                 if (window.gameManager && window.gameManager.grid) {
                     let gridTile = null;
+                    let actualX = null;
+                    let actualY = null;
+                    let matchMethod = '';
                     
-                    // Method 1: Direct coordinate lookup
-                    gridTile = window.gameManager.grid.cellContent({x: x, y: y});
-                    if (gridTile && gridTile.value.toString() === tileValue.toString()) {
-                        // Perfect match
-                    } else {
-                        gridTile = null;
-                    }
+                    console.log('🔍 Searching for grid tile matching DOM tile...');
+                    console.log('  - DOM position:', {x, y});
+                    console.log('  - DOM value:', tileValue);
+                    console.log('  - Grid size:', window.gameManager.grid.size);
                     
-                    // Method 2: Try swapped coordinates (x,y) -> (y,x)
-                    if (!gridTile) {
-                        gridTile = window.gameManager.grid.cellContent({x: y, y: x});
+                    // Method 1: Try zero-based indexing (most common)
+                    const pos1 = {x: x - 1, y: y - 1};
+                    if (pos1.x >= 0 && pos1.y >= 0 && pos1.x < window.gameManager.grid.size && pos1.y < window.gameManager.grid.size) {
+                        gridTile = window.gameManager.grid.cellContent(pos1);
                         if (gridTile && gridTile.value.toString() === tileValue.toString()) {
-                            // Swapped coordinates match
+                            actualX = pos1.x;
+                            actualY = pos1.y;
+                            matchMethod = 'zero-based';
+                            console.log('✅ Found using zero-based coordinates:', pos1);
                         } else {
                             gridTile = null;
                         }
                     }
                     
-                    // Method 3: Try zero-based vs one-based indexing
+                    // Method 2: Try direct coordinates (1-based)
                     if (!gridTile) {
-                        const x0 = x - 1;
-                        const y0 = y - 1;
-                        if (x0 >= 0 && y0 >= 0) {
-                            gridTile = window.gameManager.grid.cellContent({x: x0, y: y0});
+                        const pos2 = {x: x, y: y};
+                        if (pos2.x >= 0 && pos2.y >= 0 && pos2.x < window.gameManager.grid.size && pos2.y < window.gameManager.grid.size) {
+                            gridTile = window.gameManager.grid.cellContent(pos2);
                             if (gridTile && gridTile.value.toString() === tileValue.toString()) {
-                                // Zero-based coordinates match
+                                actualX = pos2.x;
+                                actualY = pos2.y;
+                                matchMethod = 'direct';
+                                console.log('✅ Found using direct coordinates:', pos2);
                             } else {
                                 gridTile = null;
                             }
                         }
                     }
                     
-                    // Method 4: Try swapped zero-based
+                    // Method 3: Search by DOM element reference (most reliable for duplicates)
                     if (!gridTile) {
-                        const x0 = x - 1;
-                        const y0 = y - 1;
-                        if (x0 >= 0 && y0 >= 0) {
-                            gridTile = window.gameManager.grid.cellContent({x: y0, y: x0});
-                            if (gridTile && gridTile.value.toString() === tileValue.toString()) {
-                                // Swapped zero-based coordinates match
-                            } else {
-                                gridTile = null;
+                        console.log('🔍 Searching by DOM element reference...');
+                        window.gameManager.grid.eachCell(function(gx, gy, tile) {
+                            if (tile && !gridTile) {
+                                // Check if this grid tile corresponds to our DOM element
+                                const allDomTiles = document.querySelectorAll('.tile');
+                                for (let domTile of allDomTiles) {
+                                    if (domTile === domTileElement) {
+                                        // This is our clicked DOM element
+                                        const domValue = domTile.querySelector('.tile-inner')?.textContent;
+                                        if (tile.value.toString() === domValue && tile.value.toString() === tileValue.toString()) {
+                                            // Values match and this is the right DOM element
+                                            gridTile = tile;
+                                            actualX = gx;
+                                            actualY = gy;
+                                            matchMethod = 'DOM-reference';
+                                            console.log('✅ Found using DOM element reference at:', gx, gy);
+                                            break;
+                                        }
+                                    }
+                                }
                             }
+                        });
+                    }
+                    
+                    // Method 4: Fallback - find by position class matching
+                    if (!gridTile) {
+                        console.log('🔍 Fallback: Searching by position class matching...');
+                        const allDomTiles = document.querySelectorAll('.tile');
+                        
+                        // Find all DOM tiles with the same position class
+                        const tilesWithSamePosition = Array.from(allDomTiles).filter(domTile => {
+                            const classes = Array.from(domTile.classList);
+                            return classes.includes(positionClass.replace('tile-position-', '').split('-').join('-'));
+                        });
+                        
+                        if (tilesWithSamePosition.length === 1 && tilesWithSamePosition[0] === domTileElement) {
+                            // Only one tile with this position, safe to delete by coordinates
+                            window.gameManager.grid.eachCell(function(gx, gy, tile) {
+                                if (tile && tile.value.toString() === tileValue.toString() && !gridTile) {
+                                    gridTile = tile;
+                                    actualX = gx;
+                                    actualY = gy;
+                                    matchMethod = 'position-class-fallback';
+                                    console.log('✅ Found using position class fallback at:', gx, gy);
+                                }
+                            });
                         }
                     }
                     
                     // Execute deletion if found
                     if (gridTile) {
-                        // Final safety check
+                        console.log('🗑️ Deleting tile:', {
+                            gridPosition: {x: actualX, y: actualY},
+                            value: gridTile.value,
+                            matchMethod: matchMethod
+                        });
+                        
+                        // Final safety check - ensure we're deleting the right tile
                         if (gridTile.value.toString() === tileValue.toString()) {
                             window.gameManager.grid.removeTile(gridTile);
                             window.gameManager.actuate();
                             
+                            console.log('✅ Successfully deleted tile with value:', tileValue, 'using method:', matchMethod);
                             showSelectionMessage(`Tile ${tileValue} deleted!`);
                             checkForTileReward(window.powerUps.delete.requiredTile, 'delete');
                         } else {
-                            showSelectionMessage('Delete failed - value mismatch');
+                            console.log('❌ Final safety check failed - value mismatch');
+                            console.log('  Expected:', tileValue);
+                            console.log('  Found:', gridTile.value);
+                            showSelectionMessage('Delete failed - safety check failed');
                         }
                     } else {
-                        showSelectionMessage('Delete failed - tile not found');
+                        console.log('❌ Could not find matching grid tile');
+                        console.log('🔍 Debug info:');
+                        console.log('  - DOM element:', domTileElement);
+                        console.log('  - Position class:', positionClass);
+                        console.log('  - Extracted coordinates:', {x, y});
+                        console.log('  - Tile value:', tileValue);
+                        console.log('  - Grid size:', window.gameManager.grid.size);
+                        
+                        // Show all grid tiles for debugging
+                        console.log('🔍 All grid tiles:');
+                        window.gameManager.grid.eachCell(function(gx, gy, tile) {
+                            if (tile) {
+                                console.log(`  Grid (${gx},${gy}): value=${tile.value}`);
+                            }
+                        });
+                        
+                        // Show all DOM tiles for debugging
+                        console.log('🔍 All DOM tiles:');
+                        const allDomTiles = document.querySelectorAll('.tile');
+                        allDomTiles.forEach((domTile, index) => {
+                            const classes = Array.from(domTile.classList);
+                            const posClass = classes.find(c => c.startsWith('tile-position-'));
+                            const value = domTile.querySelector('.tile-inner')?.textContent || '?';
+                            console.log(`  DOM Tile ${index}: ${posClass}, value=${value}, isClicked=${domTile === domTileElement}`);
+                        });
+                        
+                        showSelectionMessage('Delete failed - tile not found in grid');
                     }
                 } else {
                     showSelectionMessage('Delete failed - game not ready');
@@ -3005,7 +3124,7 @@
                 window.gameSounds.playDelete();
             }
 
-            // Check if there are at least 3 tiles on the board
+            // Check if there are more than 2 tiles on the board (need at least 3 to delete 1)
             let tileCount = 0;
             if (window.gameManager && window.gameManager.grid) {
                 window.gameManager.grid.eachCell(function(x, y, tile) {
@@ -3015,8 +3134,11 @@
                 });
             }
             
-            if (tileCount < 3) {
-                showSelectionMessage('Need at least 3 tiles to delete');
+            console.log('🔍 Current tile count:', tileCount);
+            
+            if (tileCount <= 2) {
+                showSelectionMessage('Need more than 2 tiles to delete one');
+                console.log('❌ Delete blocked: only', tileCount, 'tiles available');
                 
                 // Auto-hide message after 2 seconds
                 setTimeout(() => {
@@ -3025,6 +3147,8 @@
                 
                 return;
             }
+            
+            console.log('✅ Delete allowed:', tileCount, 'tiles available');
 
             // Use one delete
             window.powerUps.delete.uses--;
@@ -4182,6 +4306,386 @@
                     resolve();
                 }, 2000);
             });
+        };
+
+        // Force enable swap for testing
+        window.enableSwapForTesting = function() {
+            console.log('🔧 Enabling swap for testing...');
+            window.powerUps.swap.uses = 5; // Give plenty of uses for testing
+            updateButtonTitles();
+            console.log('✅ Swap enabled with 5 uses');
+        };
+
+        // Debug 5x5 swap issues
+        window.debug5x5Swap = function() {
+            console.log('🔍 DEBUGGING 5x5 SWAP ISSUES...');
+            
+            console.log('🔍 Current settings:');
+            console.log('  - currentLevel:', window.currentLevel);
+            console.log('  - currentGridSize:', window.currentGridSize);
+            console.log('  - gameManager exists:', !!window.gameManager);
+            console.log('  - gameManager.grid exists:', !!(window.gameManager && window.gameManager.grid));
+            console.log('  - gameManager.grid.size:', window.gameManager ? window.gameManager.grid.size : 'N/A');
+            
+            // Check DOM tiles
+            const domTiles = document.querySelectorAll('.tile');
+            console.log('🔍 DOM tiles:', domTiles.length);
+            
+            domTiles.forEach((tile, index) => {
+                const classes = Array.from(tile.classList);
+                const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                const value = tile.querySelector('.tile-inner')?.textContent || '?';
+                
+                if (positionClass) {
+                    const coords = positionClass.replace('tile-position-', '').split('-');
+                    const x = parseInt(coords[0]) - 1;
+                    const y = parseInt(coords[1]) - 1;
+                    
+                    console.log(`🔍 Tile ${index}: ${positionClass} → (${x},${y}), value=${value}`);
+                    
+                    // Check if position is valid for current grid
+                    const currentGridSize = window.currentGridSize || 4;
+                    const isValid = x >= 0 && x < currentGridSize && y >= 0 && y < currentGridSize;
+                    console.log(`  - Valid for ${currentGridSize}x${currentGridSize}:`, isValid);
+                    
+                    // Check if tile exists in game grid
+                    if (window.gameManager && window.gameManager.grid) {
+                        const gridTile = window.gameManager.grid.cellContent({x: x, y: y});
+                        console.log(`  - Exists in game grid:`, !!gridTile);
+                        if (gridTile) {
+                            console.log(`  - Grid tile value:`, gridTile.value);
+                        }
+                    }
+                }
+            });
+            
+            // Check grid tiles
+            if (window.gameManager && window.gameManager.grid) {
+                console.log('🔍 Grid tiles:');
+                let gridTileCount = 0;
+                window.gameManager.grid.eachCell(function(x, y, tile) {
+                    if (tile) {
+                        gridTileCount++;
+                        console.log(`🔍   Grid (${x},${y}): value=${tile.value}`);
+                    }
+                });
+                console.log('🔍 Total grid tiles:', gridTileCount);
+            }
+        };
+
+        // Test delete with duplicate tiles
+        window.testDeleteWithDuplicates = function() {
+            console.log('🧪 TESTING DELETE WITH DUPLICATE TILES...');
+            
+            // Enable delete for testing
+            window.enableDeleteForTesting();
+            
+            // Check current state
+            let tileCount = 0;
+            const tileValues = {};
+            
+            if (window.gameManager && window.gameManager.grid) {
+                window.gameManager.grid.eachCell(function(x, y, tile) {
+                    if (tile) {
+                        tileCount++;
+                        const value = tile.value.toString();
+                        tileValues[value] = (tileValues[value] || 0) + 1;
+                        console.log(`🔍 Grid tile at (${x},${y}): value=${value}`);
+                    }
+                });
+            }
+            
+            console.log('🔍 Current state:');
+            console.log('  - Total tiles:', tileCount);
+            console.log('  - Tile value counts:', tileValues);
+            
+            // Find duplicates
+            const duplicates = Object.keys(tileValues).filter(value => tileValues[value] > 1);
+            
+            if (duplicates.length > 0) {
+                console.log('✅ Found duplicate tiles with values:', duplicates);
+                console.log('🎯 Perfect for testing! Click delete button and try deleting specific tiles');
+                console.log('🎯 Watch the console to see which tile gets deleted');
+            } else {
+                console.log('ℹ️ No duplicate tiles found - delete should work normally');
+                console.log('🎯 You can still test delete functionality');
+            }
+            
+            // Show DOM tiles for comparison
+            console.log('🔍 DOM tiles:');
+            const domTiles = document.querySelectorAll('.tile');
+            domTiles.forEach((domTile, index) => {
+                const classes = Array.from(domTile.classList);
+                const posClass = classes.find(c => c.startsWith('tile-position-'));
+                const value = domTile.querySelector('.tile-inner')?.textContent || '?';
+                console.log(`  DOM Tile ${index}: ${posClass}, value=${value}`);
+            });
+            
+            if (tileCount <= 2) {
+                console.log('❌ Need more than 2 tiles to test delete');
+                console.log('🎯 Play a few moves to get more tiles');
+            }
+        };
+
+        // Debug delete tile functionality
+        window.debugDeleteTile = function() {
+            console.log('🔍 DEBUGGING DELETE TILE FUNCTIONALITY...');
+            
+            // Check current game state
+            console.log('🔍 Current settings:');
+            console.log('  - currentLevel:', window.currentLevel);
+            console.log('  - currentGridSize:', window.currentGridSize);
+            console.log('  - gameManager exists:', !!window.gameManager);
+            console.log('  - gameManager.grid exists:', !!(window.gameManager && window.gameManager.grid));
+            
+            // Count tiles
+            let tileCount = 0;
+            const tilePositions = [];
+            
+            if (window.gameManager && window.gameManager.grid) {
+                window.gameManager.grid.eachCell(function(x, y, tile) {
+                    if (tile) {
+                        tileCount++;
+                        tilePositions.push({x, y, value: tile.value});
+                    }
+                });
+            }
+            
+            console.log('🔍 Grid analysis:');
+            console.log('  - Total tiles:', tileCount);
+            console.log('  - Can delete:', tileCount > 2 ? 'YES' : 'NO');
+            console.log('  - Delete uses available:', window.powerUps.delete.uses);
+            
+            // Check DOM tiles
+            const domTiles = document.querySelectorAll('.tile');
+            console.log('🔍 DOM tiles:', domTiles.length);
+            
+            domTiles.forEach((tile, index) => {
+                const classes = Array.from(tile.classList);
+                const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                const value = tile.querySelector('.tile-inner')?.textContent || '?';
+                
+                if (positionClass) {
+                    const posMatch = positionClass.match(/tile-position-(\d+)-(\d+)/);
+                    if (posMatch) {
+                        const x = parseInt(posMatch[1]);
+                        const y = parseInt(posMatch[2]);
+                        console.log(`🔍 DOM Tile ${index}: ${positionClass} → (${x},${y}), value=${value}`);
+                        
+                        // Check if this tile exists in grid
+                        const gridTile = window.gameManager?.grid?.cellContent({x: x, y: y});
+                        const gridTileAlt = window.gameManager?.grid?.cellContent({x: x-1, y: y-1});
+                        
+                        console.log(`  - Grid match (${x},${y}):`, gridTile ? `value=${gridTile.value}` : 'not found');
+                        console.log(`  - Grid match (${x-1},${y-1}):`, gridTileAlt ? `value=${gridTileAlt.value}` : 'not found');
+                    }
+                }
+            });
+            
+            // Show tile positions from grid
+            console.log('🔍 Grid tile positions:');
+            tilePositions.forEach((pos, index) => {
+                console.log(`  Grid Tile ${index}: (${pos.x},${pos.y}) value=${pos.value}`);
+            });
+        };
+
+        // Test delete tile functionality
+        window.testDeleteTile = function() {
+            console.log('🧪 TESTING DELETE TILE FUNCTIONALITY...');
+            
+            // Check current state
+            let tileCount = 0;
+            if (window.gameManager && window.gameManager.grid) {
+                window.gameManager.grid.eachCell(function(x, y, tile) {
+                    if (tile) {
+                        tileCount++;
+                        console.log(`🔍 Tile at (${x},${y}): value=${tile.value}`);
+                    }
+                });
+            }
+            
+            console.log('🔍 Current tile count:', tileCount);
+            console.log('🔍 Delete uses available:', window.powerUps.delete.uses);
+            
+            if (tileCount <= 2) {
+                console.log('❌ Cannot test delete - need more than 2 tiles');
+                console.log('🎯 Play a few moves to get more tiles, then try again');
+                return;
+            }
+            
+            if (window.powerUps.delete.uses <= 0) {
+                console.log('🔧 Enabling delete for testing...');
+                window.powerUps.delete.uses = 3;
+                updateButtonTitles();
+            }
+            
+            console.log('✅ Delete should work! Current conditions:');
+            console.log('  - Tiles available:', tileCount);
+            console.log('  - Delete uses:', window.powerUps.delete.uses);
+            console.log('  - Can delete:', tileCount > 2 ? 'YES' : 'NO');
+            console.log('🎯 Click the delete button (🗑️) to test');
+        };
+
+        // Comprehensive delete tile test
+        window.testCompleteDeleteTile = function() {
+            console.log('🧪 COMPREHENSIVE DELETE TILE TEST...');
+            
+            // Step 1: Debug current state
+            console.log('Step 1: Debugging current state...');
+            window.debugDeleteTile();
+            
+            // Step 2: Enable delete for testing
+            console.log('Step 2: Enabling delete for testing...');
+            window.enableDeleteForTesting();
+            
+            // Step 3: Check if delete is possible
+            let tileCount = 0;
+            if (window.gameManager && window.gameManager.grid) {
+                window.gameManager.grid.eachCell(function(x, y, tile) {
+                    if (tile) {
+                        tileCount++;
+                    }
+                });
+            }
+            
+            console.log('Step 3: Checking delete conditions...');
+            console.log('  - Tiles available:', tileCount);
+            console.log('  - Delete uses:', window.powerUps.delete.uses);
+            console.log('  - Can delete:', tileCount > 2 ? 'YES' : 'NO');
+            
+            if (tileCount <= 2) {
+                console.log('❌ Cannot test delete - need more than 2 tiles');
+                console.log('🎯 Play a few moves to get more tiles, then try again');
+                return;
+            }
+            
+            console.log('✅ Delete should work!');
+            console.log('🎯 Click the delete button (🗑️) and then click any tile to delete it');
+            console.log('🎯 The game will prevent deletion if it would leave 2 or fewer tiles');
+        };
+
+        // Enable delete for testing
+        window.enableDeleteForTesting = function() {
+            console.log('🔧 Enabling delete for testing...');
+            window.powerUps.delete.uses = 5; // Give plenty of uses for testing
+            updateButtonTitles();
+            console.log('✅ Delete enabled with 5 uses');
+        };
+
+        // Comprehensive 5x5 swap test
+        window.testComplete5x5Swap = function() {
+            console.log('🧪 COMPREHENSIVE 5x5 SWAP TEST...');
+            
+            // Step 1: Switch to 5x5
+            console.log('Step 1: Switching to 5x5...');
+            window.selectLevel(2);
+            
+            setTimeout(() => {
+                // Step 2: Enable swap for testing
+                console.log('Step 2: Enabling swap...');
+                window.enableSwapForTesting();
+                
+                // Step 3: Debug current state
+                console.log('Step 3: Debugging current state...');
+                window.debug5x5Swap();
+                
+                // Step 4: Test position validation
+                console.log('Step 4: Testing position validation...');
+                const tiles = document.querySelectorAll('.tile');
+                if (tiles.length >= 2) {
+                    const tile1 = tiles[0];
+                    const tile2 = tiles[1];
+                    
+                    // Test getTilePosition function
+                    const pos1 = tileSelectionMode.getTilePosition(tile1);
+                    const pos2 = tileSelectionMode.getTilePosition(tile2);
+                    
+                    console.log('🔍 Position test results:');
+                    console.log('  Tile 1 position:', pos1);
+                    console.log('  Tile 2 position:', pos2);
+                    
+                    if (pos1 && pos2) {
+                        console.log('✅ Position validation working for 5x5');
+                        
+                        // Step 5: Test grid access
+                        if (window.gameManager && window.gameManager.grid) {
+                            const gridTile1 = window.gameManager.grid.cellContent(pos1);
+                            const gridTile2 = window.gameManager.grid.cellContent(pos2);
+                            
+                            console.log('🔍 Grid access test:');
+                            console.log('  Grid tile 1:', gridTile1);
+                            console.log('  Grid tile 2:', gridTile2);
+                            
+                            if (gridTile1 && gridTile2) {
+                                console.log('✅ Grid access working for 5x5');
+                                console.log('🎯 5x5 swap should work! Try clicking the swap button.');
+                            } else {
+                                console.log('❌ Grid access failed');
+                            }
+                        }
+                    } else {
+                        console.log('❌ Position validation failed');
+                    }
+                } else {
+                    console.log('❌ Not enough tiles for testing');
+                }
+                
+            }, 3000); // Wait for level transition to complete
+        };
+
+        // Test 5x5 swap functionality
+        window.test5x5Swap = function() {
+            console.log('🧪 TESTING 5x5 SWAP FUNCTIONALITY...');
+            
+            // First switch to 5x5 if not already
+            if (window.currentGridSize !== 5) {
+                console.log('🔄 Switching to 5x5 first...');
+                window.selectLevel(2);
+                
+                setTimeout(() => {
+                    console.log('✅ Now testing swap on 5x5...');
+                    testSwapAfterDelay();
+                }, 3000);
+            } else {
+                testSwapAfterDelay();
+            }
+            
+            function testSwapAfterDelay() {
+                console.log('🔍 Current grid size:', window.currentGridSize);
+                console.log('🔍 Current level:', window.currentLevel);
+                
+                // Check if we have tiles
+                const tiles = document.querySelectorAll('.tile');
+                console.log('🔍 Found', tiles.length, 'tiles');
+                
+                if (tiles.length < 2) {
+                    console.log('❌ Need at least 2 tiles to test swap');
+                    return;
+                }
+                
+                // Test position validation for 5x5
+                tiles.forEach((tile, index) => {
+                    const classes = Array.from(tile.classList);
+                    const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                    if (positionClass) {
+                        const coords = positionClass.replace('tile-position-', '').split('-');
+                        const x = parseInt(coords[0]) - 1;
+                        const y = parseInt(coords[1]) - 1;
+                        
+                        console.log(`🔍 Tile ${index}: ${positionClass} → (${x},${y})`);
+                        
+                        // Test if position would be valid for 5x5
+                        if (x >= 0 && x < 5 && y >= 0 && y < 5) {
+                            console.log('✅ Valid for 5x5');
+                        } else {
+                            console.log('❌ Invalid for 5x5');
+                        }
+                    }
+                });
+                
+                console.log('🎯 You can now test swap manually - click the swap button and select two tiles');
+                console.log('🎯 Or call window.forceSwap() to test programmatically');
+            }
         };
 
         // Test the level transition loader
