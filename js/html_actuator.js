@@ -170,7 +170,7 @@ HTMLActuator.prototype.message = function (won) {
     setTimeout(function() {
       self.messageContainer.classList.add('show-modal');
       console.log('Game over screen shown');
-    }, 100);
+    }, 50); // Faster game over screen appearance
   }
 };
 

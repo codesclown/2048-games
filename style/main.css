@@ -573,8 +573,8 @@ hr {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  -ms-touch-action: none;
-  touch-action: none;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
   background: linear-gradient(135deg, #2d1b69, #1a1a3a);
   border-radius: 6px;
   width: 500px;
@@ -583,7 +583,8 @@ hr {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   box-shadow: 0 8px 32px rgba(45, 27, 105, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1); }
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-tap-highlight-color: transparent; }
   .game-container .game-message {
     display: none;
     position: absolute;
@@ -633,7 +634,11 @@ hr {
 
 .grid-container {
   position: absolute;
-  z-index: 1; }
+  z-index: 1;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0); }
 
 .grid-row {
   margin-bottom: 15px; }
@@ -660,7 +665,12 @@ hr {
 
 .tile-container {
   position: absolute;
-  z-index: 2; }
+  z-index: 2;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: contents; }
 
 .tile, .tile .tile-inner {
   width: 107px;
@@ -749,9 +759,9 @@ hr {
 
 .tile {
   position: absolute;
-  -webkit-transition: 50ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  -moz-transition: 50ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transition: 50ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  -webkit-transition: 120ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  -moz-transition: 120ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: 120ms cubic-bezier(0.4, 0.0, 0.2, 1);
   -webkit-transition-property: -webkit-transform;
   -moz-transition-property: -moz-transform;
   transition-property: transform;
@@ -759,7 +769,9 @@ hr {
   -moz-transform: translateZ(0);
   -ms-transform: translateZ(0);
   transform: translateZ(0);
-  will-change: transform; }
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden; }
   .tile .tile-inner {
     border-radius: 3px;
     background: linear-gradient(135deg, #4a4a6a, #6a6a8a);
@@ -769,7 +781,13 @@ hr {
     font-size: 55px;
     color: #ffffff;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden; }
   .tile.tile-2 .tile-inner {
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: #ffffff;
@@ -908,9 +926,9 @@ hr {
   100% {
     box-shadow: 0 15px 50px rgba(255, 107, 107, 1), inset 0 2px 0 rgba(255, 255, 255, 0.7); } }
 .tile-new .tile-inner {
-  -webkit-animation: appear 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
-  -moz-animation: appear 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
-  animation: appear 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
+  -webkit-animation: appear 80ms cubic-bezier(0.23, 1, 0.32, 1) 10ms;
+  -moz-animation: appear 80ms cubic-bezier(0.23, 1, 0.32, 1) 10ms;
+  animation: appear 80ms cubic-bezier(0.23, 1, 0.32, 1) 10ms;
   -webkit-animation-fill-mode: backwards;
   -moz-animation-fill-mode: backwards;
   animation-fill-mode: backwards; }
@@ -971,9 +989,9 @@ hr {
     transform: scale(1); } }
 .tile-merged .tile-inner {
   z-index: 20;
-  -webkit-animation: pop 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
-  -moz-animation: pop 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
-  animation: pop 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 30ms;
+  -webkit-animation: pop 80ms cubic-bezier(0.23, 1, 0.32, 1) 10ms;
+  -moz-animation: pop 80ms cubic-bezier(0.23, 1, 0.32, 1) 10ms;
+  animation: pop 80ms cubic-bezier(0.23, 1, 0.32, 1) 10ms;
   -webkit-animation-fill-mode: backwards;
   -moz-animation-fill-mode: backwards;
   animation-fill-mode: backwards; }
@@ -1294,8 +1312,8 @@ hr {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    -ms-touch-action: none;
-    touch-action: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
     background: linear-gradient(135deg, #2d1b69, #1a1a3a);
     border-radius: 6px;
     width: calc(100vw - 40px);
@@ -1307,7 +1325,8 @@ hr {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     box-shadow: 0 8px 32px rgba(45, 27, 105, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1); }
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    -webkit-tap-highlight-color: transparent; }
     .game-container .game-message {
       display: none;
       position: absolute;

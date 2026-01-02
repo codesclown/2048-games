@@ -1661,7 +1661,7 @@
             window.powerUps.undo.uses--;
             updateButtonTitles();
             
-            // Add a slight delay to make the undo feel more deliberate
+            // Instant undo for ultra-responsive feel
             setTimeout(() => {
                 // Restore previous game state with animations
                 const undoSuccessful = restoreGameState();
@@ -1676,7 +1676,7 @@
                 checkForTileReward(window.powerUps.undo.requiredTile, 'undo');
                 
                 button.classList.remove('undoing');
-            }, 50); // Reduced delay for better responsiveness
+            }, 20); // Ultra-fast response
         };
 
         // Manual function to save current state (for testing)
@@ -4877,12 +4877,19 @@
                     position: absolute !important;
                     width: ${cellSize}px !important;
                     height: ${cellSize}px !important;
-                    -webkit-transition: 40ms cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-                    -moz-transition: 40ms cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-                    transition: 40ms cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+                    -webkit-transition: 110ms cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+                    -moz-transition: 110ms cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+                    transition: 110ms cubic-bezier(0.4, 0.0, 0.2, 1) !important;
                     -webkit-transition-property: -webkit-transform !important;
                     -moz-transition-property: -moz-transform !important;
                     transition-property: transform !important;
+                    -webkit-transform: translateZ(0) !important;
+                    -moz-transform: translateZ(0) !important;
+                    -ms-transform: translateZ(0) !important;
+                    transform: translateZ(0) !important;
+                    will-change: transform !important;
+                    -webkit-backface-visibility: hidden !important;
+                    backface-visibility: hidden !important;
                 }
                 
                 .tile .tile-inner {
@@ -4894,9 +4901,9 @@
                 }
                 
                 .tile-new .tile-inner {
-                    -webkit-animation: appear 100ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 20ms !important;
-                    -moz-animation: appear 100ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 20ms !important;
-                    animation: appear 100ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 20ms !important;
+                    -webkit-animation: appear 60ms cubic-bezier(0.23, 1, 0.32, 1) 5ms !important;
+                    -moz-animation: appear 60ms cubic-bezier(0.23, 1, 0.32, 1) 5ms !important;
+                    animation: appear 60ms cubic-bezier(0.23, 1, 0.32, 1) 5ms !important;
                     -webkit-animation-fill-mode: backwards !important;
                     -moz-animation-fill-mode: backwards !important;
                     animation-fill-mode: backwards !important;
@@ -4904,9 +4911,9 @@
                 
                 .tile-merged .tile-inner {
                     z-index: 20 !important;
-                    -webkit-animation: pop 100ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 20ms !important;
-                    -moz-animation: pop 100ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 20ms !important;
-                    animation: pop 100ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 20ms !important;
+                    -webkit-animation: pop 60ms cubic-bezier(0.23, 1, 0.32, 1) 5ms !important;
+                    -moz-animation: pop 60ms cubic-bezier(0.23, 1, 0.32, 1) 5ms !important;
+                    animation: pop 60ms cubic-bezier(0.23, 1, 0.32, 1) 5ms !important;
                     -webkit-animation-fill-mode: backwards !important;
                     -moz-animation-fill-mode: backwards !important;
                     animation-fill-mode: backwards !important;
@@ -4955,18 +4962,25 @@
                     
                     /* Optimized mobile animations */
                     .tile {
-                        -webkit-transition: 35ms cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-                        -moz-transition: 35ms cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-                        transition: 35ms cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+                        -webkit-transition: 100ms cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+                        -moz-transition: 100ms cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+                        transition: 100ms cubic-bezier(0.4, 0.0, 0.2, 1) !important;
                         -webkit-transition-property: -webkit-transform !important;
                         -moz-transition-property: -moz-transform !important;
                         transition-property: transform !important;
+                        -webkit-transform: translateZ(0) !important;
+                        -moz-transform: translateZ(0) !important;
+                        -ms-transform: translateZ(0) !important;
+                        transform: translateZ(0) !important;
+                        will-change: transform !important;
+                        -webkit-backface-visibility: hidden !important;
+                        backface-visibility: hidden !important;
                     }
                     
                     .tile-new .tile-inner {
-                        -webkit-animation: appear 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 15ms !important;
-                        -moz-animation: appear 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 15ms !important;
-                        animation: appear 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 15ms !important;
+                        -webkit-animation: appear 50ms cubic-bezier(0.23, 1, 0.32, 1) 0ms !important;
+                        -moz-animation: appear 50ms cubic-bezier(0.23, 1, 0.32, 1) 0ms !important;
+                        animation: appear 50ms cubic-bezier(0.23, 1, 0.32, 1) 0ms !important;
                         -webkit-animation-fill-mode: backwards !important;
                         -moz-animation-fill-mode: backwards !important;
                         animation-fill-mode: backwards !important;
@@ -4974,9 +4988,9 @@
                     
                     .tile-merged .tile-inner {
                         z-index: 20 !important;
-                        -webkit-animation: pop 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 15ms !important;
-                        -moz-animation: pop 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 15ms !important;
-                        animation: pop 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 15ms !important;
+                        -webkit-animation: pop 50ms cubic-bezier(0.23, 1, 0.32, 1) 0ms !important;
+                        -moz-animation: pop 50ms cubic-bezier(0.23, 1, 0.32, 1) 0ms !important;
+                        animation: pop 50ms cubic-bezier(0.23, 1, 0.32, 1) 0ms !important;
                         -webkit-animation-fill-mode: backwards !important;
                         -moz-animation-fill-mode: backwards !important;
                         animation-fill-mode: backwards !important;

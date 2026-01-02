@@ -75,6 +75,7 @@ KeyboardInputManager.prototype.listen = function () {
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
+  var touchStartTime;
   var gameContainer = document.getElementsByClassName("game-container")[0];
 
   gameContainer.addEventListener(this.eventTouchstart, function (event) {
@@ -91,10 +92,43 @@ KeyboardInputManager.prototype.listen = function () {
       touchStartClientY = event.touches[0].clientY;
     }
 
+    touchStartTime = Date.now();
     event.preventDefault();
   });
 
   gameContainer.addEventListener(this.eventTouchmove, function (event) {
+    // Allow fast swipe detection during move for ultra-responsive feel
+    if (touchStartClientX !== undefined && touchStartClientY !== undefined) {
+      var currentX, currentY;
+      
+      if (window.navigator.msPointerEnabled) {
+        currentX = event.pageX;
+        currentY = event.pageY;
+      } else {
+        currentX = event.touches[0].clientX;
+        currentY = event.touches[0].clientY;
+      }
+
+      var dx = currentX - touchStartClientX;
+      var absDx = Math.abs(dx);
+      var dy = currentY - touchStartClientY;
+      var absDy = Math.abs(dy);
+      
+      var distance = Math.max(absDx, absDy);
+      
+      // Detect fast swipes during movement for instant response
+      if (distance > 15) { // Slightly higher threshold for move detection
+        var direction = absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0);
+        
+        // Clear touch coordinates to prevent multiple triggers
+        touchStartClientX = undefined;
+        touchStartClientY = undefined;
+        
+        // Emit move immediately for ultra-fast response
+        self.emit("move", direction);
+      }
+    }
+    
     event.preventDefault();
   });
 
@@ -120,9 +154,20 @@ KeyboardInputManager.prototype.listen = function () {
     var dy = touchEndClientY - touchStartClientY;
     var absDy = Math.abs(dy);
 
-    if (Math.max(absDx, absDy) > 10) {
-      // (right : left) : (down : up)
-      self.emit("move", absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
+    var touchDuration = Date.now() - touchStartTime;
+    var distance = Math.max(absDx, absDy);
+    var velocity = distance / touchDuration;
+
+    // Ultra-sensitive swipe detection for fast response
+    // Lower threshold for fast swipes, higher for slow swipes
+    var threshold = velocity > 0.3 ? 5 : 8; // Fast swipes need only 5px, slow swipes need 8px
+
+    if (distance > threshold) {
+      // Immediate direction detection for faster response
+      var direction = absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0);
+      
+      // Emit move immediately without delay
+      self.emit("move", direction);
     }
   });
 };
