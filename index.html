@@ -4289,6 +4289,11 @@
                                 if (window.adjustWinCondition5x5) window.adjustWinCondition5x5();
                                 if (window.fixGameOverLogic5x5) window.fixGameOverLogic5x5();
                             }, 50);
+                        } else if (gridSize === 6) {
+                            setTimeout(() => {
+                                console.log('🔧 Applying 6x6 optimizations...');
+                                if (window.fix6x6Spacing) window.fix6x6Spacing();
+                            }, 50);
                         }
                     }
                 }, 1500);
@@ -4371,6 +4376,93 @@
                 });
                 console.log('🔍 Total grid tiles:', gridTileCount);
             }
+        };
+
+        // Test 6x6 grid functionality
+        window.test6x6 = function() {
+            console.log('🧪 TESTING 6x6 GRID...');
+            window.selectLevel(3);
+        };
+
+        // Debug 6x6 grid spacing
+        window.debug6x6Spacing = function() {
+            console.log('🔍 DEBUGGING 6x6 GRID SPACING...');
+            
+            if (window.currentGridSize !== 6) {
+                console.log('❌ Not currently on 6x6 grid. Current size:', window.currentGridSize);
+                console.log('🎯 Switch to Level 3 first: window.selectLevel(3)');
+                return;
+            }
+            
+            const gridContainer = document.querySelector('.grid-container');
+            const gridCells = document.querySelectorAll('.grid-cell');
+            const tiles = document.querySelectorAll('.tile');
+            
+            if (gridContainer) {
+                const containerStyle = window.getComputedStyle(gridContainer);
+                console.log('📏 Grid Container:');
+                console.log('  - Width:', containerStyle.width);
+                console.log('  - Height:', containerStyle.height);
+                console.log('  - Padding:', containerStyle.padding);
+            }
+            
+            if (gridCells.length > 0) {
+                const cellStyle = window.getComputedStyle(gridCells[0]);
+                console.log('📏 Grid Cells:');
+                console.log('  - Count:', gridCells.length);
+                console.log('  - Width:', cellStyle.width);
+                console.log('  - Height:', cellStyle.height);
+                console.log('  - Margin-right:', cellStyle.marginRight);
+            }
+            
+            if (tiles.length > 0) {
+                const tileStyle = window.getComputedStyle(tiles[0]);
+                console.log('📏 Tiles:');
+                console.log('  - Count:', tiles.length);
+                console.log('  - Width:', tileStyle.width);
+                console.log('  - Height:', tileStyle.height);
+                
+                // Check tile positions
+                tiles.forEach((tile, index) => {
+                    const classes = Array.from(tile.classList);
+                    const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                    const rect = tile.getBoundingClientRect();
+                    console.log(`  Tile ${index}: ${positionClass}, size: ${rect.width}x${rect.height}`);
+                });
+            }
+            
+            // Check for any spacing issues
+            const rows = document.querySelectorAll('.grid-row');
+            console.log('📏 Grid Rows:');
+            console.log('  - Count:', rows.length);
+            if (rows.length > 0) {
+                const rowStyle = window.getComputedStyle(rows[0]);
+                console.log('  - Gap:', rowStyle.gap);
+                console.log('  - Margin-bottom:', rowStyle.marginBottom);
+            }
+        };
+
+        // Fix 6x6 spacing issues
+        window.fix6x6Spacing = function() {
+            console.log('🔧 FIXING 6x6 SPACING ISSUES...');
+            
+            if (window.currentGridSize !== 6) {
+                console.log('❌ Not currently on 6x6 grid');
+                return;
+            }
+            
+            // Force update CSS for 6x6
+            updateGridCSS(6);
+            
+            // Force layout recalculation
+            document.body.offsetHeight;
+            
+            console.log('✅ 6x6 spacing fix applied');
+            
+            // Debug the result
+            setTimeout(() => {
+                window.debug6x6Spacing();
+            }, 100);
         };
 
         // Test delete with duplicate tiles
@@ -5605,11 +5697,11 @@
                 // No custom tile sizing - use the same size as grid cells
                 tileCSS = '';
             } else if (size === 6) {
-                // 6x6 - Perfect square cells with equal spacing
-                cellSize = 45;
-                cellGap = 8;    // Equal row and column spacing
-                fontSize = 16;
-                containerPadding = 12;
+                // 6x6 - Optimized for perfect fit with no extra spacing
+                cellSize = 44;  // Slightly smaller for better fit
+                cellGap = 6;    // Reduced gap for tighter spacing
+                fontSize = 14;  // Smaller font for 6x6
+                containerPadding = 10; // Reduced padding
             }
             
             // Calculate exact container size
@@ -5621,6 +5713,15 @@
                 totalCellWidth = cellWithMargin * size - 1; // Remove last margin: 57*5-1 = 284px
                 totalGapWidth = cellGap * (size - 1); // 10*4 = 40px
                 containerSize = totalCellWidth + totalGapWidth + (containerPadding * 2); // 284+40+30 = 354px
+            } else if (size === 6) {
+                // 6x6 - Precise calculations for perfect fit
+                totalCellWidth = cellSize * size; // 44*6 = 264px
+                totalGapWidth = cellGap * (size - 1); // 6*5 = 30px
+                containerSize = totalCellWidth + totalGapWidth + (containerPadding * 2); // 264+30+20 = 314px
+                console.log('🔧 6x6 Precise calculations:');
+                console.log('  - Cell width total:', totalCellWidth);
+                console.log('  - Gap width total:', totalGapWidth);
+                console.log('  - Container size:', containerSize);
             } else {
                 totalCellWidth = cellSize * size;
                 totalGapWidth = cellGap * (size - 1);
@@ -5648,6 +5749,7 @@
                     flex-shrink: 0 !important;
                     flex-grow: 0 !important;
                     ${size === 5 ? 'margin-right: 1px !important;' : ''}
+                    ${size === 6 ? 'margin-right: 0 !important;' : ''}
                 }
                 
                 .grid-row {
@@ -5992,8 +6094,8 @@
                 tileSpacing = 80; // 70px + 10px
                 console.log('📏 5x5 spacing: 80px (70px tile + 10px gap)');
             } else if (currentSize === 6) {
-                tileSpacing = 66; // 58px + 8px
-                console.log('📏 6x6 spacing: 66px (58px tile + 8px gap)');
+                tileSpacing = 50; // 44px + 6px gap
+                console.log('📏 6x6 spacing: 50px (44px tile + 6px gap)');
             }
             
             // Test first few positions
