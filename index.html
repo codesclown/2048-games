@@ -285,6 +285,109 @@
             100% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
         }
 
+        /* Level Transition Loader Styles */
+        .level-transition-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .level-transition-overlay.active {
+            display: flex;
+        }
+
+        .level-transition-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            animation: fadeInScale 0.4s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .level-transition-logo {
+            font-size: 80px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffb347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            margin-bottom: 20px;
+            animation: glow-title 2s ease-in-out infinite alternate;
+        }
+
+        .level-transition-text {
+            color: #e6e6fa;
+            font-size: 24px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .level-transition-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 215, 0, 0.2);
+            border-top: 3px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 25px;
+        }
+
+        .level-transition-progress {
+            width: 250px;
+            height: 4px;
+            background: rgba(45, 27, 105, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .level-transition-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffb347);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s ease;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Mobile responsive for level transition */
+        @media screen and (max-width: 520px) {
+            .level-transition-logo {
+                font-size: 60px;
+            }
+            
+            .level-transition-text {
+                font-size: 20px;
+            }
+            
+            .level-transition-progress {
+                width: 200px;
+            }
+        }
+
         /* Mobile Responsive */
         @media screen and (max-width: 520px) {
             body {
@@ -916,8 +1019,96 @@
         <div class="restart-text">Starting New Game...</div>
     </div>
 
+    <!-- Level Transition Loader -->
+    <div id="levelTransitionLoader" class="level-transition-overlay">
+        <div class="level-transition-content">
+            <div class="level-transition-logo">2048</div>
+            <div class="level-transition-text" id="levelTransitionText">Loading Level 1...</div>
+            <div class="level-transition-spinner"></div>
+            <div class="level-transition-progress">
+                <div class="level-transition-progress-bar" id="levelProgressBar"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript for Screen Management and Modals -->
     <script>
+        // Level Transition Loader Functions
+        window.showLevelTransitionLoader = function(level, gridSize) {
+            console.log('� Shoowing level transition loader for Level', level);
+            
+            const overlay = document.getElementById('levelTransitionLoader');
+            const text = document.getElementById('levelTransitionText');
+            const progressBar = document.getElementById('levelProgressBar');
+            
+            if (!overlay || !text || !progressBar) {
+                console.log('❌ Level transition loader elements not found');
+                return;
+            }
+            
+            // Set the text based on level
+            const levelNames = {
+                1: 'Level 1 - Classic 4×4',
+                2: 'Level 2 - Advanced 5×5', 
+                3: 'Level 3 - Expert 6×6'
+            };
+            
+            text.textContent = `Loading ${levelNames[level] || 'Level ' + level}...`;
+            
+            // Reset progress bar
+            progressBar.style.width = '0%';
+            
+            // Show the overlay
+            overlay.classList.add('active');
+            
+            // Define the loading steps with timing and messages
+            const loadingSteps = [
+                { progress: 10, message: 'Clearing game state...', delay: 200 },
+                { progress: 25, message: 'Updating grid structure...', delay: 400 },
+                { progress: 45, message: 'Applying CSS styles...', delay: 600 },
+                { progress: 65, message: 'Creating game manager...', delay: 800 },
+                { progress: 80, message: 'Initializing tiles...', delay: 1200 },
+                { progress: 95, message: 'Finalizing setup...', delay: 1600 },
+                { progress: 100, message: `${levelNames[level]} ready!`, delay: 2000 }
+            ];
+            
+            // Animate progress bar and update messages
+            let currentStep = 0;
+            const updateProgress = () => {
+                if (currentStep < loadingSteps.length) {
+                    const step = loadingSteps[currentStep];
+                    progressBar.style.width = step.progress + '%';
+                    text.textContent = step.message;
+                    
+                    currentStep++;
+                    if (currentStep < loadingSteps.length) {
+                        setTimeout(updateProgress, loadingSteps[currentStep].delay - step.delay);
+                    }
+                }
+            };
+            
+            // Start the progress animation
+            setTimeout(updateProgress, loadingSteps[0].delay);
+            
+            // Return a promise that resolves after 2 seconds
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                    console.log('✅ Level transition loader hidden');
+                    resolve();
+                }, 2000);
+            });
+        };
+
+        // Hide level transition loader immediately (for emergency cases)
+        window.hideLevelTransitionLoader = function() {
+            const overlay = document.getElementById('levelTransitionLoader');
+            if (overlay) {
+                overlay.classList.remove('active');
+                console.log('✅ Level transition loader hidden immediately');
+            }
+        };
+
         // Screen Management
         function showScreen(screenId) {
             console.log('📺 showScreen called with:', screenId);
@@ -3695,132 +3886,24 @@
                 return;
             }
             
-            // Update current level
-            window.currentLevel = level;
-            const newGridSize = window.gridSizes[level];
-            window.currentGridSize = newGridSize;
-            
-            console.log('🎯 New grid size:', newGridSize);
-            
-            // Close level selector
+            // Close level selector first
             closeLevelSelector();
             
             // Switch to game screen
             showScreen('gameScreen');
             
-            // Clean up any layout issues first
-            if (window.cleanupGridLayout) {
-                window.cleanupGridLayout();
-            }
+            // Update level variables
+            window.currentLevel = level;
+            const newGridSize = window.gridSizes[level];
+            window.currentGridSize = newGridSize;
             
-            // CRITICAL: Update grid structure FIRST
-            updateGridStructure(newGridSize);
-            
-            // CRITICAL: Ensure CSS is applied BEFORE creating GameManager
-            console.log('🔧 Ensuring CSS is applied for size:', newGridSize);
-            updateGridCSS(newGridSize);
-            
-            // Force CSS to be processed
-            document.body.offsetHeight; // Trigger reflow
-            
-            // CRITICAL: Clear cached state BEFORE creating GameManager
-            console.log('🔧 Clearing cached game state BEFORE creating GameManager...');
-            if (window.LocalStorageManager) {
-                const storageManager = new LocalStorageManager();
-                storageManager.clearGameState();
-                console.log('✅ Cleared cached game state');
-            }
-            
-            // CRITICAL: Create completely new game manager with correct size
-            console.log('🔧 Creating NEW GameManager with size:', newGridSize);
-            console.log('🔧 About to call: new GameManager(' + newGridSize + ', ...)');
-            window.gameManager = new GameManager(newGridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
-            
-            // IMMEDIATELY verify the game manager was created correctly
-            console.log('✅ GameManager created - IMMEDIATE verification:');
-            console.log('  - Constructor parameter passed:', newGridSize);
-            console.log('  - GameManager.size:', window.gameManager.size);
-            console.log('  - GameManager.grid:', window.gameManager.grid);
-            console.log('  - GameManager.grid.size:', window.gameManager.grid.size);
-            console.log('  - GameManager.grid.cells.length:', window.gameManager.grid.cells.length);
-            console.log('  - GameManager.grid.cells[0].length:', window.gameManager.grid.cells[0] ? window.gameManager.grid.cells[0].length : 'undefined');
-            
-            // Verify the grid is actually correct size
-            if (window.gameManager.grid.size !== newGridSize) {
-                console.log('❌ CRITICAL ERROR: GameManager grid size mismatch!');
-                console.log('  Expected:', newGridSize);
-                console.log('  Actual:', window.gameManager.grid.size);
-                console.log('  This means cached state is still interfering!');
-            } else {
-                console.log('✅ GameManager grid size is correct:', window.gameManager.grid.size);
-            }
-            
-            // Reset power-ups
-            if (window.resetPowerUps) {
-                window.resetPowerUps();
-            }
-            
-            // Force immediate actuate to show tiles
-            setTimeout(() => {
-                if (window.gameManager) {
-                    console.log('🔄 About to actuate - checking CSS first...');
-                    
-                    // Debug CSS before actuating
-                    if (newGridSize === 5) {
-                        window.check5x5CSS();
-                    }
-                    
-                    window.gameManager.actuate();
-                    console.log('🔄 Forced actuate - tiles should now appear in', newGridSize + 'x' + newGridSize, 'grid');
-                    
-                    // Auto-apply perfect alignment for 5x5
-                    if (newGridSize === 5) {
-                        setTimeout(() => {
-                            console.log('🎯 Auto-applying perfect 5x5 alignment...');
-                            window.perfectAlign5x5();
-                            
-                            // Also adjust win condition for 5x5
-                            console.log('🎯 Adjusting win condition for 5x5...');
-                            window.adjustWinCondition5x5();
-                            
-                            // Fix game over logic for 5x5
-                            console.log('🔧 Fixing game over logic for 5x5...');
-                            window.fixGameOverLogic5x5();
-                            
-                            // Debug and fix any game over issues
-                            setTimeout(() => {
-                                console.log('🔍 Checking for game over issues...');
-                                window.debugFalseGameOver();
-                                window.fixGameOverState();
-                            }, 500);
-                        }, 300);
-                    }
-                    
-                    // Debug tile positions after actuating
-                    let tileCount = 0;
-                    window.gameManager.grid.eachCell(function(x, y, tile) {
-                        if (tile) {
-                            tileCount++;
-                            console.log(`  Tile at (${x},${y}): value=${tile.value}`);
-                        }
-                    });
-                    console.log(`  Total tiles: ${tileCount}`);
-                    
-                    // Check actual DOM tiles
-                    const domTiles = document.querySelectorAll('.tile');
-                    console.log(`  DOM tiles found: ${domTiles.length}`);
-                    domTiles.forEach((tile, index) => {
-                        const classes = Array.from(tile.classList);
-                        const positionClass = classes.find(c => c.startsWith('tile-position-'));
-                        const value = tile.querySelector('.tile-inner')?.textContent || '?';
-                        const computedStyle = window.getComputedStyle(tile);
-                        console.log(`  DOM Tile ${index}: value=${value}, class=${positionClass}, transform=${computedStyle.transform}`);
-                    });
-                }
-            }, 200); // Increased timeout to ensure CSS is fully applied
-            
-            // Show confirmation message
-            showLevelChangeMessage(level, newGridSize);
+            // Show enhanced level transition loader with real-time status
+            window.showLevelTransitionWithRealStatus(level, newGridSize).then(() => {
+                console.log('🎮 Level transition completed successfully!');
+                
+                // Show confirmation message
+                showLevelChangeMessage(level, newGridSize);
+            });
         };
 
         // Update grid structure for different sizes (preserves 4x4, creates proper 5x5 and 6x6)
@@ -3969,8 +4052,152 @@
 
         // Quick test function to switch to 5x5
         window.test5x5 = function() {
-            console.log('🧪 TESTING 5x5 SWITCH...');
+            console.log('🧪 TESTING 5x5 SWITCH WITH LOADER...');
             window.selectLevel(2);
+        };
+
+        // Quick fix function for 4x4 tile sizing issues
+        window.quickFix4x4 = function() {
+            console.log('⚡ QUICK FIX: Ensuring proper 4x4 tile sizes...');
+            
+            if (window.currentLevel === 1 && window.currentGridSize === 4) {
+                window.fix4x4TileSizing();
+                
+                // Also force actuate if game manager exists
+                if (window.gameManager) {
+                    setTimeout(() => {
+                        window.gameManager.actuate();
+                        console.log('✅ Quick fix applied and game re-actuated');
+                    }, 100);
+                }
+            } else {
+                console.log('❌ Quick fix only works for Level 1 (4x4 grid)');
+            }
+        };
+
+        // Enhanced level transition with real-time status updates
+        window.showLevelTransitionWithRealStatus = function(level, gridSize) {
+            console.log('🔄 Starting enhanced level transition for Level', level);
+            
+            const overlay = document.getElementById('levelTransitionLoader');
+            const text = document.getElementById('levelTransitionText');
+            const progressBar = document.getElementById('levelProgressBar');
+            
+            if (!overlay || !text || !progressBar) {
+                console.log('❌ Level transition loader elements not found');
+                return Promise.resolve();
+            }
+            
+            const levelNames = {
+                1: 'Level 1 - Classic 4×4',
+                2: 'Level 2 - Advanced 5×5', 
+                3: 'Level 3 - Expert 6×6'
+            };
+            
+            // Show the overlay
+            overlay.classList.add('active');
+            progressBar.style.width = '0%';
+            
+            return new Promise((resolve) => {
+                // Step 1: Clear game state
+                setTimeout(() => {
+                    text.textContent = 'Clearing game state...';
+                    progressBar.style.width = '15%';
+                    
+                    // Actually clear the state
+                    if (window.gameManager) {
+                        window.gameManager = null;
+                    }
+                    if (window.LocalStorageManager) {
+                        const storageManager = new LocalStorageManager();
+                        storageManager.clearGameState();
+                    }
+                }, 200);
+                
+                // Step 2: Update grid structure
+                setTimeout(() => {
+                    text.textContent = 'Updating grid structure...';
+                    progressBar.style.width = '35%';
+                    
+                    // Actually update the grid
+                    updateGridStructure(gridSize);
+                }, 500);
+                
+                // Step 3: Apply CSS
+                setTimeout(() => {
+                    text.textContent = 'Applying CSS styles...';
+                    progressBar.style.width = '55%';
+                    
+                    // Actually apply CSS
+                    updateGridCSS(gridSize);
+                    document.body.offsetHeight; // Force reflow
+                }, 800);
+                
+                // Step 4: Create game manager
+                setTimeout(() => {
+                    text.textContent = 'Creating game manager...';
+                    progressBar.style.width = '75%';
+                    
+                    // Actually create game manager
+                    window.gameManager = new GameManager(gridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+                    
+                    // Reset power-ups
+                    if (window.resetPowerUps) {
+                        window.resetPowerUps();
+                    }
+                }, 1200);
+                
+                // Step 5: Initialize tiles
+                setTimeout(() => {
+                    text.textContent = 'Initializing tiles...';
+                    progressBar.style.width = '90%';
+                    
+                    // Actually initialize tiles
+                    if (window.gameManager) {
+                        window.gameManager.actuate();
+                        
+                        // Apply fixes based on grid size
+                        if (gridSize === 4) {
+                            setTimeout(() => window.fix4x4TileSizing(), 50);
+                        } else if (gridSize === 5) {
+                            setTimeout(() => {
+                                if (window.perfectAlign5x5) window.perfectAlign5x5();
+                                if (window.adjustWinCondition5x5) window.adjustWinCondition5x5();
+                                if (window.fixGameOverLogic5x5) window.fixGameOverLogic5x5();
+                            }, 50);
+                        }
+                    }
+                }, 1500);
+                
+                // Step 6: Finalize
+                setTimeout(() => {
+                    text.textContent = `${levelNames[level]} ready!`;
+                    progressBar.style.width = '100%';
+                }, 1800);
+                
+                // Hide loader
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                    console.log('✅ Enhanced level transition completed');
+                    resolve();
+                }, 2000);
+            });
+        };
+
+        // Test the level transition loader
+        window.testLoader = function() {
+            console.log('🧪 TESTING LEVEL TRANSITION LOADER...');
+            window.showLevelTransitionLoader(2, 5).then(() => {
+                console.log('✅ Loader test completed!');
+            });
+        };
+
+        // Test the enhanced level transition loader
+        window.testEnhancedLoader = function() {
+            console.log('🧪 TESTING ENHANCED LEVEL TRANSITION LOADER...');
+            window.showLevelTransitionWithRealStatus(2, 5).then(() => {
+                console.log('✅ Enhanced loader test completed!');
+            });
         };
 
         // Debug function to check if 5x5 CSS classes exist
@@ -4200,6 +4427,55 @@
                 cellsLength: window.gameManager.grid.cells.length,
                 availableCells: availableCells.length
             };
+        };
+
+        // Force proper 4x4 tile sizing
+        window.fix4x4TileSizing = function() {
+            console.log('🔧 FORCING PROPER 4x4 TILE SIZING...');
+            
+            // Remove any conflicting styles
+            const conflictingStyles = document.querySelectorAll('style[id*="dynamic"], style[id*="exact-tile"]');
+            conflictingStyles.forEach(style => {
+                if (style.id !== 'dynamic-grid-styles') {
+                    style.remove();
+                    console.log('✅ Removed conflicting style:', style.id);
+                }
+            });
+            
+            // Force update CSS for 4x4
+            updateGridCSS(4);
+            
+            // Force all tiles to use correct classes and remove inline styles
+            const allTiles = document.querySelectorAll('.tile');
+            allTiles.forEach(tile => {
+                // Remove any inline styles that might override CSS
+                tile.removeAttribute('style');
+                
+                // Ensure tile has proper base classes
+                const classes = Array.from(tile.classList);
+                const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                const valueClass = classes.find(c => c.startsWith('tile-') && c !== positionClass && !c.includes('position'));
+                
+                // Reset to base classes
+                tile.className = `tile ${positionClass || ''} ${valueClass || ''}`.trim();
+            });
+            
+            // Force layout recalculation
+            document.body.offsetHeight;
+            
+            console.log('✅ 4x4 tile sizing fixed');
+            
+            // Debug the result
+            setTimeout(() => {
+                const tiles = document.querySelectorAll('.tile');
+                console.log(`🔍 Found ${tiles.length} tiles after 4x4 fix:`);
+                tiles.forEach((tile, index) => {
+                    const rect = tile.getBoundingClientRect();
+                    const classes = Array.from(tile.classList);
+                    const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                    console.log(`  Tile ${index}: ${positionClass}, size: ${rect.width}px x ${rect.height}px`);
+                });
+            }, 100);
         };
 
         // Function to fix tile sizes to match grid cells exactly
