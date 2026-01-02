@@ -409,7 +409,7 @@
             </div>
             
             <div class="menu-buttons">
-                <button class="menu-button" onclick="showGame()">New Game</button>
+                <button class="menu-button" onclick="toggleLevelSelector()">New Game</button>
                 <button class="menu-button secondary" onclick="showInstructions()">How to Play</button>
                 <button class="menu-button secondary" onclick="showHighScores()">High Scores</button>
             </div>
@@ -429,7 +429,6 @@
                     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
                     <h1 class="title">2048</h1>
                     <div class="mobile-header-buttons">
-                        <button class="mobile-level-btn" onclick="toggleLevelSelector()" title="Change Level">🎯</button>
                         <button class="mobile-sound-btn" onclick="toggleGameSounds(this)" title="Toggle Sound">🔊</button>
                         <button class="mobile-refresh-btn" onclick="handleRestartClick(this)">↻</button>
                     </div>
@@ -679,29 +678,9 @@
                 margin-right: 8px;
             }
 
-            .mobile-level-btn {
-                background: rgba(255, 165, 0, 0.2);
-                border: 1px solid rgba(255, 165, 0, 0.3);
-                border-radius: 8px;
-                color: #ffa500;
-                font-size: 16px;
-                width: 40px;
-                height: 40px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                display: none;
-                align-items: center;
-                justify-content: center;
-                margin-right: 8px;
-            }
-
-            .mobile-sound-btn:hover, .mobile-level-btn:hover {
+            .mobile-sound-btn:hover {
                 background: rgba(67, 233, 123, 0.3);
                 transform: scale(1.05);
-            }
-
-            .mobile-level-btn:hover {
-                background: rgba(255, 165, 0, 0.3);
             }
 
             .mobile-header-buttons {
@@ -710,7 +689,7 @@
             }
 
             @media screen and (max-width: 520px) {
-                .mobile-sound-btn, .mobile-level-btn {
+                .mobile-sound-btn {
                     display: flex !important;
                 }
             }
@@ -768,6 +747,21 @@
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
+            }
+            
+            .level-selector-header h2::first-letter {
+                -webkit-text-fill-color: initial;
+                background: none;
+                color: initial;
+            }
+            
+            .emoji-icon {
+                background: none !important;
+                -webkit-background-clip: initial !important;
+                -webkit-text-fill-color: initial !important;
+                background-clip: initial !important;
+                color: initial !important;
+                filter: none !important;
             }
 
             .level-selector-close {
@@ -887,7 +881,7 @@
     <div id="levelSelector" class="level-selector-overlay">
         <div class="level-selector-content">
             <div class="level-selector-header">
-                <h2>🎯 Select Level</h2>
+                <h2><span class="emoji-icon">🎯</span> Choose Level</h2>
                 <button class="level-selector-close" onclick="closeLevelSelector()">×</button>
             </div>
             <div class="level-options">
@@ -2988,11 +2982,38 @@
 
         function showGame() {
             showScreen('gameScreen');
-            // Initialize game if needed
+            // Initialize game with current level or default to level 1
+            const currentLevel = window.currentLevel || 1;
+            const currentGridSize = window.currentGridSize || 4;
+            
             if (typeof GameManager !== 'undefined') {
-                // Game is already loaded, just restart
-                if (window.gameManager) {
-                    window.gameManager.restart();
+                // Create new game manager with current level settings
+                if (window.LocalStorageManager) {
+                    const storageManager = new LocalStorageManager();
+                    storageManager.clearGameState();
+                }
+                
+                // Update grid structure and CSS for current level
+                if (currentGridSize !== 4) {
+                    updateGridStructure(currentGridSize);
+                    updateGridCSS(currentGridSize);
+                    document.body.offsetHeight; // Trigger reflow
+                }
+                
+                window.gameManager = new GameManager(currentGridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+                
+                // Reset power-ups
+                if (window.resetPowerUps) {
+                    window.resetPowerUps();
+                }
+                
+                // Apply level-specific fixes
+                if (currentGridSize === 5) {
+                    setTimeout(() => {
+                        window.perfectAlign5x5();
+                        window.adjustWinCondition5x5();
+                        window.fixGameOverLogic5x5();
+                    }, 300);
                 }
             }
         }
@@ -3684,6 +3705,9 @@
             // Close level selector
             closeLevelSelector();
             
+            // Switch to game screen
+            showScreen('gameScreen');
+            
             // Clean up any layout issues first
             if (window.cleanupGridLayout) {
                 window.cleanupGridLayout();
@@ -3721,7 +3745,7 @@
             console.log('  - GameManager.grid.cells.length:', window.gameManager.grid.cells.length);
             console.log('  - GameManager.grid.cells[0].length:', window.gameManager.grid.cells[0] ? window.gameManager.grid.cells[0].length : 'undefined');
             
-            // Verify the grid is actually 5x5
+            // Verify the grid is actually correct size
             if (window.gameManager.grid.size !== newGridSize) {
                 console.log('❌ CRITICAL ERROR: GameManager grid size mismatch!');
                 console.log('  Expected:', newGridSize);
