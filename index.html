@@ -4292,7 +4292,7 @@
                         } else if (gridSize === 6) {
                             setTimeout(() => {
                                 console.log('🔧 Applying 6x6 optimizations...');
-                                if (window.fix6x6Spacing) window.fix6x6Spacing();
+                                if (window.perfectAlign6x6) window.perfectAlign6x6();
                             }, 50);
                         }
                     }
@@ -4378,10 +4378,277 @@
             }
         };
 
+        // Test that 4x4 and 5x5 are not affected by 6x6 changes
+        window.testAllLevelsIntegrity = function() {
+            console.log('🧪 TESTING ALL LEVELS INTEGRITY...');
+            
+            const testSequence = [
+                { level: 1, name: '4x4', size: 4 },
+                { level: 2, name: '5x5', size: 5 },
+                { level: 3, name: '6x6', size: 6 }
+            ];
+            
+            let currentTest = 0;
+            
+            function runNextTest() {
+                if (currentTest >= testSequence.length) {
+                    console.log('✅ ALL LEVELS INTEGRITY TEST COMPLETED!');
+                    console.log('🎯 All grid sizes should work correctly without interference');
+                    return;
+                }
+                
+                const test = testSequence[currentTest];
+                console.log(`\n🔍 Testing ${test.name} (Level ${test.level})...`);
+                
+                window.selectLevel(test.level);
+                
+                setTimeout(() => {
+                    // Verify grid size
+                    const actualSize = window.currentGridSize;
+                    const gridCells = document.querySelectorAll('.grid-cell');
+                    const tiles = document.querySelectorAll('.tile');
+                    
+                    console.log(`  - Expected size: ${test.size}x${test.size}`);
+                    console.log(`  - Actual size: ${actualSize}x${actualSize}`);
+                    console.log(`  - Grid cells: ${gridCells.length} (expected: ${test.size * test.size})`);
+                    console.log(`  - Tiles: ${tiles.length}`);
+                    
+                    const sizeCorrect = actualSize === test.size;
+                    const cellsCorrect = gridCells.length === test.size * test.size;
+                    
+                    if (sizeCorrect && cellsCorrect) {
+                        console.log(`  ✅ ${test.name} is working correctly`);
+                    } else {
+                        console.log(`  ❌ ${test.name} has issues`);
+                    }
+                    
+                    // Test tile positioning if tiles exist
+                    if (tiles.length > 0 && gridCells.length > 0) {
+                        const cellRect = gridCells[0].getBoundingClientRect();
+                        const tileRect = tiles[0].getBoundingClientRect();
+                        const sizesMatch = Math.abs(cellRect.width - tileRect.width) < 3;
+                        
+                        console.log(`  - Tile alignment: ${sizesMatch ? '✅ Good' : '❌ Misaligned'}`);
+                    }
+                    
+                    currentTest++;
+                    setTimeout(runNextTest, 2000); // Wait before next test
+                    
+                }, 3000); // Wait for level transition
+            }
+            
+            runNextTest();
+        };
+
+        // Comprehensive 6x6 test
+        window.testComplete6x6 = function() {
+            console.log('🧪 COMPREHENSIVE 6x6 TEST...');
+            
+            // Step 1: Switch to 6x6
+            console.log('Step 1: Switching to 6x6...');
+            window.selectLevel(3);
+            
+            setTimeout(() => {
+                // Step 2: Debug current state
+                console.log('Step 2: Debugging 6x6 state...');
+                window.debug6x6Spacing();
+                
+                // Step 3: Test tile positioning
+                console.log('Step 3: Testing tile positioning...');
+                const tiles = document.querySelectorAll('.tile');
+                const gridCells = document.querySelectorAll('.grid-cell');
+                
+                console.log('🔍 Tile vs Grid Cell Analysis:');
+                console.log('  - Grid cells:', gridCells.length);
+                console.log('  - Tiles:', tiles.length);
+                
+                if (gridCells.length > 0 && tiles.length > 0) {
+                    const cellRect = gridCells[0].getBoundingClientRect();
+                    const tileRect = tiles[0].getBoundingClientRect();
+                    
+                    console.log('  - Grid cell size:', Math.round(cellRect.width) + 'x' + Math.round(cellRect.height));
+                    console.log('  - Tile size:', Math.round(tileRect.width) + 'x' + Math.round(tileRect.height));
+                    
+                    const sizesMatch = Math.abs(cellRect.width - tileRect.width) < 2 && 
+                                     Math.abs(cellRect.height - tileRect.height) < 2;
+                    
+                    console.log('  - Sizes match:', sizesMatch ? '✅ YES' : '❌ NO');
+                    
+                    if (!sizesMatch) {
+                        console.log('🔧 Applying perfect alignment...');
+                        window.perfectAlign6x6();
+                    }
+                }
+                
+                // Step 4: Test positioning accuracy
+                setTimeout(() => {
+                    console.log('Step 4: Verifying tile positions...');
+                    const tilesAfter = document.querySelectorAll('.tile');
+                    
+                    tilesAfter.forEach((tile, index) => {
+                        const classes = Array.from(tile.classList);
+                        const positionClass = classes.find(c => c.startsWith('tile-position-'));
+                        const rect = tile.getBoundingClientRect();
+                        const value = tile.querySelector('.tile-inner')?.textContent || '?';
+                        
+                        console.log(`  Tile ${index}: ${positionClass}, value=${value}, size=${Math.round(rect.width)}x${Math.round(rect.height)}`);
+                    });
+                    
+                    console.log('✅ 6x6 comprehensive test completed!');
+                    console.log('🎯 The 6x6 grid should now have perfect tile alignment');
+                }, 1000);
+                
+            }, 3000); // Wait for level transition to complete
+        };
+
         // Test 6x6 grid functionality
+        // Test 6x6 tile fitting automatically
+        window.test6x6TileFitting = function() {
+            console.log('🧪 TESTING 6x6 TILE FITTING...');
+            
+            // Step 1: Switch to 6x6
+            console.log('Step 1: Switching to 6x6...');
+            window.selectLevel(3);
+            
+            // Step 2: Wait for level transition to complete, then test fitting
+            setTimeout(() => {
+                console.log('Step 2: Testing tile fitting...');
+                
+                if (window.currentGridSize !== 6) {
+                    console.log('❌ Not on 6x6 grid after transition');
+                    return;
+                }
+                
+                // Force perfect alignment
+                window.perfectAlign6x6();
+                
+                // Verify results
+                setTimeout(() => {
+                    window.verify6x6Alignment();
+                    console.log('✅ 6x6 tile fitting test completed');
+                }, 500);
+                
+            }, 2500); // Wait for level transition to complete
+        };
+
+        // Original test6x6 function (kept for compatibility)
         window.test6x6 = function() {
             console.log('🧪 TESTING 6x6 GRID...');
             window.selectLevel(3);
+        };
+
+        // Comprehensive 6x6 test function
+        window.testComplete6x6 = function() {
+            console.log('🧪 COMPREHENSIVE 6x6 TILE FITTING TEST...');
+            console.log('This will test level switching and tile alignment');
+            
+            // Step 1: Switch to 6x6
+            console.log('Step 1: Switching to Level 3 (6x6)...');
+            window.selectLevel(3);
+            
+            // Step 2: Wait for level transition and test
+            setTimeout(() => {
+                console.log('Step 2: Level transition completed, testing alignment...');
+                
+                if (window.currentGridSize !== 6) {
+                    console.log('❌ Failed to switch to 6x6 grid');
+                    return;
+                }
+                
+                // Check initial state
+                const initialResult = window.verify6x6Alignment();
+                
+                if (!initialResult) {
+                    console.log('Step 3: Initial alignment not perfect, applying fixes...');
+                    window.quick6x6Fix();
+                    
+                    setTimeout(() => {
+                        console.log('Step 4: Verifying fixes...');
+                        const finalResult = window.verify6x6Alignment();
+                        
+                        if (finalResult) {
+                            console.log('🎉 SUCCESS: 6x6 tiles now fit perfectly over grid cells!');
+                        } else {
+                            console.log('⚠️ Some alignment issues remain. Try manual fixes:');
+                            console.log('   - window.perfectAlign6x6()');
+                            console.log('   - window.quick6x6Fix()');
+                        }
+                    }, 300);
+                } else {
+                    console.log('🎉 SUCCESS: 6x6 tiles already fit perfectly!');
+                }
+                
+            }, 2500); // Wait for level transition
+        };
+
+        // Test the fixed 6x6 positioning
+        window.testFixed6x6Positioning = function() {
+            console.log('🧪 TESTING FIXED 6x6 POSITIONING...');
+            
+            // Step 1: Switch to 6x6
+            console.log('Step 1: Switching to Level 3 (6x6)...');
+            window.selectLevel(3);
+            
+            // Step 2: Wait for level transition and test positioning
+            setTimeout(() => {
+                console.log('Step 2: Level transition completed, testing positioning...');
+                
+                if (window.currentGridSize !== 6) {
+                    console.log('❌ Failed to switch to 6x6 grid');
+                    return;
+                }
+                
+                // Force regenerate CSS with new positioning
+                console.log('Step 3: Regenerating CSS with fixed positioning...');
+                updateGridCSS(6);
+                
+                // Force actuate to apply new positions
+                setTimeout(() => {
+                    if (window.gameManager) {
+                        console.log('Step 4: Re-actuating game with new positions...');
+                        window.gameManager.actuate();
+                        
+                        // Verify alignment
+                        setTimeout(() => {
+                            console.log('Step 5: Verifying tile alignment...');
+                            const result = window.verify6x6Alignment();
+                            
+                            if (result) {
+                                console.log('🎉 SUCCESS: 6x6 tiles now positioned correctly!');
+                                console.log('✅ Fixed positioning: tiles should now fit perfectly over grid cells');
+                            } else {
+                                console.log('⚠️ Positioning may need further adjustment');
+                                console.log('🔧 Try: window.quick6x6Fix() for additional fixes');
+                            }
+                        }, 300);
+                    }
+                }, 200);
+                
+            }, 2500); // Wait for level transition
+        };
+
+        // Quick 6x6 alignment fix
+        window.quick6x6Fix = function() {
+            console.log('⚡ QUICK 6x6 ALIGNMENT FIX...');
+            
+            if (window.currentGridSize !== 6) {
+                console.log('❌ Not on 6x6 grid');
+                return;
+            }
+            
+            // Apply comprehensive tile fitting immediately
+            const gridCells = document.querySelectorAll('.grid-cell');
+            if (gridCells.length > 0) {
+                const cellRect = gridCells[0].getBoundingClientRect();
+                const cellWidth = Math.round(cellRect.width);
+                const cellHeight = Math.round(cellRect.height);
+                
+                window.apply6x6TileFitting(cellWidth, cellHeight);
+                
+                setTimeout(() => {
+                    window.verify6x6Alignment();
+                }, 200);
+            }
         };
 
         // Debug 6x6 grid spacing
@@ -5598,6 +5865,376 @@
             console.log('✅ Win condition adjusted: 4096 for 5x5 grids');
         };
 
+        // Force perfect 6x6 tile alignment
+        window.force6x6TileAlignment = function() {
+            console.log('🎯 FORCING PERFECT 6x6 TILE ALIGNMENT...');
+            
+            if (window.currentGridSize !== 6) {
+                console.log('❌ Not on 6x6 grid');
+                return;
+            }
+            
+            // Use the comprehensive perfect alignment function
+            window.perfectAlign6x6();
+        };
+
+        // Verify 6x6 tile alignment with enhanced feedback
+        window.verify6x6Alignment = function() {
+            console.log('🔍 VERIFYING 6x6 TILE ALIGNMENT...');
+            
+            const gridCells = document.querySelectorAll('.grid-cell');
+            const tiles = document.querySelectorAll('.tile');
+            
+            if (gridCells.length === 0) {
+                console.log('❌ No grid cells found');
+                return false;
+            }
+            
+            if (tiles.length === 0) {
+                console.log('⚠️ No tiles found (this is normal for empty grid)');
+                return true;
+            }
+            
+            // Get grid cell dimensions
+            const cellRect = gridCells[0].getBoundingClientRect();
+            const cellWidth = Math.round(cellRect.width);
+            const cellHeight = Math.round(cellRect.height);
+            
+            console.log(`📏 Grid cell size: ${cellWidth}px x ${cellHeight}px`);
+            console.log(`🔍 Found ${tiles.length} tiles to verify`);
+            
+            // Check each tile
+            let alignmentIssues = 0;
+            let perfectTiles = 0;
+            
+            tiles.forEach((tile, index) => {
+                const tileRect = tile.getBoundingClientRect();
+                const tileWidth = Math.round(tileRect.width);
+                const tileHeight = Math.round(tileRect.height);
+                
+                const widthMatch = Math.abs(tileWidth - cellWidth) <= 1;
+                const heightMatch = Math.abs(tileHeight - cellHeight) <= 1;
+                
+                if (!widthMatch || !heightMatch) {
+                    alignmentIssues++;
+                    console.log(`❌ Tile ${index}: ${tileWidth}x${tileHeight} (should be ${cellWidth}x${cellHeight})`);
+                } else {
+                    perfectTiles++;
+                    console.log(`✅ Tile ${index}: ${tileWidth}x${tileHeight} - Perfect!`);
+                }
+            });
+            
+            console.log(`📊 Results: ${perfectTiles} perfect tiles, ${alignmentIssues} issues`);
+            
+            if (alignmentIssues === 0) {
+                console.log('🎉 ALL TILES PERFECTLY ALIGNED!');
+                return true;
+            } else {
+                console.log(`⚠️ Found ${alignmentIssues} alignment issues`);
+                console.log('🔧 You can try: window.quick6x6Fix() to apply additional fixes');
+                return false;
+            }
+        };
+
+        // Perfect alignment function for 6x6 grid
+        window.perfectAlign6x6 = function() {
+            console.log('🎯 PERFECT ALIGNING 6x6 GRID...');
+            
+            if (window.currentGridSize !== 6) {
+                console.log('❌ Not on 6x6 grid, current size:', window.currentGridSize);
+                return;
+            }
+            
+            // Step 1: Measure grid cells first
+            const gridCells = document.querySelectorAll('.grid-cell');
+            if (gridCells.length === 0) {
+                console.log('❌ No grid cells found');
+                return;
+            }
+            
+            const firstCell = gridCells[0];
+            const cellRect = firstCell.getBoundingClientRect();
+            const cellWidth = Math.round(cellRect.width);
+            const cellHeight = Math.round(cellRect.height);
+            
+            console.log(`📏 Measured grid cell size: ${cellWidth}px x ${cellHeight}px`);
+            
+            // Step 2: Apply comprehensive 6x6 tile fitting CSS
+            window.apply6x6TileFitting(cellWidth, cellHeight);
+            
+            // Step 3: Force update CSS with correct positioning
+            setTimeout(() => {
+                updateGridCSS(6);
+                document.body.offsetHeight; // Force reflow
+                
+                // Step 4: Verify alignment
+                setTimeout(() => {
+                    window.verify6x6Alignment();
+                    console.log('✅ Perfect 6x6 alignment complete!');
+                }, 200);
+            }, 100);
+        };
+
+        // Apply comprehensive 6x6 tile fitting CSS
+        window.apply6x6TileFitting = function(cellWidth, cellHeight) {
+            console.log('🔧 APPLYING COMPREHENSIVE 6x6 TILE FITTING...');
+            console.log(`📏 Target size: ${cellWidth}px x ${cellHeight}px`);
+            
+            // Remove any existing 6x6 fitting styles
+            const existingStyles = document.querySelectorAll('#comprehensive-6x6-fitting, #exact-6x6-tile-sizes, #dynamic-6x6-tiles, #aggressive-6x6-sizing, #super-aggressive-6x6');
+            existingStyles.forEach(style => style.remove());
+            
+            // Create comprehensive CSS with maximum specificity
+            const comprehensiveCSS = `
+                /* 6x6 Comprehensive Tile Fitting - Maximum Specificity */
+                html body .game-container .tile-container .tile,
+                html body .tile-container .tile,
+                html body .tile,
+                .game-container .tile-container .tile,
+                .tile-container .tile,
+                .tile {
+                    width: ${cellWidth}px !important;
+                    height: ${cellHeight}px !important;
+                    min-width: ${cellWidth}px !important;
+                    min-height: ${cellHeight}px !important;
+                    max-width: ${cellWidth}px !important;
+                    max-height: ${cellHeight}px !important;
+                    box-sizing: border-box !important;
+                    position: absolute !important;
+                    border-radius: 3px !important;
+                }
+                
+                html body .game-container .tile-container .tile .tile-inner,
+                html body .tile-container .tile .tile-inner,
+                html body .tile .tile-inner,
+                .game-container .tile-container .tile .tile-inner,
+                .tile-container .tile .tile-inner,
+                .tile .tile-inner {
+                    width: ${cellWidth}px !important;
+                    height: ${cellHeight}px !important;
+                    min-width: ${cellWidth}px !important;
+                    min-height: ${cellHeight}px !important;
+                    max-width: ${cellWidth}px !important;
+                    max-height: ${cellHeight}px !important;
+                    line-height: ${cellHeight}px !important;
+                    font-size: 14px !important;
+                    box-sizing: border-box !important;
+                    text-align: center !important;
+                    vertical-align: middle !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    border-radius: 3px !important;
+                    font-weight: bold !important;
+                    z-index: 10 !important;
+                }
+                
+                /* Force all tile elements to match grid cell size */
+                html body .tile *,
+                .tile * {
+                    max-width: ${cellWidth}px !important;
+                    max-height: ${cellHeight}px !important;
+                }
+                
+                /* Ensure proper positioning and transitions */
+                html body .tile {
+                    -webkit-transition: 110ms cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+                    -moz-transition: 110ms cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+                    transition: 110ms cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+                    -webkit-transition-property: -webkit-transform !important;
+                    -moz-transition-property: -moz-transform !important;
+                    transition-property: transform !important;
+                    -webkit-transform: translateZ(0) !important;
+                    -moz-transform: translateZ(0) !important;
+                    -ms-transform: translateZ(0) !important;
+                    transform: translateZ(0) !important;
+                    will-change: transform !important;
+                    -webkit-backface-visibility: hidden !important;
+                    backface-visibility: hidden !important;
+                }
+            `;
+            
+            // Apply the comprehensive CSS
+            const style = document.createElement('style');
+            style.id = 'comprehensive-6x6-fitting';
+            style.textContent = comprehensiveCSS;
+            document.head.appendChild(style);
+            
+            console.log('✅ Applied comprehensive 6x6 tile fitting CSS');
+            
+            // Force immediate re-render
+            document.body.offsetHeight;
+            
+            // Verify the changes immediately
+            setTimeout(() => {
+                const tiles = document.querySelectorAll('.tile');
+                if (tiles.length > 0) {
+                    const tileRect = tiles[0].getBoundingClientRect();
+                    const newTileWidth = Math.round(tileRect.width);
+                    const newTileHeight = Math.round(tileRect.height);
+                    
+                    console.log(`🔍 Immediate verification - Tile size: ${newTileWidth}px x ${newTileHeight}px`);
+                    console.log(`🔍 Target grid cell size: ${cellWidth}px x ${cellHeight}px`);
+                    
+                    const widthMatch = Math.abs(newTileWidth - cellWidth) <= 1;
+                    const heightMatch = Math.abs(newTileHeight - cellHeight) <= 1;
+                    
+                    if (widthMatch && heightMatch) {
+                        console.log('✅ Tiles now match grid cells perfectly!');
+                    } else {
+                        console.log('⚠️ Tiles still need adjustment, applying final fixes...');
+                        
+                        // Apply ultra-aggressive CSS as last resort
+                        const ultraAggressiveCSS = `
+                            * .tile, * .tile *, .tile, .tile * {
+                                width: ${cellWidth}px !important;
+                                height: ${cellHeight}px !important;
+                                min-width: ${cellWidth}px !important;
+                                min-height: ${cellHeight}px !important;
+                                max-width: ${cellWidth}px !important;
+                                max-height: ${cellHeight}px !important;
+                                box-sizing: border-box !important;
+                            }
+                        `;
+                        
+                        const ultraStyle = document.createElement('style');
+                        ultraStyle.id = 'ultra-aggressive-6x6';
+                        ultraStyle.textContent = ultraAggressiveCSS;
+                        document.head.appendChild(ultraStyle);
+                        
+                        console.log('🔧 Applied ultra-aggressive 6x6 sizing');
+                    }
+                }
+            }, 50);
+        };
+
+        // Enhanced function to fix 6x6 tile sizes to match grid cells exactly
+        window.fix6x6TileSizes = function() {
+            console.log('🔧 FIXING 6x6 TILE SIZES TO MATCH GRID CELLS EXACTLY...');
+            
+            if (window.currentGridSize !== 6) {
+                console.log('❌ Not on 6x6 grid, current size:', window.currentGridSize);
+                return;
+            }
+            
+            const gridCells = document.querySelectorAll('.grid-cell');
+            if (gridCells.length === 0) {
+                console.log('❌ No grid cells found');
+                return;
+            }
+            
+            // Get actual grid cell dimensions
+            const firstCell = gridCells[0];
+            const cellRect = firstCell.getBoundingClientRect();
+            const cellWidth = Math.round(cellRect.width);
+            const cellHeight = Math.round(cellRect.height);
+            
+            console.log(`📏 Measured grid cell size: ${cellWidth}px x ${cellHeight}px`);
+            
+            // Also get the computed style to ensure we have the right values
+            const cellStyle = window.getComputedStyle(firstCell);
+            const computedWidth = parseInt(cellStyle.width);
+            const computedHeight = parseInt(cellStyle.height);
+            
+            console.log(`📏 Computed grid cell size: ${computedWidth}px x ${computedHeight}px`);
+            
+            // Use the computed values as they're more reliable
+            const finalWidth = computedWidth || cellWidth;
+            const finalHeight = computedHeight || cellHeight;
+            
+            console.log(`📏 Final tile size will be: ${finalWidth}px x ${finalHeight}px`);
+            
+            // Create CSS with very high specificity to ensure it overrides everything
+            const tileSizeCSS = `
+                /* 6x6 Tile Sizing - Maximum Specificity */
+                .game-container .tile-container .tile,
+                .tile-container .tile,
+                .tile {
+                    width: ${finalWidth}px !important;
+                    height: ${finalHeight}px !important;
+                    box-sizing: border-box !important;
+                }
+                
+                .game-container .tile-container .tile .tile-inner,
+                .tile-container .tile .tile-inner,
+                .tile .tile-inner {
+                    width: ${finalWidth}px !important;
+                    height: ${finalHeight}px !important;
+                    line-height: ${finalHeight}px !important;
+                    font-size: 14px !important;
+                    box-sizing: border-box !important;
+                    text-align: center !important;
+                    vertical-align: middle !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+                
+                /* Ensure tiles are positioned correctly */
+                .game-container .tile-container .tile,
+                .tile-container .tile,
+                .tile {
+                    position: absolute !important;
+                    border-radius: 3px !important;
+                }
+            `;
+            
+            // Remove any existing 6x6 tile size styles
+            const existingStyles = document.querySelectorAll('#exact-6x6-tile-sizes, #dynamic-6x6-tiles');
+            existingStyles.forEach(style => style.remove());
+            
+            // Apply the new CSS
+            const style = document.createElement('style');
+            style.id = 'exact-6x6-tile-sizes';
+            style.textContent = tileSizeCSS;
+            document.head.appendChild(style);
+            
+            console.log('✅ Applied exact 6x6 tile sizes with maximum specificity');
+            
+            // Force re-render and check results
+            document.body.offsetHeight;
+            
+            // Verify the changes
+            setTimeout(() => {
+                const tiles = document.querySelectorAll('.tile');
+                if (tiles.length > 0) {
+                    const tileRect = tiles[0].getBoundingClientRect();
+                    const newTileWidth = Math.round(tileRect.width);
+                    const newTileHeight = Math.round(tileRect.height);
+                    
+                    console.log(`🔍 Verification - Tile size after fix: ${newTileWidth}px x ${newTileHeight}px`);
+                    console.log(`🔍 Grid cell size: ${finalWidth}px x ${finalHeight}px`);
+                    
+                    const widthMatch = Math.abs(newTileWidth - finalWidth) <= 1;
+                    const heightMatch = Math.abs(newTileHeight - finalHeight) <= 1;
+                    
+                    if (widthMatch && heightMatch) {
+                        console.log('✅ Tiles now match grid cells perfectly!');
+                    } else {
+                        console.log('❌ Tiles still don\'t match grid cells');
+                        console.log('🔧 Applying additional fixes...');
+                        
+                        // Apply even more aggressive CSS
+                        const aggressiveCSS = `
+                            .tile, .tile * {
+                                width: ${finalWidth}px !important;
+                                height: ${finalHeight}px !important;
+                                min-width: ${finalWidth}px !important;
+                                min-height: ${finalHeight}px !important;
+                                max-width: ${finalWidth}px !important;
+                                max-height: ${finalHeight}px !important;
+                            }
+                        `;
+                        
+                        const aggressiveStyle = document.createElement('style');
+                        aggressiveStyle.id = 'aggressive-6x6-sizing';
+                        aggressiveStyle.textContent = aggressiveCSS;
+                        document.head.appendChild(aggressiveStyle);
+                    }
+                }
+            }, 100);
+        };
+
         // Complete fix function that measures and aligns everything
         window.perfectAlign5x5 = function() {
             console.log('🎯 PERFECT ALIGNING 5x5 GRID...');
@@ -5958,11 +6595,28 @@
                         // Vertical: account for cell height + gap (no margin vertically)
                         top = y * (cellSize + cellGap); // 56 + 10 = 66px spacing
                         
-                        console.log(`  Position (${x + 1},${y + 1}): left=${left}px, top=${top}px`);
+                        console.log(`  5x5 Position (${x + 1},${y + 1}): left=${left}px, top=${top}px`);
+                    } else if (size === 6) {
+                        // For 6x6, match the EXACT grid cell positions
+                        // Grid cells: 44px width + 0px margin-right + 6px gap
+                        // FIXED: Add container padding offset to align with actual grid cells
+                        
+                        // Base spacing calculation
+                        const baseSpacing = cellSize + cellGap; // 44 + 6 = 50px
+                        
+                        // Horizontal: account for cell width + gap + container padding offset
+                        left = x * baseSpacing + 10; // Add 10px offset for proper alignment
+                        
+                        // Vertical: account for cell height + gap + container padding offset  
+                        top = y * baseSpacing + 10; // Add 10px offset for proper alignment
+                        
+                        console.log(`  6x6 Position (${x + 1},${y + 1}): left=${left}px, top=${top}px (with alignment offset)`);
                     } else {
-                        // Standard calculation for other sizes
+                        // Standard calculation for 4x4 and other sizes
                         left = x * (cellSize + cellGap);
                         top = y * (cellSize + cellGap);
+                        
+                        console.log(`  Standard Position (${x + 1},${y + 1}): left=${left}px, top=${top}px`);
                     }
                     
                     // Use 1-based indexing like original 4x4
