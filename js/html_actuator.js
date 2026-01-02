@@ -10,6 +10,13 @@ function HTMLActuator() {
 HTMLActuator.prototype.actuate = function (grid, metadata) {
   var self = this;
 
+  // Debug what metadata we're receiving
+  console.log('🎭 HTML ACTUATOR RECEIVED:');
+  console.log('  metadata.over:', metadata.over);
+  console.log('  metadata.won:', metadata.won);
+  console.log('  metadata.terminated:', metadata.terminated);
+  console.log('  metadata.score:', metadata.score);
+
   window.requestAnimationFrame(function () {
     self.clearContainer(self.tileContainer);
 
@@ -24,12 +31,24 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
     self.updateScore(metadata.score);
     self.updateBestScore(metadata.bestScore);
 
+    console.log('🎭 CHECKING GAME STATE:');
+    console.log('  Should show game over?', metadata.terminated && metadata.over);
+    console.log('  Should show you win?', metadata.terminated && metadata.won);
+
     if (metadata.terminated) {
+      console.log('⚠️ Game is terminated, checking reason...');
       if (metadata.over) {
+        console.log('💀 Showing GAME OVER message');
         self.message(false); // You lose
       } else if (metadata.won) {
+        console.log('🏆 Showing YOU WIN message');
         self.message(true); // You win!
+      } else {
+        console.log('❓ Game terminated but no clear reason - this should not happen');
       }
+    } else {
+      console.log('✅ Game continues - clearing any messages');
+      self.clearMessage();
     }
 
   });
