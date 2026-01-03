@@ -12,4 +12,11 @@ window.requestAnimationFrame(function () {
     configurePowerUpsForLevel(4);
   }
   
+  // Reset power-ups on initial game load
+  setTimeout(() => {
+    if (typeof resetPowerUps === 'function') {
+      resetPowerUps();
+    }
+  }, 100);
+  
 });

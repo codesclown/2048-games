@@ -69,8 +69,7 @@ KeyboardInputManager.prototype.listen = function () {
   });
 
   // Respond to button presses
-  this.bindButtonPress(".retry-button", this.restart);
-  this.bindButtonPress(".mobile-refresh-btn", this.restart);
+  // Note: .retry-button and .mobile-refresh-btn use custom onclick handlers that reset power-ups
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
 
   // Respond to swipe events

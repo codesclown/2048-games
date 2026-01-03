@@ -78,11 +78,17 @@ h1.title {
 .mobile-refresh-btn.spinning {
   animation: spinRestart 2s linear;
   background-color: rgba(255, 215, 0, 0.3) !important;
+  transform-origin: center center !important;
+  display: inline-flex !important;
 }
 
 @keyframes spinRestart {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(720deg); }
+  0% { 
+    transform: rotate(0deg); 
+  }
+  100% { 
+    transform: rotate(720deg); 
+  }
 }
 
 /* Game Action Buttons Below Game */
