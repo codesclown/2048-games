@@ -8,7 +8,7 @@ html, body {
   font-size: 18px; }
 
 body {
-  margin: 100px 0; }
+  margin: 40px 0; }
 
 /* Header styles */
 .heading {
@@ -313,7 +313,8 @@ h1.title {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 0px;
+  box-sizing: border-box;
 }
 
 .mobile-menu-content {
@@ -549,7 +550,8 @@ hr {
 
 .container {
   width: 500px;
-  margin: 0 auto; }
+  margin: 0 auto;
+  padding: 0 10px; }
 
 @-webkit-keyframes fade-in {
   0% {
@@ -1059,7 +1061,7 @@ hr {
     font-size: 15px; }
 
   body {
-    margin: 40px 0;
+    margin: 15px 0;
     padding: 0px; }
 
   .container {
