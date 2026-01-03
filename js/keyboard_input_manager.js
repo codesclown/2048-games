@@ -115,8 +115,8 @@ KeyboardInputManager.prototype.listen = function () {
       
       var distance = Math.max(absDx, absDy);
       
-      // Ultra-fast detection with lower threshold for instant response
-      if (distance > 8) { // Reduced from 15 to 8 for faster detection
+      // FASTER: Reduced threshold from 8 to 5 for instant response
+      if (distance > 5) { // Even faster detection
         var direction = absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0);
         
         // Clear touch coordinates to prevent multiple triggers
@@ -157,9 +157,9 @@ KeyboardInputManager.prototype.listen = function () {
     var distance = Math.max(absDx, absDy);
     var velocity = distance / touchDuration;
 
-    // Ultra-sensitive swipe detection for fastest possible response
+    // FASTER: Ultra-sensitive swipe detection for fastest possible response
     // Even lower thresholds for instant detection
-    var threshold = velocity > 0.5 ? 3 : (velocity > 0.2 ? 5 : 8); // Super fast swipes need only 3px
+    var threshold = velocity > 0.8 ? 2 : (velocity > 0.4 ? 3 : 5); // Super fast swipes need only 2px
 
     if (distance > threshold) {
       // Immediate direction detection for faster response

@@ -1733,10 +1733,28 @@
             };
         }
 
-        // MISSING FUNCTION - autoEarnPowerUps (called from game_manager.js)
+        // MISSING FUNCTION - autoEarnPowerUps (called from game_manager.js) - FIXED with guards
         window.autoEarnPowerUps = function() {
-            // Use the new unified system
-            checkPowerUpEarning();
+            // Guard against race conditions and invalid states
+            if (!window.gameManager || !window.gameManager.grid || window.gameManager.over) {
+                return; // Don't earn power-ups if game is over or invalid
+            }
+            
+            // Prevent multiple simultaneous calls
+            if (window.autoEarnPowerUps._running) {
+                return;
+            }
+            
+            window.autoEarnPowerUps._running = true;
+            
+            try {
+                // Use the new unified system with error handling
+                checkPowerUpEarning();
+            } catch (error) {
+                console.warn('Power-up earning error:', error);
+            } finally {
+                window.autoEarnPowerUps._running = false;
+            }
         };
 
         // Public API
@@ -3427,67 +3445,77 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Robust event handling for game over buttons
             function setupGameOverButtons() {
+                // Prevent multiple simultaneous setups
+                if (setupGameOverButtons._running) {
+                    return;
+                }
+                setupGameOverButtons._running = true;
+                
                 const retryBtn = document.getElementById('retryBtn');
                 const homeBtn = document.getElementById('homeBtn');
                 
-                if (retryBtn) {
-                    // Remove any existing listeners
-                    retryBtn.replaceWith(retryBtn.cloneNode(true));
-                    const newRetryBtn = document.getElementById('retryBtn');
+                if (retryBtn && !retryBtn._safeListenerAdded) {
+                    // Mark to prevent duplicate listeners
+                    retryBtn._safeListenerAdded = true;
                     
-                    newRetryBtn.addEventListener('click', function(e) {
+                    // Single click handler with debouncing
+                    retryBtn.onclick = function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         
+                        // Prevent rapid multiple clicks
+                        if (this._processing) return;
+                        this._processing = true;
+                        
                         console.log('Retry button clicked');
                         
-                        // Restart the game
-                        if (window.gameManager) {
-                            window.gameManager.restart();
-                        }
-                        
-                        // Reset power-ups
-                        if (typeof window.resetPowerUps === 'function') {
-                            window.resetPowerUps();
-                        }
-                        
-                        // Hide game over modal
+                        // Hide game over modal first
                         const gameMessage = document.querySelector('.game-message');
                         if (gameMessage) {
                             gameMessage.classList.remove('show-modal');
                             gameMessage.classList.remove('game-over');
                             gameMessage.style.display = 'none';
                         }
-                    });
-                    
-                    // Also add touch event for mobile
-                    newRetryBtn.addEventListener('touchend', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        newRetryBtn.click();
-                    });
+                        
+                        // Restart safely with delay
+                        setTimeout(() => {
+                            if (window.gameManager) {
+                                window.gameManager.restart();
+                            }
+                            
+                            // Reset power-ups
+                            if (typeof window.resetPowerUps === 'function') {
+                                window.resetPowerUps();
+                            }
+                            
+                            this._processing = false;
+                        }, 100);
+                    };
                 }
                 
-                if (homeBtn) {
-                    // Remove any existing listeners
-                    homeBtn.replaceWith(homeBtn.cloneNode(true));
-                    const newHomeBtn = document.getElementById('homeBtn');
+                if (homeBtn && !homeBtn._safeListenerAdded) {
+                    // Mark to prevent duplicate listeners
+                    homeBtn._safeListenerAdded = true;
                     
-                    newHomeBtn.addEventListener('click', function(e) {
+                    // Single click handler with debouncing
+                    homeBtn.onclick = function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         
+                        // Prevent rapid multiple clicks
+                        if (this._processing) return;
+                        this._processing = true;
+                        
                         console.log('Home button clicked');
-                        window.goToHome();
-                    });
-                    
-                    // Also add touch event for mobile
-                    newHomeBtn.addEventListener('touchend', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        newHomeBtn.click();
-                    });
+                        
+                        setTimeout(() => {
+                            window.goToHome();
+                            this._processing = false;
+                        }, 100);
+                    };
                 }
+                
+                setupGameOverButtons._running = false;
             }
             
             // Setup buttons initially
@@ -3912,7 +3940,27 @@
                     document.body.offsetHeight; // Trigger reflow
                 }
                 
-                window.gameManager = new GameManager(currentGridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+                // FIXED: Safe GameManager creation to prevent multiple instances
+                function createSafeGameManager(gridSize) {
+                    // Destroy existing game manager first
+                    if (window.gameManager) {
+                        // Clear any existing event listeners
+                        if (window.gameManager.inputManager) {
+                            window.gameManager.inputManager.events = {};
+                        }
+                        window.gameManager = null;
+                    }
+                    
+                    // Ensure grid size consistency
+                    window.currentGridSize = gridSize;
+                    
+                    // Create new game manager
+                    window.gameManager = new GameManager(gridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+                    
+                    return window.gameManager;
+                }
+                
+                createSafeGameManager(currentGridSize);
                 
                 // Configure powerups for the current level
                 configurePowerUpsForLevel(currentGridSize);
@@ -8144,9 +8192,30 @@
             }
         });
 
+        // GLOBAL: Safe GameManager creation function to prevent multiple instances
+        window.createSafeGameManager = function(gridSize) {
+            // Destroy existing game manager first
+            if (window.gameManager) {
+                // Clear any existing event listeners
+                if (window.gameManager.inputManager) {
+                    window.gameManager.inputManager.events = {};
+                }
+                // Clear any timers or intervals
+                window.gameManager = null;
+            }
+            
+            // Ensure grid size consistency
+            window.currentGridSize = gridSize;
+            
+            // Create new game manager with proper size
+            window.gameManager = new GameManager(gridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+            
+            return window.gameManager;
+        };
+
         // ===== GAME OVER FUNCTIONS =====
 
-        // Function to check if game is over
+        // Function to check if game is over (FIXED - more robust detection)
         window.checkGameOver = function() {
             if (!window.gameManager || !window.gameManager.grid) {
                 return { isGameOver: false, reason: 'No game manager' };
@@ -8154,6 +8223,12 @@
 
             const grid = window.gameManager.grid;
             const size = window.gameManager.size;
+
+            // CRITICAL: Ensure grid size matches current grid size
+            if (size !== window.currentGridSize) {
+                console.warn('Grid size mismatch:', size, 'vs', window.currentGridSize);
+                return { isGameOver: false, reason: 'Grid size mismatch - preventing false game over' };
+            }
 
             // Check 1: Are there empty cells?
             const emptyCells = grid.availableCells();
@@ -8205,19 +8280,29 @@
                 };
             }
 
-            // Check 3: Can move in any direction?
-            const canMoveUp = window.gameManager.canMoveInDirection ? window.gameManager.canMoveInDirection(0) : false;
-            const canMoveRight = window.gameManager.canMoveInDirection ? window.gameManager.canMoveInDirection(1) : false;
-            const canMoveDown = window.gameManager.canMoveInDirection ? window.gameManager.canMoveInDirection(2) : false;
-            const canMoveLeft = window.gameManager.canMoveInDirection ? window.gameManager.canMoveInDirection(3) : false;
-
-            const canMove = canMoveUp || canMoveRight || canMoveDown || canMoveLeft;
+            // Check 3: Can move in any direction? (with error handling)
+            let canMove = false;
+            try {
+                if (window.gameManager.canMoveInDirection) {
+                    const canMoveUp = window.gameManager.canMoveInDirection(0);
+                    const canMoveRight = window.gameManager.canMoveInDirection(1);
+                    const canMoveDown = window.gameManager.canMoveInDirection(2);
+                    const canMoveLeft = window.gameManager.canMoveInDirection(3);
+                    canMove = canMoveUp || canMoveRight || canMoveDown || canMoveLeft;
+                } else {
+                    // Fallback: use movesAvailable if canMoveInDirection doesn't exist
+                    canMove = window.gameManager.movesAvailable ? window.gameManager.movesAvailable() : false;
+                }
+            } catch (error) {
+                console.warn('Error checking moves:', error);
+                return { isGameOver: false, reason: 'Error checking moves - preventing false game over' };
+            }
 
             if (canMove) {
                 return { 
                     isGameOver: false, 
                     reason: 'Can still move in at least one direction',
-                    canMoveUp, canMoveRight, canMoveDown, canMoveLeft
+                    canMove: true
                 };
             }
 
