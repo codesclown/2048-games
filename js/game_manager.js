@@ -152,7 +152,6 @@ GameManager.prototype.moveTile = function (tile, cell) {
 
 // Enhanced debug method to show synchronized grid state
 GameManager.prototype.logGridState = function () {
-  console.log('📋 GRID STATE (' + this.size + 'x' + this.size + '):');
   
   for (var y = 0; y < this.size; y++) {
     var row = [];
@@ -164,7 +163,6 @@ GameManager.prototype.logGridState = function () {
         row.push('   .');
       }
     }
-    console.log('  Row ' + y + ': [' + row.join('|') + ']');
   }
 };
 
@@ -191,7 +189,6 @@ GameManager.prototype.isRealGameOver = function () {
     return false;
   }
   
-  console.log('🚨 GAME OVER: No moves possible');
   return true;
 };
 

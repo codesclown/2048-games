@@ -12,5 +12,4 @@ window.requestAnimationFrame(function () {
     configurePowerUpsForLevel(4);
   }
   
-  console.log('🎮 Game initialized with Level 1 (4x4 grid)');
 });
