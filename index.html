@@ -737,6 +737,28 @@
                 min-width: 120px !important;
                 touch-action: manipulation !important;
             }
+
+            /* Yellow styling for retry button specifically */
+            .game-container .game-over-buttons .retry-button,
+            .game-container .game-over-buttons #retryBtn {
+                background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%) !important;
+                color: #1a1a3a !important;
+                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3) !important;
+            }
+
+            .game-container .game-over-buttons .retry-button:hover,
+            .game-container .game-over-buttons #retryBtn:hover {
+                background: linear-gradient(135deg, #ffdc00 0%, #ffc107 100%) !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4) !important;
+            }
+
+            .game-container .game-over-buttons .retry-button:active,
+            .game-container .game-over-buttons #retryBtn:active {
+                background: linear-gradient(135deg, #e6c200 0%, #e6ac00 100%) !important;
+                transform: translateY(0) !important;
+                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2) !important;
+            }
             
             .game-container .game-over-buttons button:hover {
                 transform: translateY(-2px) !important;
@@ -1082,9 +1104,12 @@
 
     <!-- JavaScript for Screen Management and Modals -->
     <script>
-        // Level Transition Loader Functions
+        // Level Transition Loader Functions (FIXED - with state management)
         window.showLevelTransitionLoader = function(level, gridSize) {
-
+            // Set loading state
+            if (window.gameStateManager) {
+                window.gameStateManager.setState('LOADING');
+            }
             
             const overlay = document.getElementById('levelTransitionLoader');
             const text = document.getElementById('levelTransitionText');
@@ -1142,6 +1167,10 @@
             return new Promise((resolve) => {
                 setTimeout(() => {
                     overlay.classList.remove('active');
+                    // Set playing state when loading complete
+                    if (window.gameStateManager) {
+                        window.gameStateManager.setState('PLAYING');
+                    }
                     resolve();
                 }, 2000);
             });
@@ -1273,10 +1302,12 @@
         window.gameStateHistory = [];
         const MAX_HISTORY = 5; // Keep last 5 moves for undo
 
-        // Move counter for power-up unlocking
+        // Move counter for power-up unlocking (UNIFIED SYSTEM)
         window.moveCount = 0;
         const POWERUP_UNLOCK_MOVES = 4; // Unlock power-ups after 4 moves
         window.powerUpsUnlocked = false; // Track if power-ups have been unlocked
+
+        // REMOVED OLD CONFLICTING FUNCTIONS - Using unified system only
 
         // Level system configuration
         window.gridSizes = {
@@ -1289,7 +1320,7 @@
         window.currentLevel = 1;
         window.currentGridSize = 4;
 
-        // Save current game state for undo (with duplicate prevention)
+        // Save current game state for undo (with duplicate prevention) - FIXED
         function saveGameState() {
             if (window.gameManager) {
                 const currentState = {
@@ -1317,7 +1348,7 @@
                     window.gameStateHistory.shift();
                 }
                 
-                // Use new power-up system for move tracking
+                // Use unified power-up system for move tracking
                 window.powerUpSystem.onMove();
             }
         }
@@ -1418,48 +1449,55 @@
             }
         }
 
-        // ===== SIMPLIFIED ROBUST POWER-UP SYSTEM =====
+        // ===== UNIFIED ROBUST POWER-UP SYSTEM =====
         
-        // Power-up system configuration - SIMPLIFIED
+        // Power-up system configuration
         const POWERUP_CONFIG = {
             UNLOCK_MOVES: 4,
+            EARN_COOLDOWN: 1000, // 1 second cooldown to prevent spam
             
-            // Level-based configurations - SIMPLIFIED
+            // Level-based configurations
             levels: {
                 4: { // 4x4 grid
-                    undo: { start: 2, max: 4, sessionLimit: 4, requiredTile: 128 },
-                    swap: { start: 1, max: 4, sessionLimit: 4, requiredTile: 256 },
-                    delete: { start: 1, max: 4, sessionLimit: 4, requiredTile: 512 }
+                    undo: { start: 2, max: 4, lifetime: 4, requiredTile: 128 },
+                    swap: { start: 1, max: 4, lifetime: 4, requiredTile: 256 },
+                    delete: { start: 1, max: 4, lifetime: 4, requiredTile: 512 }
                 },
                 5: { // 5x5 grid
-                    undo: { start: 2, max: 5, sessionLimit: 5, requiredTile: 128 },
-                    swap: { start: 2, max: 5, sessionLimit: 5, requiredTile: 256 },
-                    delete: { start: 2, max: 5, sessionLimit: 5, requiredTile: 512 }
+                    undo: { start: 2, max: 5, lifetime: 5, requiredTile: 128 },
+                    swap: { start: 2, max: 5, lifetime: 5, requiredTile: 256 },
+                    delete: { start: 2, max: 5, lifetime: 5, requiredTile: 512 }
                 },
                 6: { // 6x6 grid
-                    undo: { start: 3, max: 6, sessionLimit: 6, requiredTile: 128 },
-                    swap: { start: 3, max: 6, sessionLimit: 6, requiredTile: 256 },
-                    delete: { start: 3, max: 6, sessionLimit: 6, requiredTile: 512 }
+                    undo: { start: 3, max: 6, lifetime: 6, requiredTile: 128 },
+                    swap: { start: 3, max: 6, lifetime: 6, requiredTile: 256 },
+                    delete: { start: 3, max: 6, lifetime: 6, requiredTile: 512 }
                 }
             }
         };
 
-        // SINGLE power-up state management
+        // Unified power-up state management
         window.powerUpState = {
             moveCount: 0,
             unlocked: false,
             
             undo: {
-                available: 0,    // Current available uses
-                totalUsed: 0     // Total used this session
+                uses: 0,
+                lifetimeUsed: 0,
+                lastUsedTime: 0,
+                lastEarnTime: 0
             },
             swap: {
-                available: 0,
-                totalUsed: 0
+                uses: 0,
+                lifetimeUsed: 0,
+                lastUsedTime: 0,
+                lastEarnTime: 0
             },
             delete: {
-                available: 0,
-                totalUsed: 0
+                uses: 0,
+                lifetimeUsed: 0,
+                lastUsedTime: 0,
+                lastEarnTime: 0
             }
         };
 
@@ -1471,7 +1509,7 @@
 
         // Initialize power-ups for a new game
         function initializePowerUps() {
-            console.log('Initializing power-ups for new game');
+            const config = getCurrentLevelConfig();
             
             // Reset all state
             window.powerUpState.moveCount = 0;
@@ -1480,8 +1518,10 @@
             // Reset each power-up type
             ['undo', 'swap', 'delete'].forEach(type => {
                 window.powerUpState[type] = {
-                    available: 0,    // Start locked
-                    totalUsed: 0
+                    uses: 0, // Start locked
+                    lifetimeUsed: 0,
+                    lastUsedTime: 0,
+                    lastEarnTime: 0
                 };
             });
             
@@ -1490,97 +1530,71 @@
             
             // Update UI
             updatePowerUpUI();
-            updateLegacyPowerUps();
         }
 
         // Unlock power-ups after sufficient moves
         function unlockPowerUps() {
             if (window.powerUpState.moveCount >= POWERUP_CONFIG.UNLOCK_MOVES && !window.powerUpState.unlocked) {
-                console.log('Unlocking power-ups after', window.powerUpState.moveCount, 'moves');
                 const config = getCurrentLevelConfig();
                 
                 window.powerUpState.unlocked = true;
-                window.powerUpState.undo.available = config.undo.start;
-                window.powerUpState.swap.available = config.swap.start;
-                window.powerUpState.delete.available = config.delete.start;
+                window.powerUpState.undo.uses = config.undo.start;
+                window.powerUpState.swap.uses = config.swap.start;
+                window.powerUpState.delete.uses = config.delete.start;
                 
                 updatePowerUpUI();
-                updateLegacyPowerUps();
             }
         }
 
-        // Use a power-up - SIMPLIFIED with double-execution guard
+        // Use a power-up (FIXED - properly decreases count)
         function usePowerUp(type) {
-            // Prevent double execution
-            if (window.powerUpSystem._processing) {
-                console.log(`Preventing double execution of ${type} power-up`);
-                return false;
-            }
-            
-            window.powerUpSystem._processing = true;
-            
-            const powerUp = window.powerUpState[type];
             const config = getCurrentLevelConfig();
-            
-            console.log(`Attempting to use ${type}:`, {
-                unlocked: window.powerUpState.unlocked,
-                available: powerUp.available,
-                totalUsed: powerUp.totalUsed,
-                sessionLimit: config[type].sessionLimit
-            });
+            const powerUp = window.powerUpState[type];
             
             // Check if can use
-            if (!window.powerUpState.unlocked || powerUp.available <= 0) {
-                console.log(`Cannot use ${type}: unlocked=${window.powerUpState.unlocked}, available=${powerUp.available}`);
-                window.powerUpSystem._processing = false;
+            if (!window.powerUpState.unlocked || powerUp.uses <= 0) {
                 return false;
             }
             
-            // Check session limit
-            if (powerUp.totalUsed >= config[type].sessionLimit) {
-                console.log(`Cannot use ${type}: session limit reached (${powerUp.totalUsed}/${config[type].sessionLimit})`);
-                window.powerUpSystem._processing = false;
-                return false;
-            }
+            // Use the power-up (CRITICAL FIX)
+            powerUp.uses--;
+            powerUp.lifetimeUsed++;
+            powerUp.lastUsedTime = Date.now();
             
-            // Use the power-up
-            powerUp.available--;
-            powerUp.totalUsed++;
-            
-            console.log(`Used ${type}: available=${powerUp.available}, totalUsed=${powerUp.totalUsed}`);
-            
+            // Immediately update UI to show decreased count
             updatePowerUpUI();
             updateLegacyPowerUps();
-            
-            // Clear processing flag after a short delay
-            setTimeout(() => {
-                window.powerUpSystem._processing = false;
-            }, 100);
             
             return true;
         }
 
-        // Check if can earn power-ups - SIMPLIFIED
+        // Check if can earn power-ups (FIXED - only when used and have required tile)
         function checkPowerUpEarning() {
             if (!window.gameManager || !window.gameManager.grid || !window.powerUpState.unlocked) {
                 return;
             }
             
             const config = getCurrentLevelConfig();
+            const currentTime = Date.now();
             
             // Check each power-up type
             ['undo', 'swap', 'delete'].forEach(type => {
                 const powerUp = window.powerUpState[type];
                 const typeConfig = config[type];
                 
-                // Can earn if:
-                // 1. Have used this power-up at least once
-                // 2. Haven't reached session limit
-                // 3. Don't exceed max available at any time
+                // FIXED EARNING LOGIC:
+                // Can only earn if:
+                // 1. Have used this power-up at least once (lifetimeUsed > 0)
+                // 2. Total available + used doesn't exceed lifetime limit
+                // 3. Not in cooldown period
                 // 4. Have required tile on board
-                if (powerUp.totalUsed > 0 &&
-                    powerUp.totalUsed < typeConfig.sessionLimit &&
-                    powerUp.available < typeConfig.max) {
+                // 5. Currently have less than max uses available
+                const totalPowerUps = powerUp.uses + powerUp.lifetimeUsed;
+                
+                if (powerUp.lifetimeUsed > 0 &&
+                    totalPowerUps < typeConfig.lifetime &&
+                    powerUp.uses < typeConfig.max &&
+                    (currentTime - powerUp.lastEarnTime) >= POWERUP_CONFIG.EARN_COOLDOWN) {
                     
                     // Check for required tile
                     let hasTile = false;
@@ -1591,8 +1605,8 @@
                     });
                     
                     if (hasTile) {
-                        powerUp.available++;
-                        console.log(`Earned ${type}: available=${powerUp.available}, totalUsed=${powerUp.totalUsed}`);
+                        powerUp.uses++;
+                        powerUp.lastEarnTime = currentTime;
                         updatePowerUpUI();
                         updateLegacyPowerUps();
                     }
@@ -1600,17 +1614,11 @@
             });
         }
 
-        // Update power-up UI - SIMPLIFIED
+        // Update power-up UI (FIXED - shows correct counts)
         function updatePowerUpUI() {
             const config = getCurrentLevelConfig();
             const movesRemaining = Math.max(0, POWERUP_CONFIG.UNLOCK_MOVES - window.powerUpState.moveCount);
             const isLocked = !window.powerUpState.unlocked;
-            
-            console.log('Updating power-up UI:', {
-                isLocked,
-                movesRemaining,
-                powerUpState: JSON.parse(JSON.stringify(window.powerUpState))
-            });
             
             // Update buttons and counters
             ['undo', 'swap', 'delete'].forEach(type => {
@@ -1625,34 +1633,25 @@
                     const powerUp = window.powerUpState[type];
                     const typeConfig = config[type];
                     
-                    console.log(`${type} button update:`, {
-                        available: powerUp.available,
-                        totalUsed: powerUp.totalUsed,
-                        isLocked
-                    });
-                    
                     if (isLocked) {
                         btn.title = `${type.charAt(0).toUpperCase() + type.slice(1)} - Locked (${movesRemaining} more moves to unlock)`;
                         btn.classList.add('disabled');
                     } else {
-                        const remainingUses = typeConfig.sessionLimit - powerUp.totalUsed;
-                        btn.title = `${type.charAt(0).toUpperCase() + type.slice(1)} - ${powerUp.available} available (${remainingUses} total uses left this game)`;
+                        const totalAvailable = powerUp.uses + powerUp.lifetimeUsed;
+                        const remainingToEarn = Math.max(0, typeConfig.lifetime - totalAvailable);
+                        btn.title = `${type.charAt(0).toUpperCase() + type.slice(1)} - ${powerUp.uses} available (${remainingToEarn} more can be earned)`;
                         
-                        if (powerUp.available === 0) {
-                            console.log(`Disabling ${type} button: available = ${powerUp.available}`);
+                        if (powerUp.uses === 0) {
                             btn.classList.add('disabled');
                         } else {
-                            console.log(`Enabling ${type} button: available = ${powerUp.available}`);
                             btn.classList.remove('disabled');
                         }
                     }
                 }
                 
                 if (counter) {
-                    const displayValue = isLocked ? '🔒' : window.powerUpState[type].available;
-                    console.log(`${type} counter update: ${displayValue}`);
-                    counter.textContent = displayValue;
-                    counter.className = (isLocked || window.powerUpState[type].available === 0) ? 
+                    counter.textContent = isLocked ? '🔒' : window.powerUpState[type].uses;
+                    counter.className = (isLocked || window.powerUpState[type].uses === 0) ? 
                         'power-up-counter zero' : 'power-up-counter';
                     counter.offsetHeight; // Force reflow
                 }
@@ -1672,40 +1671,46 @@
             
             window.powerUps = {
                 undo: {
-                    uses: window.powerUpState.undo.available,
+                    uses: window.powerUpState.undo.uses,
                     maxUses: config.undo.max,
                     requiredTile: config.undo.requiredTile,
                     earnAmount: 1,
-                    lifetimeUsed: window.powerUpState.undo.totalUsed,
-                    lifetimeLimit: config.undo.sessionLimit,
-                    lastUsedTime: Date.now(),
-                    earnCooldown: 0,
+                    lifetimeUsed: window.powerUpState.undo.lifetimeUsed,
+                    lifetimeLimit: config.undo.lifetime,
+                    lastUsedTime: window.powerUpState.undo.lastUsedTime,
+                    earnCooldown: POWERUP_CONFIG.EARN_COOLDOWN,
                     startUses: config.undo.start
                 },
                 swap: {
-                    uses: window.powerUpState.swap.available,
+                    uses: window.powerUpState.swap.uses,
                     maxUses: config.swap.max,
                     requiredTile: config.swap.requiredTile,
                     earnAmount: 1,
-                    lifetimeUsed: window.powerUpState.swap.totalUsed,
-                    lifetimeLimit: config.swap.sessionLimit,
-                    lastUsedTime: Date.now(),
-                    earnCooldown: 0,
+                    lifetimeUsed: window.powerUpState.swap.lifetimeUsed,
+                    lifetimeLimit: config.swap.lifetime,
+                    lastUsedTime: window.powerUpState.swap.lastUsedTime,
+                    earnCooldown: POWERUP_CONFIG.EARN_COOLDOWN,
                     startUses: config.swap.start
                 },
                 delete: {
-                    uses: window.powerUpState.delete.available,
+                    uses: window.powerUpState.delete.uses,
                     maxUses: config.delete.max,
                     requiredTile: config.delete.requiredTile,
                     earnAmount: 1,
-                    lifetimeUsed: window.powerUpState.delete.totalUsed,
-                    lifetimeLimit: config.delete.sessionLimit,
-                    lastUsedTime: Date.now(),
-                    earnCooldown: 0,
+                    lifetimeUsed: window.powerUpState.delete.lifetimeUsed,
+                    lifetimeLimit: config.delete.lifetime,
+                    lastUsedTime: window.powerUpState.delete.lastUsedTime,
+                    earnCooldown: POWERUP_CONFIG.EARN_COOLDOWN,
                     startUses: config.delete.start
                 }
             };
         }
+
+        // MISSING FUNCTION - autoEarnPowerUps (called from game_manager.js)
+        window.autoEarnPowerUps = function() {
+            // Use the new unified system
+            checkPowerUpEarning();
+        };
 
         // Public API
         window.powerUpSystem = {
@@ -1713,17 +1718,15 @@
             use: usePowerUp,
             onMove: onGameMove,
             updateUI: updatePowerUpUI,
-            updateLegacy: updateLegacyPowerUps,
-            _processing: false  // Guard against double execution
+            updateLegacy: updateLegacyPowerUps
         };
 
-        // Initialize the system and update legacy compatibility
+        // Initialize the system
         initializePowerUps();
         updateLegacyPowerUps();
 
-        // Make functions globally accessible
+        // Make functions globally accessible (FIXED)
         window.resetPowerUps = function() {
-            console.log('Resetting power-ups');
             window.powerUpSystem.initialize();
             window.powerUpSystem.updateLegacy();
         };
@@ -1735,177 +1738,13 @@
 
         // Debug function to check powerup status (for console debugging)
         window.debugPowerUps = function() {
-            console.log('=== Power-up Debug Info ===');
+            console.log('=== Power-Up System Status ===');
             console.log('Move count:', window.powerUpState.moveCount);
             console.log('Unlocked:', window.powerUpState.unlocked);
-            console.log('Undo:', window.powerUpState.undo);
-            console.log('Swap:', window.powerUpState.swap);
-            console.log('Delete:', window.powerUpState.delete);
-            console.log('Legacy powerUps:', window.powerUps);
-            
-            // Check button states
-            const undoBtn = document.querySelector('.undo-btn');
-            const swapBtn = document.querySelector('.replace-btn');
-            const deleteBtn = document.querySelector('.menu-btn');
-            
-            console.log('Button states:');
-            console.log('- Undo disabled:', undoBtn?.classList.contains('disabled'));
-            console.log('- Swap disabled:', swapBtn?.classList.contains('disabled'));
-            console.log('- Delete disabled:', deleteBtn?.classList.contains('disabled'));
-            
-            // Check counters
-            const undoCounter = document.getElementById('undo-counter');
-            const swapCounter = document.getElementById('swap-counter');
-            const deleteCounter = document.getElementById('delete-counter');
-            
-            console.log('Counter values:');
-            console.log('- Undo counter:', undoCounter?.textContent);
-            console.log('- Swap counter:', swapCounter?.textContent);
-            console.log('- Delete counter:', deleteCounter?.textContent);
-            
-            return {
-                state: window.powerUpState,
-                legacy: window.powerUps,
-                buttons: {
-                    undo: undoBtn?.classList.contains('disabled'),
-                    swap: swapBtn?.classList.contains('disabled'),
-                    delete: deleteBtn?.classList.contains('disabled')
-                }
-            };
+            console.log('Undo:', window.powerUpState.undo.uses, '/', getCurrentLevelConfig().undo.max);
+            console.log('Swap:', window.powerUpState.swap.uses, '/', getCurrentLevelConfig().swap.max);
+            console.log('Delete:', window.powerUpState.delete.uses, '/', getCurrentLevelConfig().delete.max);
         };
-
-        // Test function to spawn game over popup for testing
-        window.testGameOver = function() {
-            console.log('=== Testing Game Over Popup ===');
-            
-            // Set game state to GAME_OVER
-            if (window.gameStateManager) {
-                window.gameStateManager.setState('GAME_OVER');
-            }
-            
-            // Get the game message element
-            const gameMessage = document.querySelector('.game-message');
-            if (!gameMessage) {
-                console.error('Game message element not found!');
-                return false;
-            }
-            
-            // Set the message text
-            const messageP = gameMessage.querySelector('p');
-            if (messageP) {
-                messageP.textContent = 'Game over!';
-            }
-            
-            // Add game over classes and show modal
-            gameMessage.classList.add('game-over');
-            gameMessage.classList.add('show-modal');
-            gameMessage.style.display = 'flex';
-            
-            console.log('Game over popup should now be visible');
-            console.log('Try clicking the Home and Try Again buttons');
-            
-            // Check if buttons exist
-            const retryBtn = document.getElementById('retryBtn');
-            const homeBtn = document.getElementById('homeBtn');
-            
-            console.log('Button check:');
-            console.log('- Retry button found:', !!retryBtn);
-            console.log('- Home button found:', !!homeBtn);
-            
-            if (retryBtn) {
-                console.log('- Retry button clickable:', retryBtn.style.pointerEvents !== 'none');
-            }
-            if (homeBtn) {
-                console.log('- Home button clickable:', homeBtn.style.pointerEvents !== 'none');
-            }
-            
-            return true;
-        };
-
-        // Test function to hide game over popup
-        window.hideTestGameOver = function() {
-            console.log('=== Hiding Game Over Popup ===');
-            
-            const gameMessage = document.querySelector('.game-message');
-            if (gameMessage) {
-                gameMessage.classList.remove('game-over');
-                gameMessage.classList.remove('show-modal');
-                gameMessage.style.display = 'none';
-                console.log('Game over popup hidden');
-            }
-            
-            // Reset game state
-            if (window.gameStateManager) {
-                window.gameStateManager.setState('PLAYING');
-            }
-        };
-
-        // Test function to check button functionality
-        window.testGameOverButtons = function() {
-            console.log('=== Testing Game Over Buttons ===');
-            
-            // First show the game over popup
-            window.testGameOver();
-            
-            // Wait a moment then test button functionality
-            setTimeout(() => {
-                const retryBtn = document.getElementById('retryBtn');
-                const homeBtn = document.getElementById('homeBtn');
-                
-                console.log('=== Button Functionality Test ===');
-                
-                if (retryBtn) {
-                    console.log('Testing Retry button...');
-                    console.log('- Has onclick:', typeof retryBtn.onclick === 'function');
-                    console.log('- Has event listeners:', retryBtn.getEventListeners ? Object.keys(retryBtn.getEventListeners()).length : 'Cannot check');
-                    console.log('- Computed style pointer-events:', getComputedStyle(retryBtn).pointerEvents);
-                    console.log('- Z-index:', getComputedStyle(retryBtn).zIndex);
-                } else {
-                    console.error('Retry button not found!');
-                }
-                
-                if (homeBtn) {
-                    console.log('Testing Home button...');
-                    console.log('- Has onclick:', typeof homeBtn.onclick === 'function');
-                    console.log('- Has event listeners:', homeBtn.getEventListeners ? Object.keys(homeBtn.getEventListeners()).length : 'Cannot check');
-                    console.log('- Computed style pointer-events:', getComputedStyle(homeBtn).pointerEvents);
-                    console.log('- Z-index:', getComputedStyle(homeBtn).zIndex);
-                } else {
-                    console.error('Home button not found!');
-                }
-                
-                console.log('=== Manual Test Instructions ===');
-                console.log('1. You should see the game over popup');
-                console.log('2. Try clicking the "Try again" button');
-                console.log('3. Try clicking the "Home" button');
-                console.log('4. Check console for any errors');
-                console.log('5. Use hideTestGameOver() to close the popup if needed');
-                
-            }, 500);
-        };
-
-        // Check if player has required tile to earn more uses (legacy function)
-        function checkForTileReward(requiredValue, powerUpType) {
-            if (window.gameManager && window.gameManager.grid) {
-                let hasTile = false;
-                window.gameManager.grid.eachCell(function(x, y, tile) {
-                    if (tile && tile.value === requiredValue) {
-                        hasTile = true;
-                    }
-                });
-                
-                if (hasTile && window.powerUps[powerUpType].uses < window.powerUps[powerUpType].maxUses) {
-                    window.powerUps[powerUpType].uses += window.powerUps[powerUpType].earnAmount;
-                    // Ensure we don't exceed max limit
-                    if (window.powerUps[powerUpType].uses > window.powerUps[powerUpType].maxUses) {
-                        window.powerUps[powerUpType].uses = window.powerUps[powerUpType].maxUses;
-                    }
-                    updateButtonTitles();
-                    return true;
-                }
-            }
-            return false;
-        }
 
         // Override the original restart function to reset power-ups
         const originalGameManagerRestart = window.gameManager ? window.gameManager.restart : null;
@@ -1954,7 +1793,7 @@
         // Initialize counters when page loads
         setTimeout(updateButtonTitles, 500);
 
-        // Game Sound System
+        // Game Sound System with State-Based Blocking (FIXED)
         class GameSounds {
             constructor() {
                 this.audioContext = null;
@@ -1971,9 +1810,18 @@
                 }
             }
 
+            // Check if sounds should be blocked based on game state
+            shouldBlockSound() {
+                if (window.gameStateManager) {
+                    const state = window.gameStateManager.getState();
+                    return state === 'LOADING' || state === 'ERROR';
+                }
+                return false;
+            }
+
             // Create a complex tone with multiple oscillators
             createComplexTone(frequencies, duration, type = 'sine', volume = this.volume, envelope = 'smooth') {
-                if (!this.enabled || !this.audioContext) return;
+                if (!this.enabled || !this.audioContext || this.shouldBlockSound()) return;
 
                 const gainNode = this.audioContext.createGain();
                 gainNode.connect(this.audioContext.destination);
@@ -2005,9 +1853,9 @@
                 });
             }
 
-            // Enhanced tile slide sound - smooth whoosh
+            // Enhanced tile slide sound - smooth whoosh (with state blocking)
             playSlide() {
-                if (!this.enabled) return;
+                if (!this.enabled || this.shouldBlockSound()) return;
                 // Smooth air whoosh sound with gentle frequency sweep
                 const oscillator = this.audioContext.createOscillator();
                 const gainNode = this.audioContext.createGain();
@@ -2027,9 +1875,9 @@
                 oscillator.stop(this.audioContext.currentTime + 0.15);
             }
 
-            // Tile merge sound with specific sounds for different values
+            // Tile merge sound with specific sounds for different values (with state blocking)
             playMerge(tileValue) {
-                if (!this.enabled) return;
+                if (!this.enabled || this.shouldBlockSound()) return;
                 
                 if (tileValue === 4) {
                     // Soft bell for 4
@@ -2094,9 +1942,9 @@
                 }, 700);
             }
 
-            // Unique undo sound - gentle reverse/rewind effect
+            // Unique undo sound - gentle reverse/rewind effect (with state blocking)
             playUndo() {
-                if (!this.enabled) return;
+                if (!this.enabled || this.shouldBlockSound()) return;
                 // Gentle reverse swoosh with rising pitch
                 const oscillator = this.audioContext.createOscillator();
                 const gainNode = this.audioContext.createGain();
@@ -2121,9 +1969,9 @@
                 }, 200);
             }
 
-            // Unique swap sound - exchange/teleport effect
+            // Unique swap sound - exchange/teleport effect (with state blocking)
             playSwap() {
-                if (!this.enabled) return;
+                if (!this.enabled || this.shouldBlockSound()) return;
                 // Two-tone swap effect
                 this.createComplexTone([440, 880], 0.15, 'triangle', 0.2, 'sharp');
                 setTimeout(() => {
@@ -2135,9 +1983,9 @@
                 }, 300);
             }
 
-            // Unique delete sound - smooth energy dissipation effect
+            // Unique delete sound - smooth energy dissipation effect (with state blocking)
             playDelete() {
-                if (!this.enabled) return;
+                if (!this.enabled || this.shouldBlockSound()) return;
                 // Smooth energy dissipation sound
                 const oscillator = this.audioContext.createOscillator();
                 const gainNode = this.audioContext.createGain();
@@ -2164,9 +2012,9 @@
                 }
             }
 
-            // Enhanced win sound - epic victory fanfare
+            // Enhanced win sound - epic victory fanfare (with state blocking)
             playWin() {
-                if (!this.enabled) return;
+                if (!this.enabled || this.shouldBlockSound()) return;
                 // Victory fanfare
                 const fanfare = [
                     [523, 659, 784], // C major
@@ -2187,9 +2035,9 @@
                 }, 1000);
             }
 
-            // Enhanced loss sound - dramatic descent
+            // Enhanced loss sound - dramatic descent (with state blocking)
             playLoss() {
-                if (!this.enabled) return;
+                if (!this.enabled || this.shouldBlockSound()) return;
                 // Dramatic descending sequence
                 const descent = [
                     [523, 659, 784], // C major
@@ -2206,9 +2054,9 @@
                 });
             }
 
-            // Enhanced spawn sound - magical appearance
+            // Enhanced spawn sound - magical appearance (with state blocking)
             playSpawn() {
-                if (!this.enabled) return;
+                if (!this.enabled || this.shouldBlockSound()) return;
                 // Magical pop with sparkle
                 this.createComplexTone([1047, 1319], 0.1, 'sine', 0.12, 'sharp');
                 setTimeout(() => {
@@ -2216,9 +2064,9 @@
                 }, 80);
             }
 
-            // Generic power-up sound (fallback)
+            // Generic power-up sound (fallback) (with state blocking)
             playPowerUp() {
-                if (!this.enabled) return;
+                if (!this.enabled || this.shouldBlockSound()) return;
                 this.createComplexTone([523, 659, 784], 0.3, 'sine', 0.2);
             }
 
@@ -2249,20 +2097,10 @@
             }
         };
 
-        // Handle undo button click
+        // Handle undo button click (FIXED - uses unified system)
         window.handleUndoClick = function(button) {
-            // Prevent multiple rapid clicks
-            if (button.dataset.processing === 'true') {
-                console.log('Undo button already processing, ignoring click');
-                return;
-            }
-            
-            button.dataset.processing = 'true';
-            
-            // Use new power-up system
+            // Use new unified power-up system
             if (!window.powerUpSystem.use('undo')) {
-                console.log('Cannot use undo - not available');
-                button.dataset.processing = 'false';
                 return; // Can't use undo
             }
 
@@ -2273,13 +2111,11 @@
 
             // Check if we have enough history (need at least 1 state to undo to)
             if (window.gameStateHistory.length === 0) {
-                console.log('No undo history available - refunding undo use');
-                // Refund the undo use since we couldn't actually undo
-                window.powerUpState.undo.available++;
-                window.powerUpState.undo.totalUsed--;
+                // If no history but we used a power-up, refund it
+                window.powerUpState.undo.uses++;
+                window.powerUpState.undo.lifetimeUsed--;
                 window.powerUpSystem.updateUI();
                 window.powerUpSystem.updateLegacy();
-                button.dataset.processing = 'false';
                 return;
             }
 
@@ -2292,18 +2128,16 @@
                 const undoSuccessful = restoreGameState();
                 
                 if (!undoSuccessful) {
-                    console.log('Undo failed - refunding undo use');
                     // If undo failed, refund the use
-                    window.powerUpState.undo.available++;
-                    window.powerUpState.undo.totalUsed--;
+                    window.powerUpState.undo.uses++;
+                    window.powerUpState.undo.lifetimeUsed--;
                     window.powerUpSystem.updateUI();
                     window.powerUpSystem.updateLegacy();
                 }
                 
-                // Remove animation class and processing flag
+                // Remove animation class
                 setTimeout(() => {
                     button.classList.remove('undoing');
-                    button.dataset.processing = 'false';
                 }, 300);
             }, 50);
         };
@@ -2454,9 +2288,9 @@
             window.gameManager.actuate();
         };
 
-        // Handle swap tiles button click
+        // Handle swap tiles button click (FIXED - uses unified system)
         window.handleReplaceClick = function(button) {
-            // Use new power-up system
+            // Use unified power-up system
             if (!window.powerUpSystem.use('swap')) {
                 return; // Can't use swap
             }
@@ -3477,11 +3311,10 @@
             }
         };
 
-        // Handle delete tiles button click (updated for click-to-delete)
+        // Handle delete tiles button click (FIXED - uses unified system)
         window.handleMenuClick = function(button) {
-            // Use new power-up system
+            // Use unified power-up system
             if (!window.powerUpSystem.use('delete')) {
-                console.log('Cannot use delete - not available');
                 return; // Can't use delete
             }
 
@@ -3509,9 +3342,8 @@
                 }, 2000);
                 
                 // Refund the delete use since we couldn't use it
-                console.log('Not enough tiles to delete - refunding delete use');
-                window.powerUpState.delete.available++;
-                window.powerUpState.delete.totalUsed--;
+                window.powerUpState.delete.uses++;
+                window.powerUpState.delete.lifetimeUsed--;
                 window.powerUpSystem.updateUI();
                 window.powerUpSystem.updateLegacy();
                 
@@ -4030,7 +3862,12 @@
 
         function showGame() {
             showScreen('gameScreen');
-            // Initialize game with current level or default to level 1
+            // Initialize game state manager and set initial state
+        if (window.gameStateManager) {
+            window.gameStateManager.setState('PLAYING');
+        }
+
+        // Initialize game with current level or default to level 1
             const currentLevel = window.currentLevel || 1;
             const currentGridSize = window.currentGridSize || 4;
             
@@ -8279,21 +8116,196 @@
                 });
             }
         });
+
+        // ===== GAME OVER FUNCTIONS =====
+
+        // Function to check if game is over
+        window.checkGameOver = function() {
+            if (!window.gameManager || !window.gameManager.grid) {
+                return { isGameOver: false, reason: 'No game manager' };
+            }
+
+            const grid = window.gameManager.grid;
+            const size = window.gameManager.size;
+
+            // Check 1: Are there empty cells?
+            const emptyCells = grid.availableCells();
+            if (emptyCells.length > 0) {
+                return { 
+                    isGameOver: false, 
+                    reason: `${emptyCells.length} empty cells available`,
+                    emptyCells: emptyCells.length
+                };
+            }
+
+            // Check 2: Are there possible merges?
+            let possibleMerges = 0;
+            for (let x = 0; x < size; x++) {
+                for (let y = 0; y < size; y++) {
+                    const tile = grid.cellContent({ x: x, y: y });
+                    if (tile) {
+                        // Check all 4 directions for possible merges
+                        const directions = [
+                            { x: 0, y: -1 }, // Up
+                            { x: 1, y: 0 },  // Right
+                            { x: 0, y: 1 },  // Down
+                            { x: -1, y: 0 }  // Left
+                        ];
+
+                        for (let dir of directions) {
+                            const neighborX = x + dir.x;
+                            const neighborY = y + dir.y;
+
+                            // Check bounds
+                            if (neighborX >= 0 && neighborX < size && 
+                                neighborY >= 0 && neighborY < size) {
+                                
+                                const neighbor = grid.cellContent({ x: neighborX, y: neighborY });
+                                if (neighbor && neighbor.value === tile.value) {
+                                    possibleMerges++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (possibleMerges > 0) {
+                return { 
+                    isGameOver: false, 
+                    reason: `${possibleMerges} possible merges available`,
+                    possibleMerges: possibleMerges
+                };
+            }
+
+            // Check 3: Can move in any direction?
+            const canMoveUp = window.gameManager.canMoveInDirection ? window.gameManager.canMoveInDirection(0) : false;
+            const canMoveRight = window.gameManager.canMoveInDirection ? window.gameManager.canMoveInDirection(1) : false;
+            const canMoveDown = window.gameManager.canMoveInDirection ? window.gameManager.canMoveInDirection(2) : false;
+            const canMoveLeft = window.gameManager.canMoveInDirection ? window.gameManager.canMoveInDirection(3) : false;
+
+            const canMove = canMoveUp || canMoveRight || canMoveDown || canMoveLeft;
+
+            if (canMove) {
+                return { 
+                    isGameOver: false, 
+                    reason: 'Can still move in at least one direction',
+                    canMoveUp, canMoveRight, canMoveDown, canMoveLeft
+                };
+            }
+
+            // Game is truly over
+            return { 
+                isGameOver: true, 
+                reason: 'No empty cells, no possible merges, no valid moves',
+                emptyCells: 0,
+                possibleMerges: 0,
+                canMove: false
+            };
+        };
+
+        // Function to manually trigger game over popup (for testing)
+        window.testGameOverPopup = function(won = false) {
+            const gameMessage = document.querySelector('.game-message');
+            if (!gameMessage) {
+                console.error('Game message element not found');
+                return;
+            }
+
+            // Clear any existing classes
+            gameMessage.classList.remove('game-won', 'game-over', 'show-modal');
+            gameMessage.style.display = 'none';
+
+            // Set the message text
+            const messageText = gameMessage.querySelector('p');
+            if (messageText) {
+                messageText.textContent = won ? 'You win!' : 'Game over!';
+            }
+
+            // Add appropriate class
+            if (won) {
+                gameMessage.classList.add('game-won');
+            } else {
+                gameMessage.classList.add('game-over');
+            }
+
+            // Show the modal with a slight delay for smooth animation
+            setTimeout(() => {
+                gameMessage.classList.add('show-modal');
+                gameMessage.style.display = 'flex';
+            }, 50);
+
+            // Play appropriate sound
+            if (window.gameSounds) {
+                if (won) {
+                    window.gameSounds.playWin();
+                } else {
+                    window.gameSounds.playLoss();
+                }
+            }
+
+            console.log(`${won ? 'Win' : 'Game Over'} popup displayed`);
+        };
+
+        // Function to force game over state (for testing)
+        window.forceGameOver = function() {
+            if (!window.gameManager) {
+                console.error('No game manager found');
+                return;
+            }
+
+            // Set game over state
+            window.gameManager.over = true;
+            
+            // Trigger the game over popup
+            window.testGameOverPopup(false);
+            
+            console.log('Game over state forced');
+        };
+
+        // Function to test win condition
+        window.testWinPopup = function() {
+            window.testGameOverPopup(true);
+        };
+
+        // Function to check current game state
+        window.debugGameState = function() {
+            const gameOverCheck = window.checkGameOver();
+            const currentState = {
+                gameManagerExists: !!window.gameManager,
+                gameOver: window.gameManager ? window.gameManager.over : 'N/A',
+                gameWon: window.gameManager ? window.gameManager.won : 'N/A',
+                score: window.gameManager ? window.gameManager.score : 'N/A',
+                gridSize: window.gameManager ? window.gameManager.size : 'N/A',
+                gameOverCheck: gameOverCheck
+            };
+
+            console.log('=== Game State Debug ===');
+            console.log('Game Manager Exists:', currentState.gameManagerExists);
+            console.log('Game Over:', currentState.gameOver);
+            console.log('Game Won:', currentState.gameWon);
+            console.log('Score:', currentState.score);
+            console.log('Grid Size:', currentState.gridSize);
+            console.log('Game Over Check:', currentState.gameOverCheck);
+            console.log('========================');
+
+            return currentState;
+        };
+
+        // Console helper functions
+        console.log('=== Game Over Test Functions Available ===');
+        console.log('window.checkGameOver() - Check if game should be over');
+        console.log('window.testGameOverPopup() - Show game over popup');
+        console.log('window.testWinPopup() - Show win popup');
+        console.log('window.forceGameOver() - Force game over state');
+        console.log('window.debugGameState() - Debug current game state');
+        console.log('==========================================');
     </script>
 
     <!-- Game Scripts -->
     <script src="js/bind_polyfill.js"></script>
     <script src="js/classlist_polyfill.js"></script>
     <script src="js/animframe_polyfill.js"></script>
-    
-    <!-- Production-ready managers (load first) -->
-    <script src="js/game_state_manager.js"></script>
-    <script src="js/sound_manager.js"></script>
-    <script src="js/loading_manager.js"></script>
-    <script src="js/tile_sync_manager.js"></script>
-    <script src="js/ui_manager.js"></script>
-    
-    <!-- Core game files -->
     <script src="js/keyboard_input_manager.js"></script>
     <script src="js/html_actuator.js"></script>
     <script src="js/grid.js"></script>
@@ -8301,154 +8313,5 @@
     <script src="js/local_storage_manager.js"></script>
     <script src="js/game_manager.js"></script>
     <script src="js/application.js"></script>
-    
-    <!-- Production test suite -->
-    <script src="js/production_test_suite.js"></script>
 </body>
 </html>
-    <script>
-        // ===== PRODUCTION-READY GAME INITIALIZATION =====
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize game state
-            window.gameStateManager.setState('IDLE');
-            
-            // Setup initial screen
-            if (window.uiManager) {
-                window.uiManager.showScreen('homeScreen');
-            }
-            
-            console.log('🎮 Game initialized in production mode');
-        });
-        
-        // Production-ready button handlers
-        window.startGame = function(level) {
-            const gridSize = window.gridSizes[level] || 4;
-            
-            // Show loading screen
-            const loadingId = window.loadingManager.showForLevelStart(level);
-            
-            // Set current grid size
-            window.currentGridSize = gridSize;
-            
-            // Initialize power-ups for this level
-            if (window.powerUpSystem) {
-                window.powerUpSystem.initialize();
-                window.powerUpSystem.updateLegacy();
-            }
-            
-            // Start the game after loading
-            setTimeout(() => {
-                // Initialize game manager with correct size
-                window.gameManager = new GameManager(gridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
-                
-                // Show game screen
-                if (window.uiManager) {
-                    window.uiManager.showScreen('gameScreen');
-                }
-                
-                // Set playing state
-                window.gameStateManager.setState('PLAYING');
-                
-                console.log(`🎯 Started ${gridSize}x${gridSize} game`);
-            }, 1500);
-        };
-        
-        // Production-ready restart function
-        window.restartGame = function() {
-            if (window.gameManager) {
-                window.gameManager.restart();
-            }
-            
-            if (window.powerUpSystem) {
-                window.powerUpSystem.initialize();
-                window.powerUpSystem.updateLegacy();
-            }
-        };
-        
-        // Production-ready home function
-        window.goToHome = function() {
-            // Hide any modals
-            if (window.uiManager) {
-                window.uiManager.hideGameOverModal();
-            }
-            
-            // Show home screen
-            if (window.uiManager) {
-                window.uiManager.showScreen('homeScreen');
-            }
-            
-            // Set idle state
-            window.gameStateManager.setState('IDLE');
-        };
-        
-        // Production-ready sound toggle
-        window.toggleGameSounds = function(button) {
-            if (!window.soundManager) return;
-            
-            const isEnabled = window.soundManager.toggle();
-            button.textContent = isEnabled ? '🔊' : '🔇';
-            button.title = isEnabled ? 'Turn Sound Off' : 'Turn Sound On';
-            
-            // Play test sound when enabling
-            if (isEnabled) {
-                window.soundManager.playClick();
-            }
-        };
-        
-        // Emergency reset function for debugging
-        window.emergencyReset = function() {
-            console.log('🚨 Emergency reset initiated');
-            
-            // Reset all managers
-            if (window.gameStateManager) window.gameStateManager.reset();
-            if (window.uiManager) window.uiManager.emergencyReset();
-            if (window.loadingManager) window.loadingManager.forceHide();
-            if (window.soundManager) window.soundManager.stopAll();
-            
-            // Reset game
-            if (window.gameManager) {
-                window.gameManager.forceRestart();
-            }
-            
-            console.log('✅ Emergency reset completed');
-        };
-        
-        // Debug functions for testing
-        window.debugGame = {
-            showGameOver: function() {
-                if (window.uiManager) {
-                    window.uiManager.showGameOverModal();
-                }
-            },
-            
-            testButtons: function() {
-                const retryBtn = document.getElementById('retryBtn');
-                const homeBtn = document.getElementById('homeBtn');
-                
-                console.log('🔍 Button Test Results:');
-                console.log('Retry button found:', !!retryBtn);
-                console.log('Home button found:', !!homeBtn);
-                
-                if (retryBtn) {
-                    console.log('Retry button clickable:', !retryBtn.disabled);
-                }
-                
-                if (homeBtn) {
-                    console.log('Home button clickable:', !homeBtn.disabled);
-                }
-            },
-            
-            getState: function() {
-                return {
-                    gameState: window.gameStateManager?.getState(),
-                    isLoading: window.loadingManager?.isLoading,
-                    soundEnabled: window.soundManager?.enabled,
-                    syncStats: window.tileSyncManager?.getStats()
-                };
-            }
-        };
-        
-        console.log('🚀 Production-ready 2048 game loaded successfully!');
-        console.log('📋 Available debug commands: window.debugGame, window.emergencyReset');
-    </script>
