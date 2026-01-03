@@ -1131,11 +1131,16 @@
 
     <!-- JavaScript for Screen Management and Modals -->
     <script>
-        // Level Transition Loader Functions (FIXED - with state management)
+        // Level Transition Loader Functions (FIXED - enhanced sound blocking)
         window.showLevelTransitionLoader = function(level, gridSize) {
-            // Set loading state
+            // Set loading state in multiple ways for bulletproof sound blocking
             if (window.gameStateManager) {
                 window.gameStateManager.setState('LOADING');
+            }
+            
+            // Also set manual loading state for extra protection
+            if (window.gameSounds) {
+                window.gameSounds.setLoadingState('levelTransition', true);
             }
             
             const overlay = document.getElementById('levelTransitionLoader');
@@ -1194,10 +1199,16 @@
             return new Promise((resolve) => {
                 setTimeout(() => {
                     overlay.classList.remove('active');
-                    // Set playing state when loading complete
+                    
+                    // Clear loading states to re-enable sound
                     if (window.gameStateManager) {
                         window.gameStateManager.setState('PLAYING');
                     }
+                    
+                    if (window.gameSounds) {
+                        window.gameSounds.setLoadingState('levelTransition', false);
+                    }
+                    
                     resolve();
                 }, 2000);
             });
@@ -1838,12 +1849,13 @@
         // Initialize counters when page loads
         setTimeout(updateButtonTitles, 500);
 
-        // Game Sound System with State-Based Blocking (FIXED)
+        // Game Sound System with Enhanced Loading State Blocking (FIXED)
         class GameSounds {
             constructor() {
                 this.audioContext = null;
                 this.enabled = true;
                 this.volume = 0.4;
+                this.loadingStates = new Set(); // Track multiple loading states
                 this.initAudio();
             }
 
@@ -1855,13 +1867,56 @@
                 }
             }
 
-            // Check if sounds should be blocked based on game state
+            // Enhanced sound blocking - multiple ways to detect loading
             shouldBlockSound() {
+                // Method 1: Check game state manager
                 if (window.gameStateManager) {
                     const state = window.gameStateManager.getState();
-                    return state === 'LOADING' || state === 'ERROR';
+                    if (state === 'LOADING' || state === 'ERROR') {
+                        return true;
+                    }
                 }
+                
+                // Method 2: Check for visible loading screens
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen && loadingScreen.classList.contains('active')) {
+                    return true;
+                }
+                
+                const levelTransitionLoader = document.getElementById('levelTransitionLoader');
+                if (levelTransitionLoader && levelTransitionLoader.classList.contains('active')) {
+                    return true;
+                }
+                
+                // Method 3: Check manual loading states
+                if (this.loadingStates.size > 0) {
+                    return true;
+                }
+                
+                // Method 4: Check if any screen transition is happening
+                const screens = document.querySelectorAll('.screen');
+                let activeScreens = 0;
+                screens.forEach(screen => {
+                    if (screen.classList.contains('active')) {
+                        activeScreens++;
+                    }
+                });
+                
+                // If multiple screens are active, we're probably transitioning
+                if (activeScreens > 1) {
+                    return true;
+                }
+                
                 return false;
+            }
+
+            // Manual loading state control
+            setLoadingState(id, isLoading) {
+                if (isLoading) {
+                    this.loadingStates.add(id);
+                } else {
+                    this.loadingStates.delete(id);
+                }
             }
 
             // Create a complex tone with multiple oscillators
@@ -2129,6 +2184,71 @@
 
         // Initialize game sounds
         window.gameSounds = new GameSounds();
+
+        // Test sound blocking during loading (for debugging)
+        window.testSoundBlocking = function() {
+            console.log('=== SOUND BLOCKING TEST ===');
+            console.log('Loading screen active:', document.getElementById('loadingScreen')?.classList.contains('active'));
+            console.log('Level transition active:', document.getElementById('levelTransitionLoader')?.classList.contains('active'));
+            console.log('Game state:', window.gameStateManager?.getState());
+            console.log('Manual loading states:', window.gameSounds?.loadingStates);
+            console.log('Should block sound:', window.gameSounds?.shouldBlockSound());
+            console.log('=== END TEST ===');
+        };
+
+        // Test sound during loading (for debugging)
+        window.testSoundDuringLoading = function() {
+            console.log('Testing sound during loading...');
+            if (window.gameSounds) {
+                console.log('Attempting to play spawn sound...');
+                window.gameSounds.playSpawn();
+                console.log('Attempting to play slide sound...');
+                window.gameSounds.playSlide();
+                console.log('Sound blocking status:', window.gameSounds.shouldBlockSound());
+            }
+        };
+
+        // Comprehensive loading state test
+        window.testAllLoadingStates = function() {
+            console.log('=== COMPREHENSIVE LOADING STATE TEST ===');
+            
+            // Test 1: Initial loading screen
+            console.log('1. Testing initial loading screen...');
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('active');
+                console.log('   Loading screen active:', window.gameSounds?.shouldBlockSound());
+                loadingScreen.classList.remove('active');
+            }
+            
+            // Test 2: Level transition loader
+            console.log('2. Testing level transition loader...');
+            const levelLoader = document.getElementById('levelTransitionLoader');
+            if (levelLoader) {
+                levelLoader.classList.add('active');
+                console.log('   Level transition active:', window.gameSounds?.shouldBlockSound());
+                levelLoader.classList.remove('active');
+            }
+            
+            // Test 3: Game state manager LOADING state
+            console.log('3. Testing game state manager LOADING...');
+            if (window.gameStateManager) {
+                const originalState = window.gameStateManager.getState();
+                window.gameStateManager.setState('LOADING');
+                console.log('   Game state LOADING:', window.gameSounds?.shouldBlockSound());
+                window.gameStateManager.setState(originalState);
+            }
+            
+            // Test 4: Manual loading state
+            console.log('4. Testing manual loading state...');
+            if (window.gameSounds) {
+                window.gameSounds.setLoadingState('test', true);
+                console.log('   Manual loading state:', window.gameSounds?.shouldBlockSound());
+                window.gameSounds.setLoadingState('test', false);
+            }
+            
+            console.log('=== TEST COMPLETE ===');
+        };
 
         // Toggle game sounds function
         window.toggleGameSounds = function(button) {
@@ -3995,6 +4115,10 @@
             
             if (progress >= 100) {
                 setTimeout(() => {
+                    // Set game state to IDLE when loading completes
+                    if (window.gameStateManager) {
+                        window.gameStateManager.setState('IDLE');
+                    }
                     showScreen('homeScreen');
                 }, 500);
             } else {
@@ -4828,14 +4952,20 @@
 
         // Enhanced level transition with real-time status updates
         window.showLevelTransitionWithRealStatus = function(level, gridSize) {
-
+            // Set loading state immediately to block sounds
+            if (window.gameStateManager) {
+                window.gameStateManager.setState('LOADING');
+            }
             
             const overlay = document.getElementById('levelTransitionLoader');
             const text = document.getElementById('levelTransitionText');
             const progressBar = document.getElementById('levelProgressBar');
             
             if (!overlay || !text || !progressBar) {
-
+                // Even if UI elements are missing, ensure state is set properly
+                if (window.gameStateManager) {
+                    window.gameStateManager.setState('PLAYING');
+                }
                 return Promise.resolve();
             }
             
@@ -4934,7 +5064,12 @@
                 // Hide loader
                 setTimeout(() => {
                     overlay.classList.remove('active');
-
+                    
+                    // Set game state to PLAYING when level is ready
+                    if (window.gameStateManager) {
+                        window.gameStateManager.setState('PLAYING');
+                    }
+                    
                     resolve();
                 }, 2000);
             });

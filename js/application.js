@@ -1,5 +1,10 @@
 // Wait till the browser is ready to render the game (avoids glitches)
 window.requestAnimationFrame(function () {
+  // Ensure game state manager is initialized and in LOADING state
+  if (window.gameStateManager) {
+    window.gameStateManager.setState('LOADING');
+  }
+  
   // Initialize with Level 1 (4x4 grid) by default
   window.gameManager = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
   

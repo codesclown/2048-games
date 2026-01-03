@@ -5,12 +5,12 @@
 
 class GameStateManager {
     constructor() {
-        this.state = 'IDLE';
+        this.state = 'LOADING'; // Start in LOADING state since page begins with loading screen
         this.previousState = null;
         this.stateChangeListeners = [];
         this.allowedTransitions = {
             'IDLE': ['LOADING', 'PLAYING'],
-            'LOADING': ['PLAYING', 'ERROR'],
+            'LOADING': ['PLAYING', 'ERROR', 'IDLE'],
             'PLAYING': ['PAUSED', 'GAME_OVER', 'LOADING'],
             'PAUSED': ['PLAYING', 'LOADING'],
             'GAME_OVER': ['LOADING', 'IDLE'],
