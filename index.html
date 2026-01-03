@@ -533,7 +533,9 @@
                     <h1 class="title">2048</h1>
                     <div class="mobile-header-buttons">
                         <button class="mobile-sound-btn" onclick="toggleGameSounds(this)" title="Toggle Sound">🔊</button>
-                        <button class="mobile-refresh-btn" onclick="handleRestartClick(this)">↻</button>
+                        <button class="mobile-refresh-btn" onclick="handleRestartClick(this)">
+                            <span class="refresh-icon">↻</span>
+                        </button>
                     </div>
                 </div>
                 
@@ -834,14 +836,39 @@
                 align-items: center;
             }
 
-            /* Ensure mobile refresh button rotates entirely when spinning */
-            .mobile-refresh-btn.spinning {
-                animation: mobileRefreshSpin 2s linear !important;
-                background-color: rgba(255, 215, 0, 0.3) !important;
-                transform-origin: center center !important;
+            /* Mobile refresh button - only icon spins, not the whole button */
+            .mobile-refresh-btn {
+                background: rgba(255, 215, 0, 0.2);
+                border: 1px solid rgba(255, 215, 0, 0.3);
+                border-radius: 8px;
+                color: #ffd700;
+                font-size: 16px;
+                width: 40px;
+                height: 40px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                margin-left: 8px;
             }
 
-            @keyframes mobileRefreshSpin {
+            .mobile-refresh-btn:hover {
+                background: rgba(255, 215, 0, 0.3);
+                transform: scale(1.05);
+            }
+
+            /* Only the refresh icon spins, not the button */
+            .mobile-refresh-btn .refresh-icon {
+                display: inline-block;
+                transition: transform 0.3s ease;
+            }
+
+            .mobile-refresh-btn.spinning .refresh-icon {
+                animation: refreshIconSpin 2s linear !important;
+            }
+
+            @keyframes refreshIconSpin {
                 0% { 
                     transform: rotate(0deg); 
                 }
@@ -1041,7 +1068,7 @@
                 </button>
                 <button class="mobile-menu-item" onclick="closeMobileMenu(); restartGameWithAnimation();">
                     <span class="menu-icon">🎮</span>
-                    New Game
+                    Restart Level
                 </button>
                 <button class="mobile-menu-item" onclick="closeMobileMenu(); showHome();">
                     <span class="menu-icon">🏠</span>
