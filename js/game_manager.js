@@ -15,7 +15,6 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
 // Restart the game
 GameManager.prototype.restart = function () {
-  console.log('🔄 RESTARTING GAME');
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
@@ -23,8 +22,6 @@ GameManager.prototype.restart = function () {
 
 // Force clear any corrupted state and restart
 GameManager.prototype.forceRestart = function () {
-  console.log('🚨 FORCE RESTART - Clearing all state');
-  
   // Clear all game state
   this.over = false;
   this.won = false;
@@ -43,8 +40,6 @@ GameManager.prototype.forceRestart = function () {
 
 // Complete reset - clear everything including best score
 GameManager.prototype.completeReset = function () {
-  console.log('💥 COMPLETE RESET - Clearing everything');
-  
   // Clear localStorage completely for this game
   if (typeof Storage !== "undefined") {
     localStorage.removeItem("gameState");
@@ -69,12 +64,7 @@ GameManager.prototype.isGameTerminated = function () {
 GameManager.prototype.setup = function () {
   var previousState = this.storageManager.getGameState();
 
-  console.log('🔧 GAME SETUP:');
-  console.log('  Grid size:', this.size);
-  console.log('  Previous state:', previousState ? 'found' : 'none');
-
   // Always start fresh for new games - don't auto-load previous state
-  console.log('  Creating fresh new game...');
   this.grid        = new Grid(this.size);
   this.score       = 0;
   this.over        = false;
@@ -84,16 +74,8 @@ GameManager.prototype.setup = function () {
   // Add the initial tiles
   this.addStartTiles();
 
-  console.log('  Final setup state:');
-  console.log('    this.over:', this.over);
-  console.log('    this.won:', this.won);
-
   // Update the actuator
   this.actuate();
-  
-  // Debug initial state
-  console.log('🎯 GAME SETUP COMPLETE:');
-  this.logGridState();
 };
 
 // Set up the initial tiles to start the game with
@@ -119,15 +101,8 @@ GameManager.prototype.actuate = function () {
     this.storageManager.setBestScore(this.score);
   }
 
-  // Debug what we're sending to the UI
-  console.log('🎭 ACTUATING UI STATE:');
-  console.log('  this.over:', this.over);
-  console.log('  this.won:', this.won);
-  console.log('  this.isGameTerminated():', this.isGameTerminated());
-
   // Clear the state when the game is over (game over only, not win)
   if (this.over) {
-    console.log('🗑️ Clearing game state because this.over = true');
     this.storageManager.clearGameState();
   } else {
     this.storageManager.setGameState(this.serialize());
@@ -141,6 +116,10 @@ GameManager.prototype.actuate = function () {
     terminated: this.isGameTerminated()
   });
 
+  // Auto-earn powerups based on tiles present
+  if (typeof autoEarnPowerUps === 'function') {
+    autoEarnPowerUps();
+  }
 };
 
 // Represent the current game as an object
@@ -173,77 +152,46 @@ GameManager.prototype.moveTile = function (tile, cell) {
 
 // Enhanced debug method to show synchronized grid state
 GameManager.prototype.logGridState = function () {
-  console.log('📋 SYNCHRONIZED GRID STATE (' + this.size + 'x' + this.size + '):');
-  console.log('═══════════════════════════════════════');
+  console.log('📋 GRID STATE (' + this.size + 'x' + this.size + '):');
   
   for (var y = 0; y < this.size; y++) {
     var row = [];
-    var positions = [];
     for (var x = 0; x < this.size; x++) {
       var tile = this.grid.cellContent({ x: x, y: y });
       if (tile) {
         row.push(String(tile.value).padStart(4, ' '));
-        positions.push('(' + x + ',' + y + ')=' + tile.value);
       } else {
         row.push('   .');
-        positions.push('(' + x + ',' + y + ')=empty');
       }
     }
     console.log('  Row ' + y + ': [' + row.join('|') + ']');
-    console.log('         ' + positions.join(', '));
   }
-  
-  // Count empty cells and show statistics
-  var emptyCells = 0;
-  var totalCells = this.size * this.size;
-  for (var x = 0; x < this.size; x++) {
-    for (var y = 0; y < this.size; y++) {
-      if (!this.grid.cellContent({ x: x, y: y })) {
-        emptyCells++;
-      }
-    }
-  }
-  console.log('═══════════════════════════════════════');
-  console.log('  📊 Statistics:');
-  console.log('    Empty cells: ' + emptyCells + '/' + totalCells);
-  console.log('    Filled cells: ' + (totalCells - emptyCells) + '/' + totalCells);
-  console.log('    Grid utilization: ' + Math.round(((totalCells - emptyCells) / totalCells) * 100) + '%');
 };
 
 // ROBUST GAME OVER DETECTION - Only real game over, no fake ones
 GameManager.prototype.isRealGameOver = function () {
-  console.log('🔍 COMPREHENSIVE GAME OVER CHECK:');
-  console.log('  Grid size: ' + this.size + 'x' + this.size);
-  
   // Step 1: Check for empty cells (if any empty, game is NOT over)
   var hasEmptyCells = this.grid.cellsAvailable();
-  console.log('  ✓ Empty cells available: ' + hasEmptyCells);
   
   if (hasEmptyCells) {
-    console.log('  ✅ GAME CONTINUES: Empty cells found');
     return false;
   }
   
   // Step 2: Check for possible merges (if any merge possible, game is NOT over)
   var hasPossibleMerges = this.tileMatchesAvailable();
-  console.log('  ✓ Possible merges available: ' + hasPossibleMerges);
   
   if (hasPossibleMerges) {
-    console.log('  ✅ GAME CONTINUES: Possible merges found');
     return false;
   }
   
   // Step 3: Double-check by testing actual moves
   var canMoveInAnyDirection = this.canMoveInAnyDirection();
-  console.log('  ✓ Can move in any direction: ' + canMoveInAnyDirection);
   
   if (canMoveInAnyDirection) {
-    console.log('  ✅ GAME CONTINUES: Movement possible');
     return false;
   }
   
-  console.log('  🚨 REAL GAME OVER: No moves possible');
-  this.logGridState();
+  console.log('🚨 GAME OVER: No moves possible');
   return true;
 };
 
@@ -251,7 +199,6 @@ GameManager.prototype.isRealGameOver = function () {
 GameManager.prototype.canMoveInAnyDirection = function () {
   for (var direction = 0; direction < 4; direction++) {
     if (this.canMoveInDirection(direction)) {
-      console.log('    ✓ Can move in direction ' + direction + ' (' + ['UP', 'RIGHT', 'DOWN', 'LEFT'][direction] + ')');
       return true;
     }
   }
@@ -295,10 +242,7 @@ GameManager.prototype.move = function (direction) {
   // 0: up, 1: right, 2: down, 3: left
   var self = this;
 
-  console.log('🎮 MOVE ATTEMPT - Direction:', direction, '(' + ['UP', 'RIGHT', 'DOWN', 'LEFT'][direction] + ')');
-
   if (this.isGameTerminated()) {
-    console.log('⏹️ Game already terminated, ignoring move');
     return; // Don't do anything if the game's over
   }
 
@@ -348,24 +292,15 @@ GameManager.prototype.move = function (direction) {
     });
   });
 
-  console.log('🔄 Move completed. Tiles moved:', moved);
-
   if (moved) {
-    console.log('➕ Adding random tile...');
     this.addRandomTile();
     
-    console.log('🔍 Checking if game is really over...');
     // Use robust game over detection instead of simple check
     if (this.isRealGameOver()) {
-      console.log('🚨 CONFIRMED REAL GAME OVER!');
       this.over = true;
-    } else {
-      console.log('✅ Game continues - moves still available');
     }
 
     this.actuate();
-  } else {
-    console.log('❌ No tiles moved, move ignored');
   }
 };
 
@@ -416,24 +351,12 @@ GameManager.prototype.findFarthestPosition = function (cell, vector) {
 
 // LEGACY COMPATIBILITY - Keep old method but use robust detection
 GameManager.prototype.movesAvailable = function () {
-  var cellsAvailable = this.grid.cellsAvailable();
-  var matchesAvailable = this.tileMatchesAvailable();
-  
-  // Debug logging
-  console.log('🔍 LEGACY MOVES AVAILABLE CHECK:');
-  console.log('  Grid size:', this.size);
-  console.log('  Cells available:', cellsAvailable);
-  console.log('  Matches available:', matchesAvailable);
-  console.log('  Total moves available:', cellsAvailable || matchesAvailable);
-  
-  return cellsAvailable || matchesAvailable;
+  return this.grid.cellsAvailable() || this.tileMatchesAvailable();
 };
 
 // Check for available matches between tiles (more expensive check)
 GameManager.prototype.tileMatchesAvailable = function () {
   var self = this;
-
-  console.log('🔍 CHECKING TILE MATCHES:');
   
   for (var x = 0; x < this.size; x++) {
     for (var y = 0; y < this.size; y++) {
@@ -449,7 +372,6 @@ GameManager.prototype.tileMatchesAvailable = function () {
             var other = self.grid.cellContent(cell);
 
             if (other && other.value === tile.value) {
-              console.log('  ✅ Match found at (' + x + ',' + y + ') value=' + tile.value + ' with (' + cell.x + ',' + cell.y + ') value=' + other.value);
               return true; // These two tiles can be merged
             }
           }
@@ -458,7 +380,6 @@ GameManager.prototype.tileMatchesAvailable = function () {
     }
   }
 
-  console.log('  ❌ No matches found');
   return false;
 };
 

@@ -7,5 +7,10 @@ window.requestAnimationFrame(function () {
   window.currentLevel = 1;
   window.currentGridSize = 4;
   
+  // Configure powerups for level 1 (4x4) - will be called from HTML when available
+  if (typeof configurePowerUpsForLevel === 'function') {
+    configurePowerUpsForLevel(4);
+  }
+  
   console.log('🎮 Game initialized with Level 1 (4x4 grid)');
 });

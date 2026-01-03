@@ -989,12 +989,31 @@ hr {
     transform: scale(1); } }
 .tile-merged .tile-inner {
   z-index: 20;
-  -webkit-animation: pop 80ms cubic-bezier(0.23, 1, 0.32, 1) 10ms;
-  -moz-animation: pop 80ms cubic-bezier(0.23, 1, 0.32, 1) 10ms;
-  animation: pop 80ms cubic-bezier(0.23, 1, 0.32, 1) 10ms;
+  -webkit-animation: pop 120ms cubic-bezier(0.23, 1, 0.32, 1) 40ms;
+  -moz-animation: pop 120ms cubic-bezier(0.23, 1, 0.32, 1) 40ms;
+  animation: pop 120ms cubic-bezier(0.23, 1, 0.32, 1) 40ms;
   -webkit-animation-fill-mode: backwards;
   -moz-animation-fill-mode: backwards;
   animation-fill-mode: backwards; }
+
+/* Merging tiles - smooth fade out during animation to prevent flickering */
+.tile-merging {
+  z-index: 1;
+}
+
+.tile-merging .tile-inner {
+  opacity: 0.1;
+  transition: opacity 100ms ease-out;
+}
+
+/* Delayed merging tiles - gradual fade for smoother animation */
+.tile-merging-delayed {
+  z-index: 1;
+}
+
+.tile-merging-delayed .tile-inner {
+  /* Transitions are applied via JavaScript for precise timing */
+}
 
 .above-game:after {
   content: "";
@@ -1274,10 +1293,10 @@ hr {
     font-size: 22px;
   }
 }
-    min-width: 40px; }
 
-  .heading {
-    margin-bottom: 10px; }
+.heading {
+  margin-bottom: 10px; 
+}
 
   .game-intro {
     width: 100%;
@@ -1500,3 +1519,4 @@ hr {
     margin-top: 90px !important; }
   .game-message .lower {
     margin-top: 30px !important; } 
+  }
