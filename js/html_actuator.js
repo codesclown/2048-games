@@ -5,6 +5,11 @@ function HTMLActuator() {
   this.messageContainer = document.querySelector(".game-message");
 
   this.score = 0;
+  
+  // If messageContainer doesn't exist, we'll handle it gracefully
+  if (!this.messageContainer) {
+    console.log('Game message container not found - will use ultimate button fix for game over');
+  }
 }
 
 HTMLActuator.prototype.actuate = function (grid, metadata) {
@@ -154,8 +159,14 @@ HTMLActuator.prototype.message = function (won) {
   var type    = won ? "game-won" : "game-over";
   var message = won ? "You win!" : "Game over!";
 
-  this.messageContainer.classList.add(type);
-  this.messageContainer.getElementsByTagName("p")[0].textContent = message;
+  // Check if messageContainer exists before using it
+  if (this.messageContainer) {
+    this.messageContainer.classList.add(type);
+    var messageP = this.messageContainer.getElementsByTagName("p")[0];
+    if (messageP) {
+      messageP.textContent = message;
+    }
+  }
   
   // Play win/loss sounds
   if (window.gameSounds) {
@@ -170,17 +181,22 @@ HTMLActuator.prototype.message = function (won) {
   if (!won) {
     var self = this;
     setTimeout(function() {
-      self.messageContainer.classList.add('show-modal');
+      // Use ultimate button fix directly since original elements might not exist
+      if (typeof window.ultimateButtonFix === 'function') {
+        window.ultimateButtonFix();
+      }
     }, 50); // Faster game over screen appearance
   }
 };
 
 HTMLActuator.prototype.clearMessage = function () {
   // IE only takes one value to remove at a time.
-  this.messageContainer.classList.remove("game-won");
-  this.messageContainer.classList.remove("game-over");
-  this.messageContainer.classList.remove("show-modal");
-  
-  // Also reset the display style for our custom full-screen modal
-  this.messageContainer.style.display = '';
+  if (this.messageContainer) {
+    this.messageContainer.classList.remove("game-won");
+    this.messageContainer.classList.remove("game-over");
+    this.messageContainer.classList.remove("show-modal");
+    
+    // Also reset the display style for our custom full-screen modal
+    this.messageContainer.style.display = '';
+  }
 };

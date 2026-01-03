@@ -280,6 +280,26 @@
             100% { transform: rotate(360deg); }
         }
         
+        @keyframes gameOverSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes pulse-red {
+            from {
+                text-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+            }
+            to {
+                text-shadow: 0 0 40px rgba(255, 107, 107, 1);
+            }
+        }
+        
         @keyframes glow-title {
             0% { text-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
             100% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
@@ -646,7 +666,7 @@
                 margin: 0 !important;
                 border: none !important;
                 border-radius: 0 !important;
-                pointer-events: auto !important;
+                pointer-events: auto !important; /* CRITICAL: Allow pointer events on container */
             }
             
             /* Show when game over modal is active */
@@ -776,6 +796,21 @@
             .game-container .game-message.show-modal .game-over-buttons button {
                 pointer-events: auto !important;
                 cursor: pointer !important;
+                position: relative !important;
+                z-index: 10002 !important;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                border: none !important;
+                color: white !important;
+                padding: 12px 24px !important;
+                border-radius: 8px !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                transition: all 0.3s ease !important;
+                min-width: 120px !important;
+                touch-action: manipulation !important;
+                -webkit-tap-highlight-color: transparent !important;
+                user-select: none !important;
+                -webkit-user-select: none !important;
             }
             
             /* Mobile Responsive for Game Over */
@@ -1131,16 +1166,11 @@
 
     <!-- JavaScript for Screen Management and Modals -->
     <script>
-        // Level Transition Loader Functions (FIXED - enhanced sound blocking)
+        // Level Transition Loader Functions (FIXED - with state management)
         window.showLevelTransitionLoader = function(level, gridSize) {
-            // Set loading state in multiple ways for bulletproof sound blocking
+            // Set loading state
             if (window.gameStateManager) {
                 window.gameStateManager.setState('LOADING');
-            }
-            
-            // Also set manual loading state for extra protection
-            if (window.gameSounds) {
-                window.gameSounds.setLoadingState('levelTransition', true);
             }
             
             const overlay = document.getElementById('levelTransitionLoader');
@@ -1199,16 +1229,10 @@
             return new Promise((resolve) => {
                 setTimeout(() => {
                     overlay.classList.remove('active');
-                    
-                    // Clear loading states to re-enable sound
+                    // Set playing state when loading complete
                     if (window.gameStateManager) {
                         window.gameStateManager.setState('PLAYING');
                     }
-                    
-                    if (window.gameSounds) {
-                        window.gameSounds.setLoadingState('levelTransition', false);
-                    }
-                    
                     resolve();
                 }, 2000);
             });
@@ -1849,13 +1873,12 @@
         // Initialize counters when page loads
         setTimeout(updateButtonTitles, 500);
 
-        // Game Sound System with Enhanced Loading State Blocking (FIXED)
+        // Game Sound System with State-Based Blocking (FIXED)
         class GameSounds {
             constructor() {
                 this.audioContext = null;
                 this.enabled = true;
                 this.volume = 0.4;
-                this.loadingStates = new Set(); // Track multiple loading states
                 this.initAudio();
             }
 
@@ -1867,56 +1890,13 @@
                 }
             }
 
-            // Enhanced sound blocking - multiple ways to detect loading
+            // Check if sounds should be blocked based on game state
             shouldBlockSound() {
-                // Method 1: Check game state manager
                 if (window.gameStateManager) {
                     const state = window.gameStateManager.getState();
-                    if (state === 'LOADING' || state === 'ERROR') {
-                        return true;
-                    }
+                    return state === 'LOADING' || state === 'ERROR';
                 }
-                
-                // Method 2: Check for visible loading screens
-                const loadingScreen = document.getElementById('loadingScreen');
-                if (loadingScreen && loadingScreen.classList.contains('active')) {
-                    return true;
-                }
-                
-                const levelTransitionLoader = document.getElementById('levelTransitionLoader');
-                if (levelTransitionLoader && levelTransitionLoader.classList.contains('active')) {
-                    return true;
-                }
-                
-                // Method 3: Check manual loading states
-                if (this.loadingStates.size > 0) {
-                    return true;
-                }
-                
-                // Method 4: Check if any screen transition is happening
-                const screens = document.querySelectorAll('.screen');
-                let activeScreens = 0;
-                screens.forEach(screen => {
-                    if (screen.classList.contains('active')) {
-                        activeScreens++;
-                    }
-                });
-                
-                // If multiple screens are active, we're probably transitioning
-                if (activeScreens > 1) {
-                    return true;
-                }
-                
                 return false;
-            }
-
-            // Manual loading state control
-            setLoadingState(id, isLoading) {
-                if (isLoading) {
-                    this.loadingStates.add(id);
-                } else {
-                    this.loadingStates.delete(id);
-                }
             }
 
             // Create a complex tone with multiple oscillators
@@ -2184,71 +2164,6 @@
 
         // Initialize game sounds
         window.gameSounds = new GameSounds();
-
-        // Test sound blocking during loading (for debugging)
-        window.testSoundBlocking = function() {
-            console.log('=== SOUND BLOCKING TEST ===');
-            console.log('Loading screen active:', document.getElementById('loadingScreen')?.classList.contains('active'));
-            console.log('Level transition active:', document.getElementById('levelTransitionLoader')?.classList.contains('active'));
-            console.log('Game state:', window.gameStateManager?.getState());
-            console.log('Manual loading states:', window.gameSounds?.loadingStates);
-            console.log('Should block sound:', window.gameSounds?.shouldBlockSound());
-            console.log('=== END TEST ===');
-        };
-
-        // Test sound during loading (for debugging)
-        window.testSoundDuringLoading = function() {
-            console.log('Testing sound during loading...');
-            if (window.gameSounds) {
-                console.log('Attempting to play spawn sound...');
-                window.gameSounds.playSpawn();
-                console.log('Attempting to play slide sound...');
-                window.gameSounds.playSlide();
-                console.log('Sound blocking status:', window.gameSounds.shouldBlockSound());
-            }
-        };
-
-        // Comprehensive loading state test
-        window.testAllLoadingStates = function() {
-            console.log('=== COMPREHENSIVE LOADING STATE TEST ===');
-            
-            // Test 1: Initial loading screen
-            console.log('1. Testing initial loading screen...');
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) {
-                loadingScreen.classList.add('active');
-                console.log('   Loading screen active:', window.gameSounds?.shouldBlockSound());
-                loadingScreen.classList.remove('active');
-            }
-            
-            // Test 2: Level transition loader
-            console.log('2. Testing level transition loader...');
-            const levelLoader = document.getElementById('levelTransitionLoader');
-            if (levelLoader) {
-                levelLoader.classList.add('active');
-                console.log('   Level transition active:', window.gameSounds?.shouldBlockSound());
-                levelLoader.classList.remove('active');
-            }
-            
-            // Test 3: Game state manager LOADING state
-            console.log('3. Testing game state manager LOADING...');
-            if (window.gameStateManager) {
-                const originalState = window.gameStateManager.getState();
-                window.gameStateManager.setState('LOADING');
-                console.log('   Game state LOADING:', window.gameSounds?.shouldBlockSound());
-                window.gameStateManager.setState(originalState);
-            }
-            
-            // Test 4: Manual loading state
-            console.log('4. Testing manual loading state...');
-            if (window.gameSounds) {
-                window.gameSounds.setLoadingState('test', true);
-                console.log('   Manual loading state:', window.gameSounds?.shouldBlockSound());
-                window.gameSounds.setLoadingState('test', false);
-            }
-            
-            console.log('=== TEST COMPLETE ===');
-        };
 
         // Toggle game sounds function
         window.toggleGameSounds = function(button) {
@@ -3565,20 +3480,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Robust event handling for game over buttons
             function setupGameOverButtons() {
-                // Prevent multiple simultaneous setups
-                if (setupGameOverButtons._running) {
-                    return;
-                }
-                setupGameOverButtons._running = true;
-                
+                // Always try to setup buttons when called
                 const retryBtn = document.getElementById('retryBtn');
                 const homeBtn = document.getElementById('homeBtn');
                 
-                if (retryBtn && !retryBtn._safeListenerAdded) {
-                    // Mark to prevent duplicate listeners
-                    retryBtn._safeListenerAdded = true;
-                    
-                    // Single click handler with debouncing
+                if (retryBtn) {
+                    // Always reset the onclick handler (don't rely on flags)
                     retryBtn.onclick = function(e) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -3611,13 +3518,15 @@
                             this._processing = false;
                         }, 100);
                     };
+                    
+                    // Ensure button is always clickable
+                    retryBtn.style.pointerEvents = 'auto';
+                    retryBtn.style.cursor = 'pointer';
+                    retryBtn.style.zIndex = '10002';
                 }
                 
-                if (homeBtn && !homeBtn._safeListenerAdded) {
-                    // Mark to prevent duplicate listeners
-                    homeBtn._safeListenerAdded = true;
-                    
-                    // Single click handler with debouncing
+                if (homeBtn) {
+                    // Always reset the onclick handler (don't rely on flags)
                     homeBtn.onclick = function(e) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -3633,9 +3542,24 @@
                             this._processing = false;
                         }, 100);
                     };
+                    
+                    // Ensure button is always clickable
+                    homeBtn.style.pointerEvents = 'auto';
+                    homeBtn.style.cursor = 'pointer';
+                    homeBtn.style.zIndex = '10002';
                 }
                 
-                setupGameOverButtons._running = false;
+                // Force immediate setup on next frame
+                requestAnimationFrame(() => {
+                    if (retryBtn) {
+                        retryBtn.style.pointerEvents = 'auto';
+                        retryBtn.style.cursor = 'pointer';
+                    }
+                    if (homeBtn) {
+                        homeBtn.style.pointerEvents = 'auto';
+                        homeBtn.style.cursor = 'pointer';
+                    }
+                });
             }
             
             // Setup buttons initially
@@ -3658,36 +3582,55 @@
                 observer.observe(gameMessage, { attributes: true });
             }
             
-            // Backup event delegation
+            // Backup event delegation - More robust version
             document.addEventListener('click', function(e) {
-                if (e.target.id === 'homeBtn' || e.target.classList.contains('homeBtn')) {
+                // Handle home button clicks
+                if (e.target.id === 'homeBtn' || e.target.classList.contains('homeBtn') || 
+                    (e.target.closest && e.target.closest('#homeBtn'))) {
                     e.preventDefault();
                     e.stopPropagation();
                     console.log('Home button clicked via delegation');
-                    window.goToHome();
+                    
+                    // Hide any visible game over modal
+                    const gameMessage = document.querySelector('.game-message');
+                    if (gameMessage && gameMessage.classList.contains('show-modal')) {
+                        gameMessage.classList.remove('show-modal');
+                        gameMessage.classList.remove('game-over');
+                        gameMessage.style.display = 'none';
+                    }
+                    
+                    setTimeout(() => {
+                        window.goToHome();
+                    }, 100);
                 }
                 
-                if (e.target.id === 'retryBtn' || e.target.classList.contains('retry-button')) {
+                // Handle retry button clicks
+                if (e.target.id === 'retryBtn' || e.target.classList.contains('retry-button') ||
+                    (e.target.closest && e.target.closest('#retryBtn'))) {
                     e.preventDefault();
                     e.stopPropagation();
                     console.log('Retry button clicked via delegation');
                     
-                    if (window.gameManager) {
-                        window.gameManager.restart();
-                    }
-                    
-                    if (typeof window.resetPowerUps === 'function') {
-                        window.resetPowerUps();
-                    }
-                    
+                    // Hide game over modal
                     const gameMessage = document.querySelector('.game-message');
                     if (gameMessage) {
                         gameMessage.classList.remove('show-modal');
                         gameMessage.classList.remove('game-over');
                         gameMessage.style.display = 'none';
                     }
+                    
+                    // Restart game with delay
+                    setTimeout(() => {
+                        if (window.gameManager) {
+                            window.gameManager.restart();
+                        }
+                        
+                        if (typeof window.resetPowerUps === 'function') {
+                            window.resetPowerUps();
+                        }
+                    }, 100);
                 }
-            });
+            }, true); // Use capture phase for more reliable event handling
         });
 
         // Test function to manually show game over screen
@@ -4115,10 +4058,6 @@
             
             if (progress >= 100) {
                 setTimeout(() => {
-                    // Set game state to IDLE when loading completes
-                    if (window.gameStateManager) {
-                        window.gameStateManager.setState('IDLE');
-                    }
                     showScreen('homeScreen');
                 }, 500);
             } else {
@@ -4952,20 +4891,14 @@
 
         // Enhanced level transition with real-time status updates
         window.showLevelTransitionWithRealStatus = function(level, gridSize) {
-            // Set loading state immediately to block sounds
-            if (window.gameStateManager) {
-                window.gameStateManager.setState('LOADING');
-            }
+
             
             const overlay = document.getElementById('levelTransitionLoader');
             const text = document.getElementById('levelTransitionText');
             const progressBar = document.getElementById('levelProgressBar');
             
             if (!overlay || !text || !progressBar) {
-                // Even if UI elements are missing, ensure state is set properly
-                if (window.gameStateManager) {
-                    window.gameStateManager.setState('PLAYING');
-                }
+
                 return Promise.resolve();
             }
             
@@ -5064,12 +4997,7 @@
                 // Hide loader
                 setTimeout(() => {
                     overlay.classList.remove('active');
-                    
-                    // Set game state to PLAYING when level is ready
-                    if (window.gameStateManager) {
-                        window.gameStateManager.setState('PLAYING');
-                    }
-                    
+
                     resolve();
                 }, 2000);
             });
@@ -8451,35 +8379,43 @@
             };
         };
 
-        // Function to manually trigger game over popup (for testing)
+        // Function to manually trigger game over popup (for testing) - FIXED for multiple uses
         window.testGameOverPopup = function(won = false) {
-            const gameMessage = document.querySelector('.game-message');
-            if (!gameMessage) {
-                console.error('Game message element not found');
-                return;
-            }
-
-            // Clear any existing classes
-            gameMessage.classList.remove('game-won', 'game-over', 'show-modal');
-            gameMessage.style.display = 'none';
-
-            // Set the message text
-            const messageText = gameMessage.querySelector('p');
-            if (messageText) {
-                messageText.textContent = won ? 'You win!' : 'Game over!';
-            }
-
-            // Add appropriate class
-            if (won) {
-                gameMessage.classList.add('game-won');
-            } else {
-                gameMessage.classList.add('game-over');
-            }
-
-            // Show the modal with a slight delay for smooth animation
+            console.log('Testing game over popup...');
+            
+            // Remove any existing game over modals first
+            const existingModals = document.querySelectorAll('.game-message');
+            existingModals.forEach(modal => modal.remove());
+            
+            // Use the ultimate button fix directly since it creates a working modal
             setTimeout(() => {
-                gameMessage.classList.add('show-modal');
-                gameMessage.style.display = 'flex';
+                if (typeof window.ultimateButtonFix === 'function') {
+                    window.ultimateButtonFix();
+                    
+                    // If it's a win, update the text and styling
+                    if (won) {
+                        const modal = document.querySelector('.game-message');
+                        if (modal) {
+                            modal.classList.remove('game-over');
+                            modal.classList.add('game-won');
+                            
+                            const title = modal.querySelector('p');
+                            if (title) {
+                                title.textContent = 'You win!';
+                                title.style.cssText = `
+                                    background: linear-gradient(45deg, #ffd700, #ffb347) !important;
+                                    -webkit-background-clip: text !important;
+                                    -webkit-text-fill-color: transparent !important;
+                                    background-clip: text !important;
+                                    animation: glow-title 2s ease-in-out infinite alternate !important;
+                                    font-size: 48px !important;
+                                    margin: 0 0 30px 0 !important;
+                                    font-weight: bold !important;
+                                `;
+                            }
+                        }
+                    }
+                }
             }, 50);
 
             // Play appropriate sound
@@ -8546,7 +8482,323 @@
         console.log('window.testWinPopup() - Show win popup');
         console.log('window.forceGameOver() - Force game over state');
         console.log('window.debugGameState() - Debug current game state');
+        console.log('window.fixGameOverButtons() - Fix button functionality');
+        console.log('window.ultimateButtonFix() - ULTIMATE button fix (recreates modal)');
+        console.log('window.testButtonClicks() - Test if buttons receive clicks');
+        console.log('window.findClickBlocker() - Find what element is blocking clicks');
         console.log('==========================================');
+
+        // Function to test if buttons are receiving clicks
+        window.testButtonClicks = function() {
+            const retryBtn = document.getElementById('retryBtn');
+            const homeBtn = document.getElementById('homeBtn');
+            
+            console.log('Testing button click detection...');
+            
+            if (retryBtn) {
+                retryBtn.addEventListener('mousedown', function() {
+                    console.log('Retry button mousedown detected');
+                });
+                retryBtn.addEventListener('mouseup', function() {
+                    console.log('Retry button mouseup detected');
+                });
+                retryBtn.addEventListener('click', function() {
+                    console.log('Retry button click detected');
+                });
+            }
+            
+            if (homeBtn) {
+                homeBtn.addEventListener('mousedown', function() {
+                    console.log('Home button mousedown detected');
+                });
+                homeBtn.addEventListener('mouseup', function() {
+                    console.log('Home button mouseup detected');
+                });
+                homeBtn.addEventListener('click', function() {
+                    console.log('Home button click detected');
+                });
+            }
+            
+            console.log('Click detection listeners added. Try clicking the buttons now.');
+        };
+
+        // Function to find what element is blocking clicks
+        window.findClickBlocker = function() {
+            console.log('Click anywhere on the screen to see what element receives the click...');
+            
+            // Remove any existing click listeners
+            document.removeEventListener('click', window._clickDebugHandler);
+            
+            // Create new handler
+            window._clickDebugHandler = function(e) {
+                console.log('=== CLICK DEBUG ===');
+                console.log('Click detected on element:', e.target);
+                console.log('Element tag:', e.target.tagName);
+                console.log('Element id:', e.target.id);
+                console.log('Element classes:', e.target.className);
+                console.log('Element z-index:', window.getComputedStyle(e.target).zIndex);
+                console.log('Element pointer-events:', window.getComputedStyle(e.target).pointerEvents);
+                console.log('Click coordinates:', e.clientX, e.clientY);
+                
+                // Check what element is at this position
+                const elementAtPoint = document.elementFromPoint(e.clientX, e.clientY);
+                console.log('Element at click point:', elementAtPoint);
+                
+                // Check if there are any elements with higher z-index at this position
+                const allElements = document.elementsFromPoint(e.clientX, e.clientY);
+                console.log('All elements at click point (top to bottom):', allElements);
+                
+                console.log('==================');
+            };
+            
+            document.addEventListener('click', window._clickDebugHandler, true);
+        };
+
+        // Function to test button positions
+        window.testButtonPositions = function() {
+            const retryBtn = document.getElementById('retryBtn');
+            const homeBtn = document.getElementById('homeBtn');
+            
+            if (retryBtn) {
+                const rect = retryBtn.getBoundingClientRect();
+                console.log('Retry button position:', rect);
+                console.log('Element at retry button center:', document.elementFromPoint(rect.left + rect.width/2, rect.top + rect.height/2));
+            }
+            
+            if (homeBtn) {
+                const rect = homeBtn.getBoundingClientRect();
+                console.log('Home button position:', rect);
+                console.log('Element at home button center:', document.elementFromPoint(rect.left + rect.width/2, rect.top + rect.height/2));
+            }
+        };
+
+        // ULTIMATE BUTTON FIX - Bypass everything with proper UI
+        window.ultimateButtonFix = function() {
+            console.log('=== ULTIMATE BUTTON FIX ===');
+            
+            // Remove the entire game message and recreate it
+            const oldGameMessage = document.querySelector('.game-message');
+            if (oldGameMessage) {
+                oldGameMessage.remove();
+            }
+            
+            // Create a completely new game over modal with original design
+            const newModal = document.createElement('div');
+            newModal.className = 'game-message show-modal game-over';
+            newModal.style.cssText = `
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                background: rgba(15, 15, 35, 0.4) !important;
+                backdrop-filter: blur(15px) !important;
+                -webkit-backdrop-filter: blur(15px) !important;
+                z-index: 9999 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                pointer-events: auto !important;
+                margin: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+            `;
+            
+            // Create game over content container (matching original design)
+            const gameOverContent = document.createElement('div');
+            gameOverContent.className = 'game-over-content';
+            gameOverContent.style.cssText = `
+                background: linear-gradient(135deg, rgba(26, 26, 58, 0.75), rgba(15, 15, 35, 0.75)) !important;
+                border: 2px solid rgba(255, 215, 0, 0.3) !important;
+                border-radius: 20px !important;
+                padding: 40px 30px !important;
+                text-align: center !important;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+                backdrop-filter: blur(10px) !important;
+                max-width: 400px !important;
+                width: 90% !important;
+                animation: gameOverSlideIn 0.5s ease-out !important;
+                pointer-events: auto !important;
+                z-index: 10000 !important;
+            `;
+            
+            // Create title (matching original design)
+            const title = document.createElement('p');
+            title.textContent = 'Game over!';
+            title.style.cssText = `
+                color: #ff6b6b !important;
+                text-shadow: 0 0 30px rgba(255, 107, 107, 0.8) !important;
+                font-size: 48px !important;
+                margin: 0 0 30px 0 !important;
+                font-weight: bold !important;
+                animation: pulse-red 2s ease-in-out infinite alternate !important;
+            `;
+            
+            // Create lower section
+            const lower = document.createElement('div');
+            lower.className = 'lower';
+            
+            // Create button container (matching original design)
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'game-over-buttons';
+            buttonContainer.style.cssText = `
+                display: flex !important;
+                gap: 15px !important;
+                justify-content: center !important;
+                align-items: center !important;
+                flex-direction: column !important;
+                margin-top: 20px !important;
+                pointer-events: auto !important;
+                z-index: 10000 !important;
+            `;
+            
+            // Create retry button (matching original yellow design)
+            const retryBtn = document.createElement('button');
+            retryBtn.id = 'retryBtn';
+            retryBtn.className = 'menu-button retry-button';
+            retryBtn.innerHTML = '🔄 Try again';
+            retryBtn.style.cssText = `
+                pointer-events: auto !important;
+                z-index: 10001 !important;
+                cursor: pointer !important;
+                position: relative !important;
+                background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%) !important;
+                color: #1a1a3a !important;
+                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3) !important;
+                border: none !important;
+                border-radius: 8px !important;
+                padding: 12px 24px !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                transition: all 0.3s ease !important;
+                min-width: 120px !important;
+                touch-action: manipulation !important;
+            `;
+            
+            // Create home button (matching original blue design)
+            const homeBtn = document.createElement('button');
+            homeBtn.id = 'homeBtn';
+            homeBtn.className = 'menu-button secondary';
+            homeBtn.innerHTML = '🏠 Home';
+            homeBtn.style.cssText = `
+                pointer-events: auto !important;
+                z-index: 10001 !important;
+                cursor: pointer !important;
+                position: relative !important;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                color: white !important;
+                border: none !important;
+                border-radius: 8px !important;
+                padding: 12px 24px !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                transition: all 0.3s ease !important;
+                min-width: 120px !important;
+                touch-action: manipulation !important;
+            `;
+            
+            // Add hover effects
+            retryBtn.addEventListener('mouseenter', function() {
+                this.style.background = 'linear-gradient(135deg, #ffdc00 0%, #ffc107 100%) !important';
+                this.style.transform = 'translateY(-2px) !important';
+                this.style.boxShadow = '0 8px 25px rgba(255, 215, 0, 0.4) !important';
+            });
+            
+            retryBtn.addEventListener('mouseleave', function() {
+                this.style.background = 'linear-gradient(135deg, #ffd700 0%, #ffb347 100%) !important';
+                this.style.transform = 'translateY(0) !important';
+                this.style.boxShadow = '0 4px 15px rgba(255, 215, 0, 0.3) !important';
+            });
+            
+            homeBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px) !important';
+                this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3) !important';
+            });
+            
+            homeBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) !important';
+                this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2) !important';
+            });
+            
+            // Add click handlers with multiple event types
+            ['click', 'mousedown', 'touchstart'].forEach(eventType => {
+                retryBtn.addEventListener(eventType, function(e) {
+                    console.log('ULTIMATE RETRY CLICKED!', eventType);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Remove modal
+                    newModal.remove();
+                    
+                    // Restart game
+                    setTimeout(() => {
+                        if (window.gameManager) {
+                            window.gameManager.restart();
+                        }
+                        if (typeof window.resetPowerUps === 'function') {
+                            window.resetPowerUps();
+                        }
+                    }, 100);
+                }, true);
+                
+                homeBtn.addEventListener(eventType, function(e) {
+                    console.log('ULTIMATE HOME CLICKED!', eventType);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Remove modal
+                    newModal.remove();
+                    
+                    // Go home
+                    setTimeout(() => {
+                        window.goToHome();
+                    }, 100);
+                }, true);
+            });
+            
+            // Assemble the modal (matching original structure)
+            buttonContainer.appendChild(retryBtn);
+            buttonContainer.appendChild(homeBtn);
+            lower.appendChild(buttonContainer);
+            gameOverContent.appendChild(title);
+            gameOverContent.appendChild(lower);
+            newModal.appendChild(gameOverContent);
+            
+            // Add to page
+            document.body.appendChild(newModal);
+            
+            console.log('Ultimate button fix complete with original UI!');
+        };
+
+        // Auto-fix buttons when page loads and handle audio context
+        window.addEventListener('load', function() {
+            // Handle AudioContext warning (browser security feature)
+            if (window.gameSounds && window.gameSounds.audioContext) {
+                // Resume audio context on first user interaction
+                const resumeAudio = function() {
+                    if (window.gameSounds.audioContext.state === 'suspended') {
+                        window.gameSounds.audioContext.resume().catch(function(err) {
+                            console.log('Audio context resume failed:', err);
+                        });
+                    }
+                    // Remove listeners after first interaction
+                    document.removeEventListener('click', resumeAudio);
+                    document.removeEventListener('touchstart', resumeAudio);
+                    document.removeEventListener('keydown', resumeAudio);
+                };
+                
+                document.addEventListener('click', resumeAudio);
+                document.addEventListener('touchstart', resumeAudio);
+                document.addEventListener('keydown', resumeAudio);
+            }
+            
+            setTimeout(function() {
+                if (typeof window.fixGameOverButtons === 'function') {
+                    window.fixGameOverButtons();
+                }
+            }, 1000);
+        });
     </script>
 
     <!-- Game Scripts -->
