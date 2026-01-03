@@ -72,7 +72,7 @@ HTMLActuator.prototype.addTile = function (tile) {
       classes[2] = self.positionClass({ x: tile.x, y: tile.y });
       self.applyClasses(wrapper, classes); // Update the position
       
-      // Play slide sound for tile movement
+      // Play slide sound using original system
       if (window.gameSounds) {
         window.gameSounds.playSlide();
       }
@@ -81,7 +81,7 @@ HTMLActuator.prototype.addTile = function (tile) {
     classes.push("tile-merged");
     this.applyClasses(wrapper, classes);
 
-    // Play merge sound
+    // Play merge sound using original system
     if (window.gameSounds) {
       window.gameSounds.playMerge(tile.value);
     }
@@ -94,7 +94,7 @@ HTMLActuator.prototype.addTile = function (tile) {
     classes.push("tile-new");
     this.applyClasses(wrapper, classes);
     
-    // Play spawn sound for new tiles
+    // Play spawn sound using original system
     if (window.gameSounds) {
       window.gameSounds.playSpawn();
     }
@@ -157,7 +157,7 @@ HTMLActuator.prototype.message = function (won) {
   this.messageContainer.classList.add(type);
   this.messageContainer.getElementsByTagName("p")[0].textContent = message;
   
-  // Play win/loss sounds
+  // Play win/loss sounds using original system
   if (window.gameSounds) {
     if (won) {
       window.gameSounds.playWin();
@@ -166,12 +166,15 @@ HTMLActuator.prototype.message = function (won) {
     }
   }
   
-  // Show the full-screen modal for our custom game over screen
+  // Set game over state
   if (!won) {
+    window.gameStateManager.setState('GAME_OVER');
+    
+    // UI Manager will handle showing the modal
     var self = this;
     setTimeout(function() {
       self.messageContainer.classList.add('show-modal');
-    }, 50); // Faster game over screen appearance
+    }, 50);
   }
 };
 

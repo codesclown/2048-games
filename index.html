@@ -559,8 +559,8 @@
                         <p></p>
                         <div class="lower">
                             <div class="game-over-buttons">
-                                <button class="menu-button retry-button" onclick="if(window.gameManager) window.gameManager.restart(); resetPowerUps();">🔄 Try again</button>
-                                <button class="menu-button secondary" id="homeBtn" onclick="window.goToHome();">🏠 Home</button>
+                                <button class="menu-button retry-button" id="retryBtn">🔄 Try again</button>
+                                <button class="menu-button secondary" id="homeBtn">🏠 Home</button>
                             </div>
                         </div>
                     </div>
@@ -726,6 +726,26 @@
                 z-index: 10001 !important;
                 cursor: pointer !important;
                 position: relative !important;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                border: none !important;
+                color: white !important;
+                padding: 12px 24px !important;
+                border-radius: 8px !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                transition: all 0.3s ease !important;
+                min-width: 120px !important;
+                touch-action: manipulation !important;
+            }
+            
+            .game-container .game-over-buttons button:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.3) !important;
+            }
+            
+            .game-container .game-over-buttons button:active {
+                transform: translateY(0) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
             }
             
             /* Make sure buttons are always clickable */
@@ -1258,21 +1278,6 @@
         const POWERUP_UNLOCK_MOVES = 4; // Unlock power-ups after 4 moves
         window.powerUpsUnlocked = false; // Track if power-ups have been unlocked
 
-        // Function to unlock power-ups after sufficient moves
-        function unlockPowerUps() {
-            if (window.moveCount >= POWERUP_UNLOCK_MOVES && !window.powerUpsUnlocked) {
-                // Only unlock once when reaching the required moves
-                window.powerUpsUnlocked = true;
-                
-                window.powerUps.undo.uses = window.powerUps.undo.startUses;
-                window.powerUps.swap.uses = window.powerUps.swap.startUses;
-                window.powerUps.delete.uses = window.powerUps.delete.startUses;
-                
-                // Update button titles (no unlock notification as per user request)
-                updateButtonTitles();
-            }
-        }
-
         // Level system configuration
         window.gridSizes = {
             1: 4, // Level 1: 4x4 grid
@@ -1413,55 +1418,48 @@
             }
         }
 
-        // ===== ROBUST POWER-UP SYSTEM =====
+        // ===== SIMPLIFIED ROBUST POWER-UP SYSTEM =====
         
-        // Power-up system configuration
+        // Power-up system configuration - SIMPLIFIED
         const POWERUP_CONFIG = {
             UNLOCK_MOVES: 4,
-            EARN_COOLDOWN: 5000, // 5 seconds
             
-            // Level-based configurations
+            // Level-based configurations - SIMPLIFIED
             levels: {
                 4: { // 4x4 grid
-                    undo: { start: 2, max: 4, lifetime: 4, requiredTile: 128 },
-                    swap: { start: 1, max: 4, lifetime: 4, requiredTile: 256 },
-                    delete: { start: 1, max: 4, lifetime: 4, requiredTile: 512 }
+                    undo: { start: 2, max: 4, sessionLimit: 4, requiredTile: 128 },
+                    swap: { start: 1, max: 4, sessionLimit: 4, requiredTile: 256 },
+                    delete: { start: 1, max: 4, sessionLimit: 4, requiredTile: 512 }
                 },
                 5: { // 5x5 grid
-                    undo: { start: 2, max: 5, lifetime: 5, requiredTile: 128 },
-                    swap: { start: 2, max: 5, lifetime: 5, requiredTile: 256 },
-                    delete: { start: 2, max: 5, lifetime: 5, requiredTile: 512 }
+                    undo: { start: 2, max: 5, sessionLimit: 5, requiredTile: 128 },
+                    swap: { start: 2, max: 5, sessionLimit: 5, requiredTile: 256 },
+                    delete: { start: 2, max: 5, sessionLimit: 5, requiredTile: 512 }
                 },
                 6: { // 6x6 grid
-                    undo: { start: 3, max: 6, lifetime: 6, requiredTile: 128 },
-                    swap: { start: 3, max: 6, lifetime: 6, requiredTile: 256 },
-                    delete: { start: 3, max: 6, lifetime: 6, requiredTile: 512 }
+                    undo: { start: 3, max: 6, sessionLimit: 6, requiredTile: 128 },
+                    swap: { start: 3, max: 6, sessionLimit: 6, requiredTile: 256 },
+                    delete: { start: 3, max: 6, sessionLimit: 6, requiredTile: 512 }
                 }
             }
         };
 
-        // Power-up state management
+        // SINGLE power-up state management
         window.powerUpState = {
             moveCount: 0,
             unlocked: false,
             
             undo: {
-                uses: 0,
-                lifetimeUsed: 0,
-                lastUsedTime: 0,
-                lastEarnTime: 0
+                available: 0,    // Current available uses
+                totalUsed: 0     // Total used this session
             },
             swap: {
-                uses: 0,
-                lifetimeUsed: 0,
-                lastUsedTime: 0,
-                lastEarnTime: 0
+                available: 0,
+                totalUsed: 0
             },
             delete: {
-                uses: 0,
-                lifetimeUsed: 0,
-                lastUsedTime: 0,
-                lastEarnTime: 0
+                available: 0,
+                totalUsed: 0
             }
         };
 
@@ -1473,7 +1471,7 @@
 
         // Initialize power-ups for a new game
         function initializePowerUps() {
-            const config = getCurrentLevelConfig();
+            console.log('Initializing power-ups for new game');
             
             // Reset all state
             window.powerUpState.moveCount = 0;
@@ -1482,10 +1480,8 @@
             // Reset each power-up type
             ['undo', 'swap', 'delete'].forEach(type => {
                 window.powerUpState[type] = {
-                    uses: 0, // Start locked
-                    lifetimeUsed: 0,
-                    lastUsedTime: 0,
-                    lastEarnTime: 0
+                    available: 0,    // Start locked
+                    totalUsed: 0
                 };
             });
             
@@ -1494,65 +1490,97 @@
             
             // Update UI
             updatePowerUpUI();
+            updateLegacyPowerUps();
         }
 
         // Unlock power-ups after sufficient moves
         function unlockPowerUps() {
             if (window.powerUpState.moveCount >= POWERUP_CONFIG.UNLOCK_MOVES && !window.powerUpState.unlocked) {
+                console.log('Unlocking power-ups after', window.powerUpState.moveCount, 'moves');
                 const config = getCurrentLevelConfig();
                 
                 window.powerUpState.unlocked = true;
-                window.powerUpState.undo.uses = config.undo.start;
-                window.powerUpState.swap.uses = config.swap.start;
-                window.powerUpState.delete.uses = config.delete.start;
+                window.powerUpState.undo.available = config.undo.start;
+                window.powerUpState.swap.available = config.swap.start;
+                window.powerUpState.delete.available = config.delete.start;
                 
                 updatePowerUpUI();
+                updateLegacyPowerUps();
             }
         }
 
-        // Use a power-up
+        // Use a power-up - SIMPLIFIED with double-execution guard
         function usePowerUp(type) {
-            const config = getCurrentLevelConfig();
+            // Prevent double execution
+            if (window.powerUpSystem._processing) {
+                console.log(`Preventing double execution of ${type} power-up`);
+                return false;
+            }
+            
+            window.powerUpSystem._processing = true;
+            
             const powerUp = window.powerUpState[type];
+            const config = getCurrentLevelConfig();
+            
+            console.log(`Attempting to use ${type}:`, {
+                unlocked: window.powerUpState.unlocked,
+                available: powerUp.available,
+                totalUsed: powerUp.totalUsed,
+                sessionLimit: config[type].sessionLimit
+            });
             
             // Check if can use
-            if (!window.powerUpState.unlocked || powerUp.uses <= 0) {
+            if (!window.powerUpState.unlocked || powerUp.available <= 0) {
+                console.log(`Cannot use ${type}: unlocked=${window.powerUpState.unlocked}, available=${powerUp.available}`);
+                window.powerUpSystem._processing = false;
+                return false;
+            }
+            
+            // Check session limit
+            if (powerUp.totalUsed >= config[type].sessionLimit) {
+                console.log(`Cannot use ${type}: session limit reached (${powerUp.totalUsed}/${config[type].sessionLimit})`);
+                window.powerUpSystem._processing = false;
                 return false;
             }
             
             // Use the power-up
-            powerUp.uses--;
-            powerUp.lifetimeUsed++;
-            powerUp.lastUsedTime = Date.now();
+            powerUp.available--;
+            powerUp.totalUsed++;
+            
+            console.log(`Used ${type}: available=${powerUp.available}, totalUsed=${powerUp.totalUsed}`);
             
             updatePowerUpUI();
+            updateLegacyPowerUps();
+            
+            // Clear processing flag after a short delay
+            setTimeout(() => {
+                window.powerUpSystem._processing = false;
+            }, 100);
+            
             return true;
         }
 
-        // Check if can earn power-ups
+        // Check if can earn power-ups - SIMPLIFIED
         function checkPowerUpEarning() {
             if (!window.gameManager || !window.gameManager.grid || !window.powerUpState.unlocked) {
                 return;
             }
             
             const config = getCurrentLevelConfig();
-            const currentTime = Date.now();
             
             // Check each power-up type
             ['undo', 'swap', 'delete'].forEach(type => {
                 const powerUp = window.powerUpState[type];
                 const typeConfig = config[type];
                 
-                // Can only earn if:
+                // Can earn if:
                 // 1. Have used this power-up at least once
-                // 2. Total available + used doesn't exceed lifetime limit
-                // 3. Not in cooldown
+                // 2. Haven't reached session limit
+                // 3. Don't exceed max available at any time
                 // 4. Have required tile on board
-                const totalPowerUps = powerUp.uses + powerUp.lifetimeUsed;
-                
-                if (powerUp.lifetimeUsed > 0 &&
-                    totalPowerUps < typeConfig.lifetime &&
-                    (currentTime - powerUp.lastEarnTime) >= POWERUP_CONFIG.EARN_COOLDOWN) {
+                if (powerUp.totalUsed > 0 &&
+                    powerUp.totalUsed < typeConfig.sessionLimit &&
+                    powerUp.available < typeConfig.max) {
                     
                     // Check for required tile
                     let hasTile = false;
@@ -1563,19 +1591,26 @@
                     });
                     
                     if (hasTile) {
-                        powerUp.uses++;
-                        powerUp.lastEarnTime = currentTime;
+                        powerUp.available++;
+                        console.log(`Earned ${type}: available=${powerUp.available}, totalUsed=${powerUp.totalUsed}`);
                         updatePowerUpUI();
+                        updateLegacyPowerUps();
                     }
                 }
             });
         }
 
-        // Update power-up UI
+        // Update power-up UI - SIMPLIFIED
         function updatePowerUpUI() {
             const config = getCurrentLevelConfig();
             const movesRemaining = Math.max(0, POWERUP_CONFIG.UNLOCK_MOVES - window.powerUpState.moveCount);
             const isLocked = !window.powerUpState.unlocked;
+            
+            console.log('Updating power-up UI:', {
+                isLocked,
+                movesRemaining,
+                powerUpState: JSON.parse(JSON.stringify(window.powerUpState))
+            });
             
             // Update buttons and counters
             ['undo', 'swap', 'delete'].forEach(type => {
@@ -1590,25 +1625,34 @@
                     const powerUp = window.powerUpState[type];
                     const typeConfig = config[type];
                     
+                    console.log(`${type} button update:`, {
+                        available: powerUp.available,
+                        totalUsed: powerUp.totalUsed,
+                        isLocked
+                    });
+                    
                     if (isLocked) {
                         btn.title = `${type.charAt(0).toUpperCase() + type.slice(1)} - Locked (${movesRemaining} more moves to unlock)`;
                         btn.classList.add('disabled');
                     } else {
-                        const totalAvailable = powerUp.uses + powerUp.lifetimeUsed;
-                        const remainingToEarn = typeConfig.lifetime - totalAvailable;
-                        btn.title = `${type.charAt(0).toUpperCase() + type.slice(1)} - ${powerUp.uses} available (${remainingToEarn} more can be earned)`;
+                        const remainingUses = typeConfig.sessionLimit - powerUp.totalUsed;
+                        btn.title = `${type.charAt(0).toUpperCase() + type.slice(1)} - ${powerUp.available} available (${remainingUses} total uses left this game)`;
                         
-                        if (powerUp.uses === 0) {
+                        if (powerUp.available === 0) {
+                            console.log(`Disabling ${type} button: available = ${powerUp.available}`);
                             btn.classList.add('disabled');
                         } else {
+                            console.log(`Enabling ${type} button: available = ${powerUp.available}`);
                             btn.classList.remove('disabled');
                         }
                     }
                 }
                 
                 if (counter) {
-                    counter.textContent = isLocked ? '🔒' : window.powerUpState[type].uses;
-                    counter.className = (isLocked || window.powerUpState[type].uses === 0) ? 
+                    const displayValue = isLocked ? '🔒' : window.powerUpState[type].available;
+                    console.log(`${type} counter update: ${displayValue}`);
+                    counter.textContent = displayValue;
+                    counter.className = (isLocked || window.powerUpState[type].available === 0) ? 
                         'power-up-counter zero' : 'power-up-counter';
                     counter.offsetHeight; // Force reflow
                 }
@@ -1628,36 +1672,36 @@
             
             window.powerUps = {
                 undo: {
-                    uses: window.powerUpState.undo.uses,
+                    uses: window.powerUpState.undo.available,
                     maxUses: config.undo.max,
                     requiredTile: config.undo.requiredTile,
                     earnAmount: 1,
-                    lifetimeUsed: window.powerUpState.undo.lifetimeUsed,
-                    lifetimeLimit: config.undo.lifetime,
-                    lastUsedTime: window.powerUpState.undo.lastUsedTime,
-                    earnCooldown: POWERUP_CONFIG.EARN_COOLDOWN,
+                    lifetimeUsed: window.powerUpState.undo.totalUsed,
+                    lifetimeLimit: config.undo.sessionLimit,
+                    lastUsedTime: Date.now(),
+                    earnCooldown: 0,
                     startUses: config.undo.start
                 },
                 swap: {
-                    uses: window.powerUpState.swap.uses,
+                    uses: window.powerUpState.swap.available,
                     maxUses: config.swap.max,
                     requiredTile: config.swap.requiredTile,
                     earnAmount: 1,
-                    lifetimeUsed: window.powerUpState.swap.lifetimeUsed,
-                    lifetimeLimit: config.swap.lifetime,
-                    lastUsedTime: window.powerUpState.swap.lastUsedTime,
-                    earnCooldown: POWERUP_CONFIG.EARN_COOLDOWN,
+                    lifetimeUsed: window.powerUpState.swap.totalUsed,
+                    lifetimeLimit: config.swap.sessionLimit,
+                    lastUsedTime: Date.now(),
+                    earnCooldown: 0,
                     startUses: config.swap.start
                 },
                 delete: {
-                    uses: window.powerUpState.delete.uses,
+                    uses: window.powerUpState.delete.available,
                     maxUses: config.delete.max,
                     requiredTile: config.delete.requiredTile,
                     earnAmount: 1,
-                    lifetimeUsed: window.powerUpState.delete.lifetimeUsed,
-                    lifetimeLimit: config.delete.lifetime,
-                    lastUsedTime: window.powerUpState.delete.lastUsedTime,
-                    earnCooldown: POWERUP_CONFIG.EARN_COOLDOWN,
+                    lifetimeUsed: window.powerUpState.delete.totalUsed,
+                    lifetimeLimit: config.delete.sessionLimit,
+                    lastUsedTime: Date.now(),
+                    earnCooldown: 0,
                     startUses: config.delete.start
                 }
             };
@@ -1669,15 +1713,17 @@
             use: usePowerUp,
             onMove: onGameMove,
             updateUI: updatePowerUpUI,
-            updateLegacy: updateLegacyPowerUps
+            updateLegacy: updateLegacyPowerUps,
+            _processing: false  // Guard against double execution
         };
 
-        // Initialize the system
+        // Initialize the system and update legacy compatibility
         initializePowerUps();
         updateLegacyPowerUps();
 
         // Make functions globally accessible
         window.resetPowerUps = function() {
+            console.log('Resetting power-ups');
             window.powerUpSystem.initialize();
             window.powerUpSystem.updateLegacy();
         };
@@ -1689,6 +1735,153 @@
 
         // Debug function to check powerup status (for console debugging)
         window.debugPowerUps = function() {
+            console.log('=== Power-up Debug Info ===');
+            console.log('Move count:', window.powerUpState.moveCount);
+            console.log('Unlocked:', window.powerUpState.unlocked);
+            console.log('Undo:', window.powerUpState.undo);
+            console.log('Swap:', window.powerUpState.swap);
+            console.log('Delete:', window.powerUpState.delete);
+            console.log('Legacy powerUps:', window.powerUps);
+            
+            // Check button states
+            const undoBtn = document.querySelector('.undo-btn');
+            const swapBtn = document.querySelector('.replace-btn');
+            const deleteBtn = document.querySelector('.menu-btn');
+            
+            console.log('Button states:');
+            console.log('- Undo disabled:', undoBtn?.classList.contains('disabled'));
+            console.log('- Swap disabled:', swapBtn?.classList.contains('disabled'));
+            console.log('- Delete disabled:', deleteBtn?.classList.contains('disabled'));
+            
+            // Check counters
+            const undoCounter = document.getElementById('undo-counter');
+            const swapCounter = document.getElementById('swap-counter');
+            const deleteCounter = document.getElementById('delete-counter');
+            
+            console.log('Counter values:');
+            console.log('- Undo counter:', undoCounter?.textContent);
+            console.log('- Swap counter:', swapCounter?.textContent);
+            console.log('- Delete counter:', deleteCounter?.textContent);
+            
+            return {
+                state: window.powerUpState,
+                legacy: window.powerUps,
+                buttons: {
+                    undo: undoBtn?.classList.contains('disabled'),
+                    swap: swapBtn?.classList.contains('disabled'),
+                    delete: deleteBtn?.classList.contains('disabled')
+                }
+            };
+        };
+
+        // Test function to spawn game over popup for testing
+        window.testGameOver = function() {
+            console.log('=== Testing Game Over Popup ===');
+            
+            // Set game state to GAME_OVER
+            if (window.gameStateManager) {
+                window.gameStateManager.setState('GAME_OVER');
+            }
+            
+            // Get the game message element
+            const gameMessage = document.querySelector('.game-message');
+            if (!gameMessage) {
+                console.error('Game message element not found!');
+                return false;
+            }
+            
+            // Set the message text
+            const messageP = gameMessage.querySelector('p');
+            if (messageP) {
+                messageP.textContent = 'Game over!';
+            }
+            
+            // Add game over classes and show modal
+            gameMessage.classList.add('game-over');
+            gameMessage.classList.add('show-modal');
+            gameMessage.style.display = 'flex';
+            
+            console.log('Game over popup should now be visible');
+            console.log('Try clicking the Home and Try Again buttons');
+            
+            // Check if buttons exist
+            const retryBtn = document.getElementById('retryBtn');
+            const homeBtn = document.getElementById('homeBtn');
+            
+            console.log('Button check:');
+            console.log('- Retry button found:', !!retryBtn);
+            console.log('- Home button found:', !!homeBtn);
+            
+            if (retryBtn) {
+                console.log('- Retry button clickable:', retryBtn.style.pointerEvents !== 'none');
+            }
+            if (homeBtn) {
+                console.log('- Home button clickable:', homeBtn.style.pointerEvents !== 'none');
+            }
+            
+            return true;
+        };
+
+        // Test function to hide game over popup
+        window.hideTestGameOver = function() {
+            console.log('=== Hiding Game Over Popup ===');
+            
+            const gameMessage = document.querySelector('.game-message');
+            if (gameMessage) {
+                gameMessage.classList.remove('game-over');
+                gameMessage.classList.remove('show-modal');
+                gameMessage.style.display = 'none';
+                console.log('Game over popup hidden');
+            }
+            
+            // Reset game state
+            if (window.gameStateManager) {
+                window.gameStateManager.setState('PLAYING');
+            }
+        };
+
+        // Test function to check button functionality
+        window.testGameOverButtons = function() {
+            console.log('=== Testing Game Over Buttons ===');
+            
+            // First show the game over popup
+            window.testGameOver();
+            
+            // Wait a moment then test button functionality
+            setTimeout(() => {
+                const retryBtn = document.getElementById('retryBtn');
+                const homeBtn = document.getElementById('homeBtn');
+                
+                console.log('=== Button Functionality Test ===');
+                
+                if (retryBtn) {
+                    console.log('Testing Retry button...');
+                    console.log('- Has onclick:', typeof retryBtn.onclick === 'function');
+                    console.log('- Has event listeners:', retryBtn.getEventListeners ? Object.keys(retryBtn.getEventListeners()).length : 'Cannot check');
+                    console.log('- Computed style pointer-events:', getComputedStyle(retryBtn).pointerEvents);
+                    console.log('- Z-index:', getComputedStyle(retryBtn).zIndex);
+                } else {
+                    console.error('Retry button not found!');
+                }
+                
+                if (homeBtn) {
+                    console.log('Testing Home button...');
+                    console.log('- Has onclick:', typeof homeBtn.onclick === 'function');
+                    console.log('- Has event listeners:', homeBtn.getEventListeners ? Object.keys(homeBtn.getEventListeners()).length : 'Cannot check');
+                    console.log('- Computed style pointer-events:', getComputedStyle(homeBtn).pointerEvents);
+                    console.log('- Z-index:', getComputedStyle(homeBtn).zIndex);
+                } else {
+                    console.error('Home button not found!');
+                }
+                
+                console.log('=== Manual Test Instructions ===');
+                console.log('1. You should see the game over popup');
+                console.log('2. Try clicking the "Try again" button');
+                console.log('3. Try clicking the "Home" button');
+                console.log('4. Check console for any errors');
+                console.log('5. Use hideTestGameOver() to close the popup if needed');
+                
+            }, 500);
         };
 
         // Check if player has required tile to earn more uses (legacy function)
@@ -2058,8 +2251,18 @@
 
         // Handle undo button click
         window.handleUndoClick = function(button) {
+            // Prevent multiple rapid clicks
+            if (button.dataset.processing === 'true') {
+                console.log('Undo button already processing, ignoring click');
+                return;
+            }
+            
+            button.dataset.processing = 'true';
+            
             // Use new power-up system
             if (!window.powerUpSystem.use('undo')) {
+                console.log('Cannot use undo - not available');
+                button.dataset.processing = 'false';
                 return; // Can't use undo
             }
 
@@ -2070,6 +2273,13 @@
 
             // Check if we have enough history (need at least 1 state to undo to)
             if (window.gameStateHistory.length === 0) {
+                console.log('No undo history available - refunding undo use');
+                // Refund the undo use since we couldn't actually undo
+                window.powerUpState.undo.available++;
+                window.powerUpState.undo.totalUsed--;
+                window.powerUpSystem.updateUI();
+                window.powerUpSystem.updateLegacy();
+                button.dataset.processing = 'false';
                 return;
             }
 
@@ -2082,16 +2292,18 @@
                 const undoSuccessful = restoreGameState();
                 
                 if (!undoSuccessful) {
-                    // If undo failed, refund the use (revert the power-up system)
-                    window.powerUpState.undo.uses++;
-                    window.powerUpState.undo.lifetimeUsed--;
+                    console.log('Undo failed - refunding undo use');
+                    // If undo failed, refund the use
+                    window.powerUpState.undo.available++;
+                    window.powerUpState.undo.totalUsed--;
                     window.powerUpSystem.updateUI();
                     window.powerUpSystem.updateLegacy();
                 }
                 
-                // Remove animation class
+                // Remove animation class and processing flag
                 setTimeout(() => {
                     button.classList.remove('undoing');
+                    button.dataset.processing = 'false';
                 }, 300);
             }, 50);
         };
@@ -3269,6 +3481,7 @@
         window.handleMenuClick = function(button) {
             // Use new power-up system
             if (!window.powerUpSystem.use('delete')) {
+                console.log('Cannot use delete - not available');
                 return; // Can't use delete
             }
 
@@ -3296,8 +3509,9 @@
                 }, 2000);
                 
                 // Refund the delete use since we couldn't use it
-                window.powerUpState.delete.uses++;
-                window.powerUpState.delete.lifetimeUsed--;
+                console.log('Not enough tiles to delete - refunding delete use');
+                window.powerUpState.delete.available++;
+                window.powerUpState.delete.totalUsed--;
                 window.powerUpSystem.updateUI();
                 window.powerUpSystem.updateLegacy();
                 
@@ -3352,29 +3566,119 @@
 
         // Simple setup for game over buttons
         document.addEventListener('DOMContentLoaded', function() {
-            // Simple event delegation for backup
+            // Robust event handling for game over buttons
+            function setupGameOverButtons() {
+                const retryBtn = document.getElementById('retryBtn');
+                const homeBtn = document.getElementById('homeBtn');
+                
+                if (retryBtn) {
+                    // Remove any existing listeners
+                    retryBtn.replaceWith(retryBtn.cloneNode(true));
+                    const newRetryBtn = document.getElementById('retryBtn');
+                    
+                    newRetryBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log('Retry button clicked');
+                        
+                        // Restart the game
+                        if (window.gameManager) {
+                            window.gameManager.restart();
+                        }
+                        
+                        // Reset power-ups
+                        if (typeof window.resetPowerUps === 'function') {
+                            window.resetPowerUps();
+                        }
+                        
+                        // Hide game over modal
+                        const gameMessage = document.querySelector('.game-message');
+                        if (gameMessage) {
+                            gameMessage.classList.remove('show-modal');
+                            gameMessage.classList.remove('game-over');
+                            gameMessage.style.display = 'none';
+                        }
+                    });
+                    
+                    // Also add touch event for mobile
+                    newRetryBtn.addEventListener('touchend', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        newRetryBtn.click();
+                    });
+                }
+                
+                if (homeBtn) {
+                    // Remove any existing listeners
+                    homeBtn.replaceWith(homeBtn.cloneNode(true));
+                    const newHomeBtn = document.getElementById('homeBtn');
+                    
+                    newHomeBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log('Home button clicked');
+                        window.goToHome();
+                    });
+                    
+                    // Also add touch event for mobile
+                    newHomeBtn.addEventListener('touchend', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        newHomeBtn.click();
+                    });
+                }
+            }
+            
+            // Setup buttons initially
+            setupGameOverButtons();
+            
+            // Re-setup buttons whenever game over screen is shown
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        const target = mutation.target;
+                        if (target.classList && target.classList.contains('show-modal')) {
+                            setTimeout(setupGameOverButtons, 100);
+                        }
+                    }
+                });
+            });
+            
+            const gameMessage = document.querySelector('.game-message');
+            if (gameMessage) {
+                observer.observe(gameMessage, { attributes: true });
+            }
+            
+            // Backup event delegation
             document.addEventListener('click', function(e) {
-                if (e.target.id === 'homeBtn') {
+                if (e.target.id === 'homeBtn' || e.target.classList.contains('homeBtn')) {
                     e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Home button clicked via delegation');
                     window.goToHome();
                 }
-                if (e.target.classList.contains('retry-button')) {
+                
+                if (e.target.id === 'retryBtn' || e.target.classList.contains('retry-button')) {
                     e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Retry button clicked via delegation');
+                    
                     if (window.gameManager) {
                         window.gameManager.restart();
                     }
-                    // Ensure power-ups are reset
-                    setTimeout(() => {
-                        if (typeof resetPowerUps === 'function') {
-                            resetPowerUps();
-                        }
-                    }, 100);
-                }
-                // Handle mobile refresh button clicks
-                if (e.target.classList.contains('mobile-refresh-btn')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleRestartClick(e.target);
+                    
+                    if (typeof window.resetPowerUps === 'function') {
+                        window.resetPowerUps();
+                    }
+                    
+                    const gameMessage = document.querySelector('.game-message');
+                    if (gameMessage) {
+                        gameMessage.classList.remove('show-modal');
+                        gameMessage.classList.remove('game-over');
+                        gameMessage.style.display = 'none';
+                    }
                 }
             });
         });
@@ -3386,6 +3690,18 @@
                 gameMessage.classList.add('game-over');
                 gameMessage.classList.add('show-modal');
                 gameMessage.getElementsByTagName("p")[0].textContent = "Game over!";
+                gameMessage.style.display = 'flex';
+                
+                // Ensure buttons are set up
+                setTimeout(() => {
+                    const retryBtn = document.getElementById('retryBtn');
+                    const homeBtn = document.getElementById('homeBtn');
+                    console.log('Retry button found:', !!retryBtn);
+                    console.log('Home button found:', !!homeBtn);
+                    if (retryBtn) console.log('Retry button clickable:', retryBtn.style.pointerEvents !== 'none');
+                    if (homeBtn) console.log('Home button clickable:', homeBtn.style.pointerEvents !== 'none');
+                }, 100);
+                
                 return 'Game over screen shown';
             }
             return 'Game message element not found';
@@ -7969,6 +8285,15 @@
     <script src="js/bind_polyfill.js"></script>
     <script src="js/classlist_polyfill.js"></script>
     <script src="js/animframe_polyfill.js"></script>
+    
+    <!-- Production-ready managers (load first) -->
+    <script src="js/game_state_manager.js"></script>
+    <script src="js/sound_manager.js"></script>
+    <script src="js/loading_manager.js"></script>
+    <script src="js/tile_sync_manager.js"></script>
+    <script src="js/ui_manager.js"></script>
+    
+    <!-- Core game files -->
     <script src="js/keyboard_input_manager.js"></script>
     <script src="js/html_actuator.js"></script>
     <script src="js/grid.js"></script>
@@ -7976,5 +8301,154 @@
     <script src="js/local_storage_manager.js"></script>
     <script src="js/game_manager.js"></script>
     <script src="js/application.js"></script>
+    
+    <!-- Production test suite -->
+    <script src="js/production_test_suite.js"></script>
 </body>
 </html>
+    <script>
+        // ===== PRODUCTION-READY GAME INITIALIZATION =====
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize game state
+            window.gameStateManager.setState('IDLE');
+            
+            // Setup initial screen
+            if (window.uiManager) {
+                window.uiManager.showScreen('homeScreen');
+            }
+            
+            console.log('🎮 Game initialized in production mode');
+        });
+        
+        // Production-ready button handlers
+        window.startGame = function(level) {
+            const gridSize = window.gridSizes[level] || 4;
+            
+            // Show loading screen
+            const loadingId = window.loadingManager.showForLevelStart(level);
+            
+            // Set current grid size
+            window.currentGridSize = gridSize;
+            
+            // Initialize power-ups for this level
+            if (window.powerUpSystem) {
+                window.powerUpSystem.initialize();
+                window.powerUpSystem.updateLegacy();
+            }
+            
+            // Start the game after loading
+            setTimeout(() => {
+                // Initialize game manager with correct size
+                window.gameManager = new GameManager(gridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+                
+                // Show game screen
+                if (window.uiManager) {
+                    window.uiManager.showScreen('gameScreen');
+                }
+                
+                // Set playing state
+                window.gameStateManager.setState('PLAYING');
+                
+                console.log(`🎯 Started ${gridSize}x${gridSize} game`);
+            }, 1500);
+        };
+        
+        // Production-ready restart function
+        window.restartGame = function() {
+            if (window.gameManager) {
+                window.gameManager.restart();
+            }
+            
+            if (window.powerUpSystem) {
+                window.powerUpSystem.initialize();
+                window.powerUpSystem.updateLegacy();
+            }
+        };
+        
+        // Production-ready home function
+        window.goToHome = function() {
+            // Hide any modals
+            if (window.uiManager) {
+                window.uiManager.hideGameOverModal();
+            }
+            
+            // Show home screen
+            if (window.uiManager) {
+                window.uiManager.showScreen('homeScreen');
+            }
+            
+            // Set idle state
+            window.gameStateManager.setState('IDLE');
+        };
+        
+        // Production-ready sound toggle
+        window.toggleGameSounds = function(button) {
+            if (!window.soundManager) return;
+            
+            const isEnabled = window.soundManager.toggle();
+            button.textContent = isEnabled ? '🔊' : '🔇';
+            button.title = isEnabled ? 'Turn Sound Off' : 'Turn Sound On';
+            
+            // Play test sound when enabling
+            if (isEnabled) {
+                window.soundManager.playClick();
+            }
+        };
+        
+        // Emergency reset function for debugging
+        window.emergencyReset = function() {
+            console.log('🚨 Emergency reset initiated');
+            
+            // Reset all managers
+            if (window.gameStateManager) window.gameStateManager.reset();
+            if (window.uiManager) window.uiManager.emergencyReset();
+            if (window.loadingManager) window.loadingManager.forceHide();
+            if (window.soundManager) window.soundManager.stopAll();
+            
+            // Reset game
+            if (window.gameManager) {
+                window.gameManager.forceRestart();
+            }
+            
+            console.log('✅ Emergency reset completed');
+        };
+        
+        // Debug functions for testing
+        window.debugGame = {
+            showGameOver: function() {
+                if (window.uiManager) {
+                    window.uiManager.showGameOverModal();
+                }
+            },
+            
+            testButtons: function() {
+                const retryBtn = document.getElementById('retryBtn');
+                const homeBtn = document.getElementById('homeBtn');
+                
+                console.log('🔍 Button Test Results:');
+                console.log('Retry button found:', !!retryBtn);
+                console.log('Home button found:', !!homeBtn);
+                
+                if (retryBtn) {
+                    console.log('Retry button clickable:', !retryBtn.disabled);
+                }
+                
+                if (homeBtn) {
+                    console.log('Home button clickable:', !homeBtn.disabled);
+                }
+            },
+            
+            getState: function() {
+                return {
+                    gameState: window.gameStateManager?.getState(),
+                    isLoading: window.loadingManager?.isLoading,
+                    soundEnabled: window.soundManager?.enabled,
+                    syncStats: window.tileSyncManager?.getStats()
+                };
+            }
+        };
+        
+        console.log('🚀 Production-ready 2048 game loaded successfully!');
+        console.log('📋 Available debug commands: window.debugGame, window.emergencyReset');
+    </script>

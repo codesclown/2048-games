@@ -15,9 +15,29 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
 // Restart the game
 GameManager.prototype.restart = function () {
+  // Show loading screen
+  if (window.loadingManager) {
+    window.loadingManager.showForRestart();
+  }
+  
+  // Set loading state
+  if (window.gameStateManager) {
+    window.gameStateManager.setState('LOADING');
+  }
+  
+  // Clear storage and state
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
-  this.setup();
+  
+  // Setup new game after brief delay
+  setTimeout(() => {
+    this.setup();
+    
+    // Set playing state
+    if (window.gameStateManager) {
+      window.gameStateManager.setState('PLAYING');
+    }
+  }, 100);
 };
 
 // Force clear any corrupted state and restart
@@ -71,11 +91,18 @@ GameManager.prototype.setup = function () {
   this.won         = false;
   this.keepPlaying = false;
 
-  // Add the initial tiles
+  // Add the initial tiles (without sounds during setup)
   this.addStartTiles();
 
   // Update the actuator
   this.actuate();
+  
+  // Set playing state if not already set
+  if (window.gameStateManager && !window.gameStateManager.is('PLAYING')) {
+    setTimeout(() => {
+      window.gameStateManager.setState('PLAYING');
+    }, 200);
+  }
 };
 
 // Set up the initial tiles to start the game with
@@ -238,6 +265,11 @@ GameManager.prototype.canMoveInDirection = function (direction) {
 GameManager.prototype.move = function (direction) {
   // 0: up, 1: right, 2: down, 3: left
   var self = this;
+
+  // Only allow moves during PLAYING state
+  if (window.gameStateManager && !window.gameStateManager.is('PLAYING')) {
+    return;
+  }
 
   if (this.isGameTerminated()) {
     return; // Don't do anything if the game's over

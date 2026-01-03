@@ -96,7 +96,7 @@ KeyboardInputManager.prototype.listen = function () {
   });
 
   gameContainer.addEventListener(this.eventTouchmove, function (event) {
-    // Allow fast swipe detection during move for ultra-responsive feel
+    // Ultra-fast swipe detection during move for instant response
     if (touchStartClientX !== undefined && touchStartClientY !== undefined) {
       var currentX, currentY;
       
@@ -115,8 +115,8 @@ KeyboardInputManager.prototype.listen = function () {
       
       var distance = Math.max(absDx, absDy);
       
-      // Detect fast swipes during movement for instant response
-      if (distance > 15) { // Slightly higher threshold for move detection
+      // Ultra-fast detection with lower threshold for instant response
+      if (distance > 8) { // Reduced from 15 to 8 for faster detection
         var direction = absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0);
         
         // Clear touch coordinates to prevent multiple triggers
@@ -157,9 +157,9 @@ KeyboardInputManager.prototype.listen = function () {
     var distance = Math.max(absDx, absDy);
     var velocity = distance / touchDuration;
 
-    // Ultra-sensitive swipe detection for fast response
-    // Lower threshold for fast swipes, higher for slow swipes
-    var threshold = velocity > 0.3 ? 5 : 8; // Fast swipes need only 5px, slow swipes need 8px
+    // Ultra-sensitive swipe detection for fastest possible response
+    // Even lower thresholds for instant detection
+    var threshold = velocity > 0.5 ? 3 : (velocity > 0.2 ? 5 : 8); // Super fast swipes need only 3px
 
     if (distance > threshold) {
       // Immediate direction detection for faster response
