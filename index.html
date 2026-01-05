@@ -5,16 +5,16 @@
     <title>2048 Premium</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="style/main.css" rel="stylesheet" type="text/css" />
-    <link rel="shortcut icon" href="favicon.ico" />
-    <link rel="apple-touch-icon" href="meta/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="assets/icons/favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/icons/icons.jpg" />
     <link
       rel="apple-touch-startup-image"
-      href="meta/apple-touch-startup-image-640x1096.png"
+      href="assets/icons/icons.jpg"
       media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
     />
     <link
       rel="apple-touch-startup-image"
-      href="meta/apple-touch-startup-image-640x920.png"
+      href="assets/icons/icons.jpg"
       media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1286,6 +1286,11 @@
 
         // Make function globally accessible for debugging
         window.restartGameWithAnimation = function() {
+            // Cache ads when restart level button is pressed
+            if (typeof gameCacheAd === 'function') {
+                gameCacheAd();
+            }
+            
             const overlay = document.getElementById('restartAnimation');
             
             if (!overlay) {
@@ -1317,6 +1322,11 @@
 
         // Animate restart button and restart game
         window.animateRestartButton = function(button) {
+            // Cache ads when restart button is pressed
+            if (typeof gameCacheAd === 'function') {
+                gameCacheAd();
+            }
+            
             // Add spinning animation
             button.classList.add('spinning');
             
@@ -1334,6 +1344,11 @@
 
         // Handle restart button click with animation
         window.handleRestartClick = function(button) {
+            // Cache ads when restart button is pressed
+            if (typeof gameCacheAd === 'function') {
+                gameCacheAd();
+            }
+            
             // Add the existing spinning class for the rotation animation
             button.classList.add('spinning');
             
@@ -3498,6 +3513,11 @@
                         
                         console.log('Retry button clicked');
                         
+                        // Cache ads when retry button is pressed
+                        if (typeof gameCacheAd === 'function') {
+                            gameCacheAd();
+                        }
+                        
                         // Hide game over modal first
                         const gameMessage = document.querySelector('.game-message');
                         if (gameMessage) {
@@ -4700,6 +4720,11 @@
             if (level < 1 || level > 3) {
 
                 return;
+            }
+            
+            // Cache ads when level start button is pressed
+            if (typeof gameCacheAd === 'function') {
+                gameCacheAd();
             }
             
             // Close level selector first
@@ -8817,5 +8842,6 @@
     <script src="js/local_storage_manager.js"></script>
     <script src="js/game_manager.js"></script>
     <script src="js/application.js"></script>
+    <script src="js/jiogames_sp_wrapper.js"></script>
 </body>
 </html>
