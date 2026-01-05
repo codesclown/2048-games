@@ -408,6 +408,157 @@
             }
         }
 
+        /* Reward Video Popup Styles */
+        .reward-video-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .reward-video-overlay.active {
+            display: flex;
+        }
+
+        .reward-video-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(26, 26, 58, 0.9), rgba(15, 15, 35, 0.9));
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            max-width: 450px;
+            width: 90%;
+            animation: rewardVideoSlideIn 0.5s ease-out;
+        }
+
+        @keyframes rewardVideoSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .reward-video-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .reward-video-title {
+            color: #ffd700;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .reward-video-text {
+            color: #e6e6fa;
+            font-size: 18px;
+            line-height: 1.4;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .reward-video-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .reward-video-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .reward-video-btn.yes-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .reward-video-btn.yes-btn:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .reward-video-btn.no-btn {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .reward-video-btn.no-btn:hover {
+            background: linear-gradient(135deg, #d32f2f, #c62828);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+        }
+
+        .btn-icon {
+            font-size: 18px;
+        }
+
+        .btn-text {
+            font-size: 16px;
+        }
+
+        /* Mobile responsive for reward video popup */
+        @media screen and (max-width: 520px) {
+            .reward-video-content {
+                padding: 30px 20px;
+                max-width: 350px;
+                margin : 0 14px;
+            }
+            
+            .reward-video-icon {
+                font-size: 50px;
+            }
+            
+            .reward-video-title {
+                font-size: 24px;
+            }
+            
+            .reward-video-text {
+                font-size: 16px;
+            }
+            
+            .reward-video-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+                min-width: 180px;
+            }
+        }
+
         /* Mobile Responsive */
         @media screen and (max-width: 520px) {
             body {
@@ -1166,6 +1317,25 @@
         </div>
     </div>
 
+    <!-- Reward Video Popup -->
+    <div id="rewardVideoPopup" class="reward-video-overlay">
+        <div class="reward-video-content">
+            <div class="reward-video-icon">📺</div>
+            <div class="reward-video-title">Continue Playing?</div>
+            <div class="reward-video-text">Watch a reward video to get 5 moves back and continue your game!</div>
+            <div class="reward-video-buttons">
+                <button class="reward-video-btn yes-btn" onclick="acceptRewardVideo()">
+                    <span class="btn-icon">✅</span>
+                    <span class="btn-text">Yes, Watch Video</span>
+                </button>
+                <button class="reward-video-btn no-btn" onclick="declineRewardVideo()">
+                    <span class="btn-icon">❌</span>
+                    <span class="btn-text">No, Game Over</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript for Screen Management and Modals -->
     <script>
         // Level Transition Loader Functions (FIXED - with state management)
@@ -1377,9 +1547,338 @@
             }, 2000);
         };
 
+        // Reward video usage tracking
+        window.rewardVideoUsed = false; // Track if reward video has been used in this session
+
+        // Reward Video Popup Functions
+        window.showRewardVideoPopup = function() {
+            const popup = document.getElementById('rewardVideoPopup');
+            if (popup) {
+                popup.classList.add('active');
+            }
+        };
+
+        window.hideRewardVideoPopup = function() {
+            const popup = document.getElementById('rewardVideoPopup');
+            if (popup) {
+                popup.classList.remove('active');
+            }
+        };
+
+        // Handle "Yes, Watch Video" button
+        window.acceptRewardVideo = function() {
+            console.log('User accepted reward video');
+            console.log('Current game history length:', window.gameStateHistory ? window.gameStateHistory.length : 0);
+            
+            // Mark reward video as used for this session
+            window.rewardVideoUsed = true;
+            console.log('Reward video marked as used for this session');
+            
+            // Hide the reward video popup
+            hideRewardVideoPopup();
+            
+            // Check if rewarded video is available
+            if (typeof showAdRewarded === 'function' && typeof isRVReady !== 'undefined' && isRVReady) {
+                console.log('Rewarded video is ready, showing ad...');
+                showAdRewarded();
+                
+                // Fallback: If reward doesn't trigger within 10 seconds, give reward anyway
+                setTimeout(() => {
+                    if (window.gameManager && window.gameManager.over) {
+                        console.log('Fallback: Reward video timeout, giving reward directly');
+                        giveReward();
+                    }
+                }, 10000);
+                
+            } else if (typeof showAdRewarded === 'function') {
+                console.log('Rewarded video function exists but not ready, trying anyway...');
+                showAdRewarded();
+                
+                // Reduced fallback timeout for better user experience
+                setTimeout(() => {
+                    if (window.gameManager && window.gameManager.over) {
+                        console.log('Fallback: Rewarded video not ready, giving reward directly');
+                        giveReward();
+                    }
+                }, 500);
+                
+            } else {
+                console.log('Rewarded video not available, giving reward directly');
+                // Direct reward if no ad system available
+                setTimeout(() => {
+                    giveReward();
+                }, 500);
+            }
+        };
+
+        // Handle "No, Game Over" button
+        window.declineRewardVideo = function() {
+            console.log('User declined reward video');
+            
+            // Hide the reward video popup
+            hideRewardVideoPopup();
+            
+            // Show the actual game over screen using ultimateButtonFix
+            setTimeout(() => {
+                if (typeof window.ultimateButtonFix === 'function') {
+                    window.ultimateButtonFix();
+                } else {
+                    // Fallback: show game over using the original message system
+                    const gameMessage = document.querySelector('.game-message');
+                    if (gameMessage) {
+                        gameMessage.classList.add('show-modal', 'game-over');
+                        const messageP = gameMessage.querySelector('p');
+                        if (messageP) {
+                            messageP.textContent = 'Game over!';
+                        }
+                    }
+                }
+            }, 300);
+        };
+
+        // Handle reward after watching video (called from jiogames wrapper)
+        window.giveReward = function() {
+            console.log('Giving reward: up to 5 steps back');
+            
+            // Restore game state from up to 5 steps back (or whatever is available)
+            if (window.gameStateHistory && window.gameStateHistory.length > 0) {
+                // Calculate how many steps back we can go (minimum 1, maximum 5)
+                const availableSteps = window.gameStateHistory.length;
+                const stepsBack = Math.min(5, Math.max(1, availableSteps));
+                const targetState = window.gameStateHistory[window.gameStateHistory.length - stepsBack];
+                
+                if (targetState && window.gameManager && targetState.grid) {
+                    console.log(`Restoring game state from ${stepsBack} steps back (${availableSteps} available)`);
+                    console.log('Target state:', targetState);
+                    
+                    // Restore the game state using proper Grid deserialization
+                    window.gameManager.grid = new Grid(targetState.grid.size, targetState.grid.cells);
+                    window.gameManager.score = targetState.score;
+                    window.gameManager.over = false; // Game is no longer over
+                    window.gameManager.won = targetState.won || false;
+                    window.gameManager.keepPlaying = targetState.keepPlaying || false;
+                    
+                    // Remove only the used states from history (keep some for future rewards)
+                    // Only remove 1 state to preserve more history for future use
+                    const statesToRemove = 1;
+                    window.gameStateHistory = window.gameStateHistory.slice(0, -statesToRemove);
+                    
+                    // Update the display
+                    window.gameManager.actuate();
+                    
+                    // Reset power-ups if needed
+                    if (typeof window.resetPowerUps === 'function') {
+                        window.resetPowerUps();
+                    }
+                    
+                    console.log(`✅ Game successfully restored ${stepsBack} moves back`);
+                    console.log('Current score:', window.gameManager.score);
+                    console.log('Game over:', window.gameManager.over);
+                    console.log('Remaining history states:', window.gameStateHistory.length);
+                    console.log(`Removed ${statesToRemove} states from history`);
+                } else {
+                    console.log('❌ No valid state to restore, restarting game instead');
+                    if (window.gameManager) {
+                        window.gameManager.restart();
+                    }
+                }
+            } else {
+                console.log('❌ No history available, restarting game instead');
+                if (window.gameManager) {
+                    window.gameManager.restart();
+                }
+            }
+        };
+
+        // Test function for reward video popup
+        window.testRewardVideoPopup = function() {
+            console.log('Testing reward video popup...');
+            if (typeof showRewardVideoPopup === 'function') {
+                showRewardVideoPopup();
+            } else {
+                console.error('showRewardVideoPopup function not found');
+            }
+        };
+
+        // Test function for the complete game over flow
+        window.testGameOverFlow = function() {
+            console.log('Testing complete game over flow...');
+            console.log('1. Showing reward video popup...');
+            showRewardVideoPopup();
+            
+            console.log('2. You can now test:');
+            console.log('   - Click "Yes, Watch Video" to test reward video');
+            console.log('   - Click "No, Game Over" to test game over popup');
+        };
+
+        // Test function to automatically simulate the complete reward flow
+        window.testCompleteRewardFlow = function() {
+            console.log('=== Testing Complete Reward Flow (Automatic) ===');
+            
+            // Check if we have any history
+            if (!window.gameStateHistory || window.gameStateHistory.length < 1) {
+                console.log('❌ No game history. Make at least 1 move first.');
+                console.log('Current history length:', window.gameStateHistory ? window.gameStateHistory.length : 0);
+                return;
+            }
+            
+            const availableSteps = window.gameStateHistory.length;
+            const stepsBack = Math.min(5, availableSteps);
+            console.log(`✅ History available for ${stepsBack}-step back (${availableSteps} total states)`);
+            console.log('1. Showing reward video popup...');
+            showRewardVideoPopup();
+            
+            // Automatically simulate "Yes" button click after 2 seconds
+            setTimeout(() => {
+                console.log('2. Simulating "Yes, Watch Video" button click...');
+                acceptRewardVideo();
+            }, 2000);
+        };
+
+        // Test function to automatically simulate "No" button flow
+        window.testGameOverNoFlow = function() {
+            console.log('=== Testing "No, Game Over" Flow (Automatic) ===');
+            console.log('1. Showing reward video popup...');
+            showRewardVideoPopup();
+            
+            // Automatically simulate "No" button click after 2 seconds
+            setTimeout(() => {
+                console.log('2. Simulating "No, Game Over" button click...');
+                declineRewardVideo();
+            }, 2000);
+        };
+
+        // Test function to simulate reward video completion
+        window.testRewardVideoComplete = function() {
+            console.log('=== Testing Reward Video Completion ===');
+            console.log('Current game state history length:', window.gameStateHistory ? window.gameStateHistory.length : 0);
+            console.log('MAX_HISTORY:', typeof MAX_HISTORY !== 'undefined' ? MAX_HISTORY : 'undefined');
+            
+            if (window.gameStateHistory && window.gameStateHistory.length >= 1) {
+                const availableSteps = window.gameStateHistory.length;
+                const stepsBack = Math.min(5, availableSteps);
+                console.log(`✅ History available for ${stepsBack}-step back (${availableSteps} total states)`);
+                console.log('Simulating reward video completion...');
+                giveReward();
+            } else {
+                console.log('❌ No history available. Make at least 1 move in the game first.');
+                console.log('For best results, make 5+ moves to get full 5-step back.');
+            }
+        };
+
+        // Test function to check game state history
+        window.checkGameHistory = function() {
+            console.log('=== Game State History ===');
+            console.log('History length:', window.gameStateHistory ? window.gameStateHistory.length : 0);
+            console.log('MAX_HISTORY:', typeof MAX_HISTORY !== 'undefined' ? MAX_HISTORY : 'undefined');
+            
+            if (window.gameStateHistory && window.gameStateHistory.length > 0) {
+                console.log('Recent states:');
+                window.gameStateHistory.slice(-3).forEach((state, index) => {
+                    const actualIndex = window.gameStateHistory.length - 3 + index;
+                    console.log(`  State ${actualIndex}: Score=${state.score}, Over=${state.over}`);
+                });
+                
+                const availableSteps = window.gameStateHistory.length;
+                const stepsBack = Math.min(5, availableSteps);
+                console.log(`Next reward will go back ${stepsBack} steps`);
+            } else {
+                console.log('No history available. Make some moves in the game first.');
+            }
+        };
+
+        // Helper function to build up game history for testing
+        window.buildTestHistory = function(count = 10) {
+            console.log(`Building ${count} test history states...`);
+            
+            if (!window.gameManager) {
+                console.log('❌ No game manager available');
+                return;
+            }
+            
+            for (let i = 0; i < count; i++) {
+                const testState = {
+                    grid: window.gameManager.grid.serialize(),
+                    score: window.gameManager.score + (i * 10), // Fake increasing score
+                    over: false,
+                    won: false,
+                    keepPlaying: false
+                };
+                
+                window.gameStateHistory.push(testState);
+                
+                // Respect MAX_HISTORY limit
+                if (window.gameStateHistory.length > MAX_HISTORY) {
+                    window.gameStateHistory.shift();
+                }
+            }
+            
+            console.log(`✅ Built ${window.gameStateHistory.length} history states`);
+            console.log('Now you can test rewards with: window.testRewardVideoComplete()');
+        };
+
+        // Test function to check reward video status
+        window.checkRewardVideoStatus = function() {
+            console.log('=== Reward Video Status ===');
+            console.log('Reward video used:', window.rewardVideoUsed ? '✅ Yes' : '❌ No');
+            console.log('Next game over will show:', window.rewardVideoUsed ? 'Game Over popup directly' : 'Reward video popup');
+        };
+
+        // Test function to reset reward video usage
+        window.resetRewardVideoUsage = function() {
+            window.rewardVideoUsed = false;
+            console.log('✅ Reward video usage reset - next game over will show reward popup');
+        };
+
+        // Test function to simulate multiple game overs
+        window.testMultipleGameOvers = function() {
+            console.log('=== Testing Multiple Game Overs ===');
+            
+            // Reset for clean test
+            window.rewardVideoUsed = false;
+            
+            console.log('1. First game over (should show reward popup):');
+            setTimeout(() => {
+                if (window.gameManager && window.gameManager.actuator) {
+                    window.gameManager.actuator.showRewardVideoPopup();
+                }
+            }, 1000);
+            
+            console.log('2. Second game over (should show game over directly):');
+            setTimeout(() => {
+                // Simulate reward video being used
+                window.rewardVideoUsed = true;
+                if (window.gameManager && window.gameManager.actuator) {
+                    window.gameManager.actuator.showRewardVideoPopup();
+                }
+            }, 3000);
+        };
+
+        // Debug function to check if all reward video functions are loaded
+        window.checkRewardVideoFunctions = function() {
+            const functions = [
+                'showRewardVideoPopup',
+                'hideRewardVideoPopup', 
+                'acceptRewardVideo',
+                'declineRewardVideo',
+                'giveReward',
+                'testRewardVideoPopup'
+            ];
+            
+            console.log('=== Reward Video Functions Status ===');
+            functions.forEach(funcName => {
+                const exists = typeof window[funcName] === 'function';
+                console.log(`${funcName}: ${exists ? '✅ Available' : '❌ Missing'}`);
+            });
+            
+            // Check if popup element exists
+            const popup = document.getElementById('rewardVideoPopup');
+            console.log(`rewardVideoPopup element: ${popup ? '✅ Found' : '❌ Missing'}`);
+        };
+
         // Game state history for undo functionality
         window.gameStateHistory = [];
-        const MAX_HISTORY = 5; // Keep last 5 moves for undo
+        const MAX_HISTORY = 15; // Keep last 15 moves for multiple rewards (3 rewards × 5 steps each)
 
         // Move counter for power-up unlocking (UNIFIED SYSTEM)
         window.moveCount = 0;
@@ -4726,6 +5225,10 @@
             if (typeof gameCacheAd === 'function') {
                 gameCacheAd();
             }
+            
+            // Reset reward video usage for new level
+            window.rewardVideoUsed = false;
+            console.log('New level started - reward video reset');
             
             // Close level selector first
             closeLevelSelector();
@@ -8509,6 +9012,17 @@
         console.log('window.testGameOverPopup() - Show game over popup');
         console.log('window.testWinPopup() - Show win popup');
         console.log('window.forceGameOver() - Force game over state');
+        console.log('window.testRewardVideoPopup() - Test reward video popup');
+        console.log('window.testGameOverFlow() - Test complete game over flow (manual)');
+        console.log('window.testCompleteRewardFlow() - Test complete reward flow (automatic)');
+        console.log('window.testGameOverNoFlow() - Test "No, Game Over" flow (automatic)');
+        console.log('window.testRewardVideoComplete() - Test reward (flexible steps back)');
+        console.log('window.checkGameHistory() - Check game state history');
+        console.log('window.buildTestHistory(count) - Build test history for multiple rewards');
+        console.log('window.checkRewardVideoStatus() - Check if reward video has been used');
+        console.log('window.resetRewardVideoUsage() - Reset reward video for testing');
+        console.log('window.testMultipleGameOvers() - Test first vs subsequent game overs');
+        console.log('window.checkRewardVideoFunctions() - Check if reward functions are loaded');
         console.log('window.debugGameState() - Debug current game state');
         console.log('window.fixGameOverButtons() - Fix button functionality');
         console.log('window.ultimateButtonFix() - ULTIMATE button fix (recreates modal)');
@@ -8758,6 +9272,11 @@
                     e.preventDefault();
                     e.stopPropagation();
                     
+                    // Cache ads when retry button is pressed
+                    if (typeof gameCacheAd === 'function') {
+                        gameCacheAd();
+                    }
+                    
                     // Remove modal
                     newModal.remove();
                     
@@ -8843,5 +9362,43 @@
     <script src="js/game_manager.js"></script>
     <script src="js/application.js"></script>
     <script src="js/jiogames_sp_wrapper.js"></script>
+    
+    <!-- Fallback script to ensure reward video functions are available -->
+    <script>
+        // Ensure reward video functions are available immediately
+        if (typeof window.testRewardVideoPopup !== 'function') {
+            window.testRewardVideoPopup = function() {
+                console.log('Testing reward video popup (fallback)...');
+                const popup = document.getElementById('rewardVideoPopup');
+                if (popup) {
+                    popup.classList.add('active');
+                    console.log('Reward video popup shown');
+                } else {
+                    console.error('Reward video popup element not found');
+                }
+            };
+        }
+        
+        if (typeof window.checkRewardVideoFunctions !== 'function') {
+            window.checkRewardVideoFunctions = function() {
+                console.log('=== Reward Video Functions Status (Fallback) ===');
+                console.log('testRewardVideoPopup:', typeof window.testRewardVideoPopup === 'function' ? '✅' : '❌');
+                console.log('showRewardVideoPopup:', typeof window.showRewardVideoPopup === 'function' ? '✅' : '❌');
+                console.log('hideRewardVideoPopup:', typeof window.hideRewardVideoPopup === 'function' ? '✅' : '❌');
+                console.log('acceptRewardVideo:', typeof window.acceptRewardVideo === 'function' ? '✅' : '❌');
+                console.log('declineRewardVideo:', typeof window.declineRewardVideo === 'function' ? '✅' : '❌');
+                console.log('giveReward:', typeof window.giveReward === 'function' ? '✅' : '❌');
+                
+                const popup = document.getElementById('rewardVideoPopup');
+                console.log('rewardVideoPopup element:', popup ? '✅ Found' : '❌ Missing');
+            };
+        }
+        
+        // Make functions available immediately
+        console.log('Reward video fallback functions loaded');
+        console.log('Try: window.testMultipleGameOvers() to test one-time reward behavior');
+        console.log('Or: window.checkRewardVideoStatus() to check current status');
+        console.log('Or: window.resetRewardVideoUsage() to reset for testing');
+    </script>
 </body>
 </html>

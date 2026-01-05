@@ -179,13 +179,38 @@ HTMLActuator.prototype.message = function (won) {
   
   // Show the full-screen modal for our custom game over screen
   if (!won) {
-    var self = this;
+    // Show reward video popup first before game over
+    this.showRewardVideoPopup();
+  }
+};
+
+// New method to show reward video popup
+HTMLActuator.prototype.showRewardVideoPopup = function() {
+  var self = this;
+  
+  // Check if reward video has already been used in this session
+  if (window.rewardVideoUsed) {
+    console.log('Reward video already used this session, showing game over directly');
+    // Show game over directly
     setTimeout(function() {
-      // Use ultimate button fix directly since original elements might not exist
       if (typeof window.ultimateButtonFix === 'function') {
         window.ultimateButtonFix();
       }
-    }, 50); // Faster game over screen appearance
+    }, 50);
+    return;
+  }
+  
+  // Show reward video popup for first time
+  if (typeof window.showRewardVideoPopup === 'function') {
+    console.log('First game over - showing reward video popup');
+    window.showRewardVideoPopup();
+  } else {
+    // Fallback to direct game over if popup function doesn't exist
+    setTimeout(function() {
+      if (typeof window.ultimateButtonFix === 'function') {
+        window.ultimateButtonFix();
+      }
+    }, 50);
   }
 };
 

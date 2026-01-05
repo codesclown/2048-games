@@ -18,6 +18,12 @@ GameManager.prototype.restart = function () {
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
+  
+  // Reset reward video usage for new game
+  if (typeof window !== 'undefined') {
+    window.rewardVideoUsed = false;
+    console.log('Game restarted - reward video reset');
+  }
 };
 
 // Force clear any corrupted state and restart
