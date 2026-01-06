@@ -1626,20 +1626,7 @@
             // Hide the reward video popup
             hideRewardVideoPopup();
             
-            // 1. Post Score (First, as per request)
-            if (window.gameManager && typeof postScore === 'function') {
-                const currentScore = window.gameManager.score;
-                console.log('Posting score:', currentScore);
-                postScore(currentScore); // from jiogames_sp_wrapper.js
-            }
 
-            // 2. Show Interstitial Ad
-            if (typeof showAd === 'function' && typeof isAdReady !== 'undefined' && isAdReady) {
-                console.log('Showing interstitial ad...');
-                showAd(); // from jiogames_sp_wrapper.js
-            } else {
-                console.log("mid roll Ad not ready");
-            }
             
             // 3. Show Game Over Screen
             setTimeout(() => {
@@ -9435,6 +9422,14 @@
                     e.preventDefault();
                     e.stopPropagation();
                     
+                    // Post score and show ad on retry
+                    if (window.gameManager && typeof postScore === 'function') {
+                        postScore(window.gameManager.score);
+                    }
+                    if (typeof showAd === 'function') {
+                        showAd();
+                    }
+
                     // Cache ads when retry button is pressed
                     if (typeof gameCacheAd === 'function') {
                         gameCacheAd();
@@ -9458,6 +9453,14 @@
                     console.log('ULTIMATE HOME CLICKED!', eventType);
                     e.preventDefault();
                     e.stopPropagation();
+                    
+                    // Post score and show ad on home
+                    if (window.gameManager && typeof postScore === 'function') {
+                        postScore(window.gameManager.score);
+                    }
+                    if (typeof showAd === 'function') {
+                        showAd();
+                    }
                     
                     // Remove modal
                     newModal.remove();

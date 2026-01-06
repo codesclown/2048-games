@@ -20,6 +20,15 @@ function HTMLActuator() {
       if (retryBtn) {
           retryBtn.onclick = function(e) {
               e.preventDefault();
+              
+              // Post score and show ad on retry
+              if (typeof postScore === 'function') {
+                  postScore(self.score);
+              }
+              if (typeof showAd === 'function') {
+                  showAd();
+              }
+              
               if (window.gameManager) {
                   window.gameManager.restart();
               } else {
@@ -34,6 +43,15 @@ function HTMLActuator() {
       if (homeBtn) {
           homeBtn.onclick = function(e) {
              e.preventDefault();
+             
+             // Post score and show ad on home
+             if (typeof postScore === 'function') {
+                  postScore(self.score);
+             }
+             if (typeof showAd === 'function') {
+                  showAd();
+             }
+
              location.reload();
           };
       }
