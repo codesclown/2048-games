@@ -3858,6 +3858,9 @@
                         
                         // Final safety check - ensure we're deleting the right tile
                         if (gridTile.value.toString() === tileValue.toString()) {
+                            // CRITICAL FIX: Disable mode immediately to prevent multiple deletions
+                            this.active = false;
+                            
                             window.gameManager.grid.removeTile(gridTile);
                             window.gameManager.actuate();
                             
