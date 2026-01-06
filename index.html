@@ -138,6 +138,9 @@
             height: 100vh;
             text-align: center;
             padding: 0;
+            position: relative; 
+            z-index: 200 !important; /* Ensure Home is above Reward Popup (100) */
+            background: #1a1a2e; /* Ensure opacity blocks items behind it */
             margin: 0;
             overflow: hidden;
         }
@@ -981,7 +984,6 @@
                 }
             }
             
-            /* Extra small screens */
             @media screen and (max-width: 380px) {
                 .game-container .game-over-content {
                     padding: 25px 15px !important;
@@ -991,6 +993,11 @@
                 .game-container .game-message p {
                     font-size: 32px !important;
                 }
+            }
+
+            /* Fix z-index for reward popup to be below menu/level selector but above tiles */
+            #rewardVideoPopup.reward-video-overlay {
+                z-index: 90 !important; /* Above tiles (~10), below Home (200), below Menu (10000) */
             }
         </style>
 
@@ -8912,7 +8919,7 @@
                 border-radius: 12px;
                 font-weight: bold;
                 font-size: 16px;
-                z-index: 10001;
+                z-index: 10;
                 animation: levelChangeSlide 0.5s ease-out;
                 box-shadow: 0 10px 30px rgba(255, 165, 0, 0.4);
                 border: 2px solid rgba(255, 255, 255, 0.3);
