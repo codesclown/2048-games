@@ -32,7 +32,6 @@ GameManager.prototype.restart = function () {
   // Reset reward video usage for new game
   if (typeof window !== 'undefined') {
     window.rewardVideoUsed = false;
-    console.log('Game restarted - reward video reset');
   }
 };
 
@@ -178,7 +177,7 @@ GameManager.prototype.logGridState = function () {
       }
     }
     // console.log(row.join('|')); // formatting
-    console.log(row.join(' | '));
+    // console.log(row.join(' | '));
   }
 };
 
@@ -205,9 +204,9 @@ GameManager.prototype.isRealGameOver = function () {
   // If we get here, the grid is full AND there are no matches.
   // It really is Game Over.
   
-  console.log('!!! GAME OVER TRIGGERED !!!');
-  console.log('Grid Size:', this.size);
-  console.log('Empty Cells:', this.grid.availableCells().length);
+  // console.log('!!! GAME OVER TRIGGERED !!!');
+  // console.log('Grid Size:', this.size);
+  // console.log('Empty Cells:', this.grid.availableCells().length);
   // Log visual representation
   this.logGridState();
   
@@ -400,7 +399,6 @@ GameManager.prototype.tileMatchesAvailable = function () {
     }
   }
 
-  console.log('No matches found in full scan');
   return false;
 };
 
