@@ -1612,13 +1612,29 @@
         };
 
         // Handle "No, Game Over" button
+        // Handle "No, Game Over" button
         window.declineRewardVideo = function() {
             console.log('User declined reward video');
             
             // Hide the reward video popup
             hideRewardVideoPopup();
             
-            // Show the actual game over screen using ultimateButtonFix
+            // 1. Post Score (First, as per request)
+            if (window.gameManager && typeof postScore === 'function') {
+                const currentScore = window.gameManager.score;
+                console.log('Posting score:', currentScore);
+                postScore(currentScore); // from jiogames_sp_wrapper.js
+            }
+
+            // 2. Show Interstitial Ad
+            if (typeof showAd === 'function' && typeof isAdReady !== 'undefined' && isAdReady) {
+                console.log('Showing interstitial ad...');
+                showAd(); // from jiogames_sp_wrapper.js
+            } else {
+                console.log("mid roll Ad not ready");
+            }
+            
+            // 3. Show Game Over Screen
             setTimeout(() => {
                 if (typeof window.ultimateButtonFix === 'function') {
                     window.ultimateButtonFix();
@@ -1633,7 +1649,7 @@
                         }
                     }
                 }
-            }, 300);
+            }, 500); // Slight delay to allow ad to trigger
         };
 
         // Handle reward after watching video (called from jiogames wrapper)
