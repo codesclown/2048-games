@@ -10,15 +10,79 @@ function HTMLActuator() {
   if (!this.messageContainer) {
     console.log('Game message container not found - will use ultimate button fix for game over');
   }
+  
+  // Wire up buttons dynamically since ui_logic.js is missing
+  // This ensures "Try Again" and "Home" work even after revert
+  var self = this;
+  setTimeout(function() {
+      // Retry Button
+      var retryBtn = document.getElementById('retryBtn');
+      if (retryBtn) {
+          retryBtn.onclick = function(e) {
+              e.preventDefault();
+              if (window.gameManager) {
+                  window.gameManager.restart();
+              } else {
+                  // Fallback if gameManager missing
+                  location.reload(); 
+              }
+          };
+      }
+      
+      // Home Button - Redirects to home/reload since we lost the home screen logic
+      var homeBtn = document.getElementById('homeBtn');
+      if (homeBtn) {
+          homeBtn.onclick = function(e) {
+             e.preventDefault();
+             location.reload();
+          };
+      }
+  }, 1000);
 }
 
 HTMLActuator.prototype.actuate = function (grid, metadata) {
   var self = this;
 
+  // CLONE the grid cells synchronously to capture the state at this exact moment.
+  // This prevents race conditions where logic updates the grid before the next animation frame.
+  var cellsSnapshot = [];
+  for (var x = 0; x < grid.size; x++) {
+    var row = [];
+    for (var y = 0; y < grid.size; y++) {
+      var tile = grid.cells[x][y];
+      if (tile) {
+        // We need to clone the tile object too, especially previousPosition and mergedFrom
+        var tileClone = {
+          x: tile.x,
+          y: tile.y,
+          value: tile.value,
+          previousPosition: tile.previousPosition ? { x: tile.previousPosition.x, y: tile.previousPosition.y } : null,
+          mergedFrom: null
+        };
+        
+        if (tile.mergedFrom) {
+          tileClone.mergedFrom = tile.mergedFrom.map(function(t) {
+             return {
+               x: t.x,
+               y: t.y,
+               value: t.value,
+               previousPosition: t.previousPosition
+             };
+          });
+        }
+        row.push(tileClone);
+      } else {
+        row.push(null);
+      }
+    }
+    cellsSnapshot.push(row);
+  }
+
   window.requestAnimationFrame(function () {
     self.clearContainer(self.tileContainer);
 
-    grid.cells.forEach(function (column) {
+    // Use the snapshot!
+    cellsSnapshot.forEach(function (column) {
       column.forEach(function (cell) {
         if (cell) {
           self.addTile(cell);
@@ -38,8 +102,122 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
     } else {
       self.clearMessage();
     }
-
   });
+
+  // Self-healing: Inject CSS for larger grids if missing
+  // This fixes the issue where 5x5/6x6 tiles are invisible or stacked because ui_logic.js is missing
+  if (grid.size > 4 && this.currentGridSize !== grid.size) {
+    this.injectGridCSS(grid.size);
+    this.currentGridSize = grid.size;
+  }
+};
+
+// DYNAMIC CSS INJECTION to support 5x5 and 6x6 grids without external dependencies
+HTMLActuator.prototype.injectGridCSS = function(size) {
+    const styleId = 'dynamic-grid-style';
+    let styleEl = document.getElementById(styleId);
+    
+    if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = styleId;
+        document.head.appendChild(styleEl);
+    }
+    
+    // Default main.css is optimal for 4x4. We only override for valid larger sizes.
+    if (size <= 4) {
+        styleEl.textContent = '';
+        return;
+    }
+
+    // Responsive logic using calc() and CSS vars to fit perfectly in the existing container
+    // We strictly use the parent container's padding to ensure alignment
+    const css = `
+        :root {
+            --grid-gap: 15px;
+            --grid-padding: 15px;
+            --grid-size: ${size};
+        }
+        @media screen and (max-width: 520px) {
+            :root {
+                --grid-gap: 10px;
+                --grid-padding: 10px;
+            }
+        }
+        
+        /* Constrain grid container to the CONTENT box of the parent */
+        /* Parent .game-container has padding, so we must subtract it */
+        .grid-container, .tile-container {
+            width: calc(100% - 2 * var(--grid-padding));
+            height: calc(100% - 2 * var(--grid-padding));
+            left: var(--grid-padding);
+            top: var(--grid-padding);
+            right: auto;
+            bottom: auto;
+            margin: 0; 
+            position: absolute;
+        }
+
+        .grid-cell {
+            width: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+            height: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+            margin-right: var(--grid-gap);
+            margin-bottom: var(--grid-gap);
+            float: left;
+        }
+        
+        /* Remove margins from last items in each row to fit perfectly */
+        .grid-cell:nth-of-type(${size}n) {
+            margin-right: 0;
+        }
+        /* Remove bottom margin from last row */
+        .grid-cell:nth-of-type(n + ${size * (size - 1) + 1}) {
+            margin-bottom: 0;
+        }
+        
+        .tile, .tile .tile-inner {
+            width: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+            height: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+            line-height: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+        }
+        
+        /* Generate positions for dynamic size */
+        ${this.generatePositionCSS(size)}
+        
+        /* Font size adjustments */
+        .tile .tile-inner {
+            font-size: ${size >= 6 ? '20px' : size === 5 ? '30px' : '35px'};
+        }
+        @media screen and (max-width: 520px) {
+            .tile .tile-inner {
+                font-size: ${size >= 6 ? '10px' : size === 5 ? '15px' : '20px'};
+            }
+        }
+    `;
+    
+    styleEl.textContent = css;
+};
+
+HTMLActuator.prototype.generatePositionCSS = function(size) {
+    let css = '';
+    for (let x = 0; x < size; x++) {
+        for (let y = 0; y < size; y++) {
+            // Formula in CSS: index * (cellWidth + gap)
+            // cellWidth + gap = (100% - (size-1)*gap)/size + gap
+            const positionFormula = `(100% - (${size} - 1) * var(--grid-gap)) / ${size} + var(--grid-gap)`;
+            
+            const xFormula = `calc(${x} * (${positionFormula}))`;
+            const yFormula = `calc(${y} * (${positionFormula}))`;
+            
+            css += `
+                .tile.tile-position-${x + 1}-${y + 1} {
+                    -webkit-transform: translate(${xFormula}, ${yFormula});
+                    -moz-transform: translate(${xFormula}, ${yFormula});
+                    transform: translate(${xFormula}, ${yFormula});
+                }
+            `;
+        }
+    }
+    return css;
 };
 
 // Continues the game (both restart and keep playing)

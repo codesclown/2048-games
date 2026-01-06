@@ -6,7 +6,8 @@ window.requestAnimationFrame(function () {
   }
   
   // Initialize with Level 1 (4x4 grid) by default
-  window.gameManager = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+  // COMMENTS OUT TO PREVENT GHOST GAME: Handled by index.html / ui_logic replacement
+  // window.gameManager = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
   
   // Store current level
   window.currentLevel = 1;

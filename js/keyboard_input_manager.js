@@ -15,6 +15,8 @@ function KeyboardInputManager() {
   this.listen();
 }
 
+
+
 KeyboardInputManager.prototype.on = function (event, callback) {
   if (!this.events[event]) {
     this.events[event] = [];
@@ -49,8 +51,8 @@ KeyboardInputManager.prototype.listen = function () {
     65: 3  // A
   };
 
-  // Respond to direction keys
-  document.addEventListener("keydown", function (event) {
+  // Cached handler for keydown to allow removal
+  this.handleKeydown = function (event) {
     var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
                     event.shiftKey;
     var mapped    = map[event.which];
@@ -66,21 +68,26 @@ KeyboardInputManager.prototype.listen = function () {
     if (!modifiers && event.which === 82) {
       self.restart.call(self, event);
     }
-  });
+  };
+
+  // Respond to direction keys
+  document.addEventListener("keydown", this.handleKeydown);
 
   // Respond to button presses
-  // Note: .retry-button and .mobile-refresh-btn use custom onclick handlers that reset power-ups
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
   var touchStartTime;
-  var gameContainer = document.getElementsByClassName("game-container")[0];
+  var gameContainer = document.querySelector(".game-container");
+  
+  // Guard against missing container
+  if (!gameContainer) return;
 
-  gameContainer.addEventListener(this.eventTouchstart, function (event) {
+  this.handleTouchStart = function (event) {
     if ((!window.navigator.msPointerEnabled && event.touches.length > 1) ||
         event.targetTouches.length > 1) {
-      return; // Ignore if touching with more than 1 finger
+      return;
     }
 
     if (window.navigator.msPointerEnabled) {
@@ -93,10 +100,9 @@ KeyboardInputManager.prototype.listen = function () {
 
     touchStartTime = Date.now();
     event.preventDefault();
-  });
+  };
 
-  gameContainer.addEventListener(this.eventTouchmove, function (event) {
-    // Ultra-fast swipe detection during move for instant response
+  this.handleTouchMove = function (event) {
     if (touchStartClientX !== undefined && touchStartClientY !== undefined) {
       var currentX, currentY;
       
@@ -115,26 +121,20 @@ KeyboardInputManager.prototype.listen = function () {
       
       var distance = Math.max(absDx, absDy);
       
-      // FASTER: Reduced threshold from 8 to 5 for instant response
-      if (distance > 5) { // Even faster detection
+      if (distance > 5) {
         var direction = absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0);
-        
-        // Clear touch coordinates to prevent multiple triggers
         touchStartClientX = undefined;
         touchStartClientY = undefined;
-        
-        // Emit move immediately for ultra-fast response
         self.emit("move", direction);
       }
     }
-    
     event.preventDefault();
-  });
+  };
 
-  gameContainer.addEventListener(this.eventTouchend, function (event) {
+  this.handleTouchEnd = function (event) {
     if ((!window.navigator.msPointerEnabled && event.touches.length > 0) ||
         event.targetTouches.length > 0) {
-      return; // Ignore if still touching with one or more fingers
+      return;
     }
 
     var touchEndClientX, touchEndClientY;
@@ -149,26 +149,34 @@ KeyboardInputManager.prototype.listen = function () {
 
     var dx = touchEndClientX - touchStartClientX;
     var absDx = Math.abs(dx);
-
     var dy = touchEndClientY - touchStartClientY;
     var absDy = Math.abs(dy);
-
     var touchDuration = Date.now() - touchStartTime;
     var distance = Math.max(absDx, absDy);
     var velocity = distance / touchDuration;
-
-    // FASTER: Ultra-sensitive swipe detection for fastest possible response
-    // Even lower thresholds for instant detection
-    var threshold = velocity > 0.8 ? 2 : (velocity > 0.4 ? 3 : 5); // Super fast swipes need only 2px
+    var threshold = velocity > 0.8 ? 2 : (velocity > 0.4 ? 3 : 5);
 
     if (distance > threshold) {
-      // Immediate direction detection for faster response
       var direction = absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0);
-      
-      // Emit move immediately without delay
       self.emit("move", direction);
     }
-  });
+  };
+
+  gameContainer.addEventListener(this.eventTouchstart, this.handleTouchStart);
+  gameContainer.addEventListener(this.eventTouchmove, this.handleTouchMove);
+  gameContainer.addEventListener(this.eventTouchend, this.handleTouchEnd);
+};
+
+// Cleanup method to remove event listeners
+KeyboardInputManager.prototype.stop = function () {
+  document.removeEventListener("keydown", this.handleKeydown);
+  
+  var gameContainer = document.querySelector(".game-container");
+  if (gameContainer) {
+    if (this.handleTouchStart) gameContainer.removeEventListener(this.eventTouchstart, this.handleTouchStart);
+    if (this.handleTouchMove) gameContainer.removeEventListener(this.eventTouchmove, this.handleTouchMove);
+    if (this.handleTouchEnd) gameContainer.removeEventListener(this.eventTouchend, this.handleTouchEnd);
+  }
 };
 
 KeyboardInputManager.prototype.restart = function (event) {

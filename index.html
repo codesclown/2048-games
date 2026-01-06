@@ -2013,6 +2013,11 @@
                         // Save state before move
                         saveGameState();
                         
+                        // CRITICAL FIX: Count moves for powerups!
+                        if (window.powerUpSystem && window.powerUpSystem.onMove) {
+                            window.powerUpSystem.onMove();
+                        }
+                        
                         // Enable undo button after first move
                         const undoButton = document.querySelector('.undo-btn');
                         if (undoButton && undoButton.classList.contains('disabled')) {
@@ -2031,7 +2036,7 @@
         
         // Power-up system configuration
         const POWERUP_CONFIG = {
-            UNLOCK_MOVES: 4,
+            UNLOCK_MOVES: 2,
             EARN_COOLDOWN: 1000, // 1 second cooldown to prevent spam
             
             // Level-based configurations
@@ -2330,6 +2335,21 @@
         window.updateButtonTitles = function() {
             window.powerUpSystem.updateUI();
             window.powerUpSystem.updateLegacy();
+        };
+
+        // Re-implement missing configuration function
+        window.configurePowerUpsForLevel = function(gridSize) {
+            window.currentGridSize = gridSize || 4;
+            
+            // Re-initialize powerups for the new level
+            if (window.resetPowerUps) {
+                window.resetPowerUps();
+            }
+            
+            // Update the UI
+            if (window.updateButtonTitles) {
+                window.updateButtonTitles();
+            }
         };
 
         // Debug function to check powerup status (for console debugging)
@@ -2694,9 +2714,15 @@
         };
 
         // Handle undo button click (FIXED - uses unified system)
+        // Handle undo button click (FIXED - uses unified system)
         window.handleUndoClick = function(button) {
+            // Prevent multiple rapid clicks (Debounce)
+            if (window.handleUndoClick._processing) return;
+            window.handleUndoClick._processing = true;
+
             // Use new unified power-up system
             if (!window.powerUpSystem.use('undo')) {
+                window.handleUndoClick._processing = false;
                 return; // Can't use undo
             }
 
@@ -2712,6 +2738,7 @@
                 window.powerUpState.undo.lifetimeUsed--;
                 window.powerUpSystem.updateUI();
                 window.powerUpSystem.updateLegacy();
+                window.handleUndoClick._processing = false;
                 return;
             }
 
@@ -2734,6 +2761,7 @@
                 // Remove animation class
                 setTimeout(() => {
                     button.classList.remove('undoing');
+                    window.handleUndoClick._processing = false; // Reset flag
                 }, 300);
             }, 50);
         };
@@ -3228,6 +3256,8 @@
 
                 
                 // Perform the swap
+                // CRITICAL FIX: Disable mode immediately to prevent multiple swaps
+                this.active = false;
                 const tempValue = tileObj1.value;
                 tileObj1.value = tileObj2.value;
                 tileObj2.value = tempValue;
@@ -5244,7 +5274,29 @@
             // Show enhanced level transition loader with real-time status
             window.showLevelTransitionWithRealStatus(level, newGridSize).then(() => {
 
-                
+                // CRITICAL FIX: Re-initialize GameManager with the correct size!
+                // This prevents the "Ghost Game Over" bug where logic stays 4x4 while UI is 5x5
+                // CRITICAL FIX: Re-initialize GameManager with the correct size!
+                // This prevents the "Ghost Game Over" bug where logic stays 4x4 while UI is 5x5
+                if (window.GameManager) {
+                     // Clean up old instance first!
+                     if (window.gameManager && typeof window.gameManager.terminate === 'function') {
+                         window.gameManager.terminate();
+                     }
+                     
+                     window.gameManager = new GameManager(newGridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+                     
+                     // CRITICAL FIX: Re-hook the move counter to the new InputManager!
+                     if (typeof hookGameMoves === 'function') {
+                         hookGameMoves();
+                     }
+
+                     // Reset powerups for new game
+                     if (window.resetPowerUps) {
+                        window.resetPowerUps();
+                     }
+                }
+
                 // Show confirmation message
                 showLevelChangeMessage(level, newGridSize);
             });
@@ -5316,6 +5368,106 @@
             }, 100);
             
 
+        }
+
+        // Define updateGridCSS inline since ui_logic.js is missing
+        // This ensures the inline script in index.html works correctly
+        function updateGridCSS(size) {
+            const styleId = 'dynamic-grid-style';
+            let styleEl = document.getElementById(styleId);
+            
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = styleId;
+                document.head.appendChild(styleEl);
+            }
+
+            // Return early for 4x4 to use default main.css
+            if (size <= 4) {
+                styleEl.textContent = '';
+                return;
+            }
+            
+            // Responsive logic using calc() and CSS vars
+            const css = `
+                :root {
+                    --grid-gap: 15px;
+                    --grid-padding: 15px;
+                    --grid-size: ${size};
+                }
+                @media screen and (max-width: 520px) {
+                    :root {
+                        --grid-gap: 10px;
+                        --grid-padding: 10px;
+                    }
+                }
+                
+                /* Constrain grid container to the CONTENT box of the parent */
+                .grid-container, .tile-container {
+                    width: calc(100% - 2 * var(--grid-padding));
+                    height: calc(100% - 2 * var(--grid-padding));
+                    left: var(--grid-padding);
+                    top: var(--grid-padding);
+                    right: auto;
+                    bottom: auto;
+                    margin: 0; 
+                    position: absolute;
+                }
+
+                .grid-cell {
+                    width: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+                    height: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+                    margin-right: var(--grid-gap);
+                    margin-bottom: var(--grid-gap);
+                    float: left;
+                }
+                
+                .grid-cell:nth-of-type(${size}n) {
+                    margin-right: 0;
+                }
+                .grid-cell:nth-of-type(n + ${size * (size - 1) + 1}) {
+                    margin-bottom: 0;
+                }
+                
+                .tile, .tile .tile-inner {
+                    width: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+                    height: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+                    line-height: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+                }
+                
+                ${generatePositionCSS(size)}
+                
+                .tile .tile-inner {
+                    font-size: ${size >= 6 ? '20px' : size === 5 ? '30px' : '35px'};
+                }
+                @media screen and (max-width: 520px) {
+                    .tile .tile-inner {
+                        font-size: ${size >= 6 ? '10px' : size === 5 ? '15px' : '20px'};
+                    }
+                }
+            `;
+            
+            styleEl.textContent = css;
+        }
+
+        function generatePositionCSS(size) {
+            let css = '';
+            for (let x = 0; x < size; x++) {
+                for (let y = 0; y < size; y++) {
+                    const positionFormula = `(100% - (${size} - 1) * var(--grid-gap)) / ${size} + var(--grid-gap)`;
+                    const xFormula = `calc(${x} * (${positionFormula}))`;
+                    const yFormula = `calc(${y} * (${positionFormula}))`;
+                    
+                    css += `
+                        .tile.tile-position-${x + 1}-${y + 1} {
+                            -webkit-transform: translate(${xFormula}, ${yFormula});
+                            -moz-transform: translate(${xFormula}, ${yFormula});
+                            transform: translate(${xFormula}, ${yFormula});
+                        }
+                    `;
+                }
+            }
+            return css;
         }
 
         // Debug function to check current grid state
@@ -5453,6 +5605,10 @@
                     
                     // Actually clear the state
                     if (window.gameManager) {
+                        // CRITICAL FIX: Must terminate to remove event listeners!
+                        if (typeof window.gameManager.terminate === 'function') {
+                            window.gameManager.terminate();
+                        }
                         window.gameManager = null;
                     }
                     if (window.LocalStorageManager) {

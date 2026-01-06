@@ -13,6 +13,16 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.setup();
 }
 
+
+
+// Clean up input manager when destroying game manager
+// This prevents double-input bugs when switching levels
+GameManager.prototype.terminate = function() {
+    if (this.inputManager && typeof this.inputManager.stop === 'function') {
+        this.inputManager.stop();
+    }
+};
+
 // Restart the game
 GameManager.prototype.restart = function () {
   this.storageManager.clearGameState();
@@ -165,35 +175,41 @@ GameManager.prototype.logGridState = function () {
       var tile = this.grid.cellContent({ x: x, y: y });
       if (tile) {
         row.push(String(tile.value).padStart(4, ' '));
-      } else {
-        row.push('   .');
       }
     }
+    // console.log(row.join('|')); // formatting
+    console.log(row.join(' | '));
   }
 };
 
 // ROBUST GAME OVER DETECTION - Only real game over, no fake ones
 GameManager.prototype.isRealGameOver = function () {
   // Step 1: Check for empty cells (if any empty, game is NOT over)
-  var hasEmptyCells = this.grid.cellsAvailable();
-  
-  if (hasEmptyCells) {
+  // This is the fastest and most reliable check
+  if (this.grid.cellsAvailable()) {
     return false;
   }
   
-  // Step 2: Check for possible merges (if any merge possible, game is NOT over)
-  var hasPossibleMerges = this.tileMatchesAvailable();
-  
-  if (hasPossibleMerges) {
+  // Step 2: Check for possible merges (horizontal and vertical)
+  // This checks immediate neighbors for matching values
+  if (this.tileMatchesAvailable()) {
     return false;
   }
   
-  // Step 3: Double-check by testing actual moves
-  var canMoveInAnyDirection = this.canMoveInAnyDirection();
-  
-  if (canMoveInAnyDirection) {
-    return false;
+  // Step 3: Double-check logic using the legacy method as a fallback
+  // This ensures we don't accidentally end the game if one check fails
+  if (this.movesAvailable()) {
+     return false;
   }
+  
+  // If we get here, the grid is full AND there are no matches.
+  // It really is Game Over.
+  
+  console.log('!!! GAME OVER TRIGGERED !!!');
+  console.log('Grid Size:', this.size);
+  console.log('Empty Cells:', this.grid.availableCells().length);
+  // Log visual representation
+  this.logGridState();
   
   return true;
 };
@@ -361,6 +377,7 @@ GameManager.prototype.movesAvailable = function () {
 GameManager.prototype.tileMatchesAvailable = function () {
   var self = this;
   
+  // console.log('Checking matches...');
   for (var x = 0; x < this.size; x++) {
     for (var y = 0; y < this.size; y++) {
       var tile = this.grid.cellContent({ x: x, y: y });
@@ -370,11 +387,11 @@ GameManager.prototype.tileMatchesAvailable = function () {
           var vector = self.getVector(direction);
           var cell   = { x: x + vector.x, y: y + vector.y };
 
-          // Check bounds BEFORE calling cellContent
           if (this.grid.withinBounds(cell)) {
             var other = self.grid.cellContent(cell);
 
             if (other && other.value === tile.value) {
+              console.log('Match found!', x, y, 'with', cell.x, cell.y, 'val:', tile.value);
               return true; // These two tiles can be merged
             }
           }
@@ -383,6 +400,7 @@ GameManager.prototype.tileMatchesAvailable = function () {
     }
   }
 
+  console.log('No matches found in full scan');
   return false;
 };
 
