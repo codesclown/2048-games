@@ -162,9 +162,9 @@ KeyboardInputManager.prototype.listen = function () {
     }
   };
 
-  gameContainer.addEventListener(this.eventTouchstart, this.handleTouchStart);
-  gameContainer.addEventListener(this.eventTouchmove, this.handleTouchMove);
-  gameContainer.addEventListener(this.eventTouchend, this.handleTouchEnd);
+  gameContainer.addEventListener(this.eventTouchstart, this.handleTouchStart, { passive: false });
+  gameContainer.addEventListener(this.eventTouchmove, this.handleTouchMove, { passive: false });
+  gameContainer.addEventListener(this.eventTouchend, this.handleTouchEnd, { passive: false });
 };
 
 // Cleanup method to remove event listeners
