@@ -4617,6 +4617,12 @@
                     // Create new game manager
                     window.gameManager = new GameManager(gridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
                     
+                    // CRITICAL FIX: Hook moves for history tracking (needed for reward video)
+                    // This ensures the FIRST game session has history, not just subsequent ones
+                    if (typeof hookGameMoves === 'function') {
+                        hookGameMoves();
+                    }
+
                     return window.gameManager;
                 }
                 
