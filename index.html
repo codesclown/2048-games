@@ -1578,9 +1578,23 @@
 
         // Reward Video Popup Functions
         window.showRewardVideoPopup = function() {
-            const popup = document.getElementById('rewardVideoPopup');
-            if (popup) {
-                popup.classList.add('active');
+            // Check if rewarded video is actually ready
+            if (typeof isRVReady !== 'undefined' && isRVReady) {
+                const popup = document.getElementById('rewardVideoPopup');
+                if (popup) {
+                    popup.classList.add('active');
+                } else {
+                    // Fallback if popup DOM is missing
+                    if (typeof window.ultimateButtonFix === 'function') {
+                        window.ultimateButtonFix();
+                    }
+                }
+            } else {
+                console.log('Rewared video not ready, skipping popup');
+                // Skip directly to game over
+                if (typeof window.ultimateButtonFix === 'function') {
+                    window.ultimateButtonFix();
+                }
             }
         };
 
