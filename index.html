@@ -9452,13 +9452,11 @@
                     e.preventDefault();
                     e.stopPropagation();
                     
-                    // Post score and show ad on retry
+                    // Post score on retry
                     if (window.gameManager && typeof postScore === 'function') {
                         postScore(window.gameManager.score);
                     }
-                    if (typeof showAd === 'function') {
-                        showAd();
-                    }
+                    // Ad call removed as per user request
 
                     // Cache ads when retry button is pressed
                     if (typeof gameCacheAd === 'function') {
