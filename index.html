@@ -1591,7 +1591,12 @@
                 }
             } else {
                 console.log('Rewared video not ready, skipping popup');
-                // Skip directly to game over
+                // Skip directly to game over (but show interstitial first)
+                if (typeof showAd === 'function') {
+                    console.log('Reward video not ready, showing interstitial instead');
+                    showAd();
+                }
+                
                 if (typeof window.ultimateButtonFix === 'function') {
                     window.ultimateButtonFix();
                 }
@@ -1661,6 +1666,12 @@
             
 
             
+            // 2. Show Interstitial Ad (as per requirement)
+            if (typeof showAd === 'function') {
+                console.log('Showing interstitial ad before Game Over popup');
+                showAd();
+            }
+
             // 3. Show Game Over Screen
             setTimeout(() => {
                 if (typeof window.ultimateButtonFix === 'function') {
