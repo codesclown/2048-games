@@ -5369,6 +5369,31 @@
             
             // Remove any existing inline styles that might interfere
             gridContainer.removeAttribute('style');
+
+            // CRITICAL FIX: details
+            // Remove lingering "measured" CSS from 6x6/5x5 auto-fitting that breaks 4x4 alignment
+            const measuredStyle = document.getElementById('measured-grid-positions');
+            if (measuredStyle) {
+                console.log('Clearing measured-grid-positions style');
+                measuredStyle.remove();
+            }
+
+            // CRITICAL FIX: Also remove the specific 6x6 fitting styles which are aggressive
+            const sixBySixStyles = [
+                'comprehensive-6x6-fitting', 
+                'exact-6x6-tile-sizes', 
+                'dynamic-6x6-tiles', 
+                'aggressive-6x6-sizing', 
+                'super-aggressive-6x6'
+            ];
+            
+            sixBySixStyles.forEach(id => {
+                const styleEl = document.getElementById(id);
+                if (styleEl) {
+                    console.log('Clearing 6x6 style:', id);
+                    styleEl.remove();
+                }
+            });
             
             // Create new grid structure with EXACTLY the right number of rows and columns
 
