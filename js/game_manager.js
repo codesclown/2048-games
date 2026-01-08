@@ -5,6 +5,16 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.actuator       = new Actuator;
 
   this.startTiles     = 2;
+  
+  // Dynamic winning score based on grid size/level
+  // TEST MODE: Low values for quick testing
+  if (this.size === 6) {
+    this.winningValue = 8192; // Level 3
+  } else if (this.size === 5) {
+    this.winningValue = 4096; // Level 2
+  } else {
+    this.winningValue = 2048;  // Level 1
+  }
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
@@ -297,8 +307,8 @@ GameManager.prototype.move = function (direction) {
           // Update the score
           self.score += merged.value;
 
-          // The mighty 2048 tile
-          if (merged.value === 2048) self.won = true;
+          // Check for winning value
+          if (merged.value === self.winningValue) self.won = true;
         } else {
           self.moveTile(tile, positions.farthest);
         }

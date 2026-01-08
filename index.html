@@ -272,6 +272,24 @@
             opacity: 0.6;
         }
 
+        /* Premium Level Tag Style */
+        .level-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            color: #1a1a3a;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 800;
+            margin-right: 8px;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+            vertical-align: middle;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transform: translateY(-1px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
         /* Animations */
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
@@ -735,7 +753,8 @@
                         <p></p>
                         <div class="lower">
                             <div class="game-over-buttons">
-                                <button class="menu-button retry-button" id="retryBtn">🔄 Try again</button>
+                                <button class="menu-button keep-playing-button" id="keepPlayingBtn" style="display: none; background: linear-gradient(135deg, #4CAF50, #45a049); box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);">▶ Keep going</button>
+                                <button class="menu-button retry-button" id="retryBtn">🔄 Play again</button>
                                 <button class="menu-button secondary" id="homeBtn">🏠 Home</button>
                             </div>
                         </div>
@@ -5308,6 +5327,11 @@
                      if (window.resetPowerUps) {
                         window.resetPowerUps();
                      }
+
+                     // Update UI text for winning target
+                     if (window.updateGameIntro) {
+                        window.updateGameIntro(newGridSize);
+                     }
                 }
 
                 // Show confirmation message
@@ -8816,6 +8840,10 @@
                     window.resetPowerUps();
                 }
                 
+                // Update UI text for winning target
+                if (window.updateGameIntro) {
+                    window.updateGameIntro(newSize);
+                }
 
                 
                 // Force actuate to ensure tiles are positioned correctly
@@ -8975,6 +9003,11 @@
             // Create new game manager with proper size
             window.gameManager = new GameManager(gridSize, KeyboardInputManager, HTMLActuator, LocalStorageManager);
             
+            // Update UI text for winning target
+            if (window.updateGameIntro) {
+                window.updateGameIntro(gridSize);
+            }
+            
             return window.gameManager;
         };
 
@@ -8995,91 +9028,46 @@
                 return { isGameOver: false, reason: 'Grid size mismatch - preventing false game over' };
             }
 
-            // Check 1: Are there empty cells?
+        // Check 1: Are there empty cells?
             const emptyCells = grid.availableCells();
             if (emptyCells.length > 0) {
-                return { 
-                    isGameOver: false, 
-                    reason: `${emptyCells.length} empty cells available`,
-                    emptyCells: emptyCells.length
-                };
+                return { isGameOver: false, reason: 'Empty cells available' };
             }
 
-            // Check 2: Are there possible merges?
-            let possibleMerges = 0;
-            for (let x = 0; x < size; x++) {
-                for (let y = 0; y < size; y++) {
-                    const tile = grid.cellContent({ x: x, y: y });
-                    if (tile) {
-                        // Check all 4 directions for possible merges
-                        const directions = [
-                            { x: 0, y: -1 }, // Up
-                            { x: 1, y: 0 },  // Right
-                            { x: 0, y: 1 },  // Down
-                            { x: -1, y: 0 }  // Left
-                        ];
-
-                        for (let dir of directions) {
-                            const neighborX = x + dir.x;
-                            const neighborY = y + dir.y;
-
-                            // Check bounds
-                            if (neighborX >= 0 && neighborX < size && 
-                                neighborY >= 0 && neighborY < size) {
-                                
-                                const neighbor = grid.cellContent({ x: neighborX, y: neighborY });
-                                if (neighbor && neighbor.value === tile.value) {
-                                    possibleMerges++;
-                                }
-                            }
-                        }
-                    }
-                }
+            // Check 2: Are there matches? (more expensive)
+            if (window.gameManager.tileMatchesAvailable()) {
+                return { isGameOver: false, reason: 'Matches available' };
             }
 
-            if (possibleMerges > 0) {
-                return { 
-                    isGameOver: false, 
-                    reason: `${possibleMerges} possible merges available`,
-                    possibleMerges: possibleMerges
-                };
-            }
-
-            // Check 3: Can move in any direction? (with error handling)
-            let canMove = false;
-            try {
-                if (window.gameManager.canMoveInDirection) {
-                    const canMoveUp = window.gameManager.canMoveInDirection(0);
-                    const canMoveRight = window.gameManager.canMoveInDirection(1);
-                    const canMoveDown = window.gameManager.canMoveInDirection(2);
-                    const canMoveLeft = window.gameManager.canMoveInDirection(3);
-                    canMove = canMoveUp || canMoveRight || canMoveDown || canMoveLeft;
-                } else {
-                    // Fallback: use movesAvailable if canMoveInDirection doesn't exist
-                    canMove = window.gameManager.movesAvailable ? window.gameManager.movesAvailable() : false;
-                }
-            } catch (error) {
-                console.warn('Error checking moves:', error);
-                return { isGameOver: false, reason: 'Error checking moves - preventing false game over' };
-            }
-
-            if (canMove) {
-                return { 
-                    isGameOver: false, 
-                    reason: 'Can still move in at least one direction',
-                    canMove: true
-                };
-            }
-
-            // Game is truly over
-            return { 
-                isGameOver: true, 
-                reason: 'No empty cells, no possible merges, no valid moves',
-                emptyCells: 0,
-                possibleMerges: 0,
-                canMove: false
-            };
+            // If we get here, it's really game over
+            return { isGameOver: true, reason: 'No moves available' };
         };
+        
+        // Update the game intro text based on the winning value
+        window.updateGameIntro = function(size) {
+            const introContainer = document.querySelector('.game-intro');
+            if (!introContainer) return;
+            
+            // Ensure size is a number
+            const gridSize = parseInt(size);
+            
+            let winningValue = 2048; 
+            let levelInfo = "Level 1 (4x4)";
+            
+            if (gridSize === 5) {
+                winningValue = 4096;
+                levelInfo = "Level 2 (5x5)";
+            } else if (gridSize === 6) {
+                winningValue = 8192;
+                levelInfo = "Level 3 (6x6)";
+            }
+            
+            const tagHTML = '<div style="margin-bottom: 4px;"><span class="level-tag">' + levelInfo + '</span></div>';
+            introContainer.innerHTML = tagHTML + 'Join the numbers and get to the <strong>' + winningValue + ' tile!</strong>';
+        };
+
+
+
 
         // Function to manually trigger game over popup (for testing) - FIXED for multiple uses
         window.testGameOverPopup = function(won = false) {
@@ -9265,7 +9253,7 @@
         };
 
         // ULTIMATE BUTTON FIX - Bypass everything with proper UI
-        window.ultimateButtonFix = function() {
+        window.ultimateButtonFix = function(won = false) {
             console.log('=== ULTIMATE BUTTON FIX ===');
             
             // Remove the entire game message and recreate it
@@ -9319,14 +9307,14 @@
             
             // Create title (matching original design)
             const title = document.createElement('p');
-            title.textContent = 'Game over!';
+            title.textContent = won ? 'You win!' : 'Game over!';
             title.style.cssText = `
-                color: #ff6b6b !important;
-                text-shadow: 0 0 30px rgba(255, 107, 107, 0.8) !important;
+                color: ${won ? '#ffd700' : '#ff6b6b'} !important;
+                text-shadow: 0 0 30px rgba(${won ? '255, 215, 0' : '255, 107, 107'}, 0.8) !important;
                 font-size: 48px !important;
                 margin: 0 0 30px 0 !important;
                 font-weight: bold !important;
-                animation: pulse-red 2s ease-in-out infinite alternate !important;
+                animation: ${won ? 'glow-title' : 'pulse-red'} 2s ease-in-out infinite alternate !important;
             `;
             
             // Create lower section
@@ -9346,12 +9334,15 @@
                 pointer-events: auto !important;
                 z-index: 10000 !important;
             `;
+
+            // Removed Keep Playing button as per user request
+            
             
             // Create retry button (matching original yellow design)
             const retryBtn = document.createElement('button');
             retryBtn.id = 'retryBtn';
             retryBtn.className = 'menu-button retry-button';
-            retryBtn.innerHTML = '🔄 Try again';
+            retryBtn.innerHTML = won ? '🔄 Play again' : '🔄 Try again';
             retryBtn.style.cssText = `
                 pointer-events: auto !important;
                 z-index: 10001 !important;

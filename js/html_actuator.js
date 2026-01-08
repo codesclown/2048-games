@@ -55,6 +55,17 @@ function HTMLActuator() {
              location.reload();
           };
       }
+
+      // Keep Playing Button
+      var keepPlayingBtn = document.getElementById('keepPlayingBtn');
+      if (keepPlayingBtn) {
+          keepPlayingBtn.onclick = function(e) {
+              e.preventDefault();
+              if (window.gameManager) {
+                  window.gameManager.keepPlaying();
+              }
+          };
+      }
   }, 1000);
 }
 
@@ -375,8 +386,22 @@ HTMLActuator.prototype.message = function (won) {
   
   // Show the full-screen modal for our custom game over screen
   if (!won) {
+    // Hide Keep Playing button for Game Over
+    var keepPlayingBtn = document.getElementById('keepPlayingBtn');
+    if (keepPlayingBtn) keepPlayingBtn.style.display = 'none';
+
     // Show reward video popup first before game over
     this.showRewardVideoPopup();
+  } else {
+    // Show Keep Playing button for Win
+    var keepPlayingBtn = document.getElementById('keepPlayingBtn');
+    if (keepPlayingBtn) keepPlayingBtn.style.display = 'inline-block';
+
+    // Use the robust ultimate fix to show the win popup
+    // This ensures consistency with how game over is shown
+    if (typeof window.ultimateButtonFix === 'function') {
+        window.ultimateButtonFix(true);
+    }
   }
 };
 
