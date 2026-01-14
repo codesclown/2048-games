@@ -1,6 +1,6 @@
 {
-	"version": "1.0.0",
-	"version_code": 1,
+	"version": "3.0.0",
+	"version_code": 3,
 	"name": "2048 Premium",
 	"description": "Play the classic 2048 puzzle with smooth controls clean design and endless challenge Merge tiles reach 2048 and beat your high score.",
 	"package_name": "com.kaifoundry.2048PremiumSP",
