@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -34,15 +34,21 @@
       /* Tile Selection Animation */
       @keyframes pulse {
         0% {
-          box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+          box-shadow:
+            0 0 20px #00ffff,
+            0 0 40px #00ffff;
           transform: scale(1.05);
         }
         50% {
-          box-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff;
+          box-shadow:
+            0 0 30px #00ffff,
+            0 0 60px #00ffff;
           transform: scale(1.08);
         }
         100% {
-          box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+          box-shadow:
+            0 0 20px #00ffff,
+            0 0 40px #00ffff;
           transform: scale(1.05);
         }
       }
@@ -50,7 +56,9 @@
       /* Tile Selection Highlighting Classes - More Specific */
       .tile-container .tile.tile-selected {
         border: 4px solid #00ffff !important;
-        box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff !important;
+        box-shadow:
+          0 0 20px #00ffff,
+          0 0 40px #00ffff !important;
         z-index: 1000 !important;
         outline: 2px solid #00ffff !important;
         outline-offset: 2px !important;
@@ -62,7 +70,9 @@
 
       .tile-container .tile.tile-selected .tile-inner {
         border: 2px solid #00ffff !important;
-        box-shadow: 0 0 15px #00ffff, 0 4px 15px rgba(0, 255, 255, 0.5) !important;
+        box-shadow:
+          0 0 15px #00ffff,
+          0 4px 15px rgba(0, 255, 255, 0.5) !important;
         background: rgba(0, 255, 255, 0.2) !important;
       }
 
@@ -204,28 +214,33 @@
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+        box-shadow:
+          0 2px 8px rgba(0, 0, 0, 0.3),
           inset 0 1px 0 rgba(255, 255, 255, 0.1);
       }
 
       .preview-cell.tile-2 {
         background: linear-gradient(135deg, #667eea, #764ba2);
-        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4),
+        box-shadow:
+          0 3px 10px rgba(102, 126, 234, 0.4),
           inset 0 1px 0 rgba(255, 255, 255, 0.2);
       }
       .preview-cell.tile-4 {
         background: linear-gradient(135deg, #f093fb, #f5576c);
-        box-shadow: 0 3px 10px rgba(240, 147, 251, 0.4),
+        box-shadow:
+          0 3px 10px rgba(240, 147, 251, 0.4),
           inset 0 1px 0 rgba(255, 255, 255, 0.2);
       }
       .preview-cell.tile-8 {
         background: linear-gradient(135deg, #4facfe, #00f2fe);
-        box-shadow: 0 3px 10px rgba(79, 172, 254, 0.4),
+        box-shadow:
+          0 3px 10px rgba(79, 172, 254, 0.4),
           inset 0 1px 0 rgba(255, 255, 255, 0.2);
       }
       .preview-cell.tile-16 {
         background: linear-gradient(135deg, #43e97b, #38f9d7);
-        box-shadow: 0 3px 10px rgba(67, 233, 123, 0.4),
+        box-shadow:
+          0 3px 10px rgba(67, 233, 123, 0.4),
           inset 0 1px 0 rgba(255, 255, 255, 0.2);
       }
 
@@ -646,23 +661,28 @@
           width: 28px;
           height: 28px;
           font-size: 11px;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3),
+          box-shadow:
+            0 2px 6px rgba(0, 0, 0, 0.3),
             inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         .preview-cell.tile-2 {
-          box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4),
+          box-shadow:
+            0 2px 6px rgba(102, 126, 234, 0.4),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         .preview-cell.tile-4 {
-          box-shadow: 0 2px 6px rgba(240, 147, 251, 0.4),
+          box-shadow:
+            0 2px 6px rgba(240, 147, 251, 0.4),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         .preview-cell.tile-8 {
-          box-shadow: 0 2px 6px rgba(79, 172, 254, 0.4),
+          box-shadow:
+            0 2px 6px rgba(79, 172, 254, 0.4),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         .preview-cell.tile-16 {
-          box-shadow: 0 2px 6px rgba(67, 233, 123, 0.4),
+          box-shadow:
+            0 2px 6px rgba(67, 233, 123, 0.4),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         .menu-buttons {
@@ -1467,28 +1487,40 @@
         <div class="mobile-menu-items">
           <button
             class="mobile-menu-item"
-            onclick="closeMobileMenu(); showInstructions();"
+            onclick="
+              closeMobileMenu();
+              showInstructions();
+            "
           >
             <span class="menu-icon">📖</span>
             How to Play
           </button>
           <button
             class="mobile-menu-item"
-            onclick="closeMobileMenu(); showHighScores();"
+            onclick="
+              closeMobileMenu();
+              showHighScores();
+            "
           >
             <span class="menu-icon">🏆</span>
             High Scores
           </button>
           <button
             class="mobile-menu-item"
-            onclick="closeMobileMenu(); restartGameWithAnimation();"
+            onclick="
+              closeMobileMenu();
+              restartGameWithAnimation();
+            "
           >
             <span class="menu-icon">🎮</span>
             Restart Level
           </button>
           <button
             class="mobile-menu-item"
-            onclick="closeMobileMenu(); showHome();"
+            onclick="
+              closeMobileMenu();
+              showHome();
+            "
           >
             <span class="menu-icon">🏠</span>
             Home
@@ -1647,7 +1679,7 @@
             if (currentStep < loadingSteps.length) {
               setTimeout(
                 updateProgress,
-                loadingSteps[currentStep].delay - step.delay
+                loadingSteps[currentStep].delay - step.delay,
               );
             }
           }
@@ -1848,7 +1880,7 @@
         console.log("User accepted reward video");
         console.log(
           "Current game history length:",
-          window.gameStateHistory ? window.gameStateHistory.length : 0
+          window.gameStateHistory ? window.gameStateHistory.length : 0,
         );
 
         // Mark reward video as used for this session
@@ -1871,14 +1903,14 @@
           setTimeout(() => {
             if (window.gameManager && window.gameManager.over) {
               console.log(
-                "Fallback: Reward video timeout, giving reward directly"
+                "Fallback: Reward video timeout, giving reward directly",
               );
               giveReward();
             }
           }, 10000);
         } else if (typeof showAdRewarded === "function") {
           console.log(
-            "Rewarded video function exists but not ready, trying anyway..."
+            "Rewarded video function exists but not ready, trying anyway...",
           );
           showAdRewarded();
 
@@ -1886,7 +1918,7 @@
           setTimeout(() => {
             if (window.gameManager && window.gameManager.over) {
               console.log(
-                "Fallback: Rewarded video not ready, giving reward directly"
+                "Fallback: Rewarded video not ready, giving reward directly",
               );
               giveReward();
             }
@@ -1947,21 +1979,22 @@
 
           if (targetState && window.gameManager && targetState.grid) {
             console.log(
-              `Restoring game state from ${stepsToSubtract} moves back (History index: ${targetIndex})`
+              `Restoring game state from ${stepsToSubtract} moves back (History index: ${targetIndex})`,
             );
 
-            // Preservation of high score: "score remains the same as the previous score"
-            // We keep the score attained at the point of death
             const currentScore = window.gameManager.score;
 
             // Restore the grid structure
             window.gameManager.grid = new Grid(
               targetState.grid.size,
-              targetState.grid.cells
+              targetState.grid.cells,
             );
 
-            // Apply state but KEEP the current high score
+            // FIX: Restore the score from the historical state to ensure consistency
+            // "remains the same as the previous score" implies the score associated with that state
+            // This also prevents "score reset to 0" bugs if currentScore was lost
             window.gameManager.score = currentScore;
+
             window.gameManager.over = false; // Essential: Reset over flag
             window.gameManager.won = targetState.won || false;
             window.gameManager.keepPlaying = targetState.keepPlaying || false;
@@ -1969,7 +2002,7 @@
             // TRUNCATE history to the target index to prevent future state contamination
             window.gameStateHistory = window.gameStateHistory.slice(
               0,
-              targetIndex
+              targetIndex,
             );
 
             // Ensure all Game Over UI elements are hidden immediately
@@ -1994,20 +2027,36 @@
             }
 
             console.log(
-              `✅ Success: Retained score ${currentScore} and restored grid from ${stepsToSubtract} steps ago.`
+              `✅ Success: Retained score ${currentScore} and restored grid from ${stepsToSubtract} steps ago.`,
             );
           } else {
             console.log(
-              "❌ Invalid state to restore, falling back to restart"
+              "❌ Invalid state to restore - but DO NOT restart as per Jiogames requirement",
             );
+
             if (window.gameManager) {
-              window.gameManager.restart();
+              window.gameManager.over = false;
+
+              if (typeof window.forceCloseGameOver === "function") {
+                window.forceCloseGameOver();
+              }
+
+              window.gameManager.actuate();
             }
           }
         } else {
-          console.log("❌ No history available, falling back to restart");
+          console.log(
+            "❌ No history available - continue current game instead of restart",
+          );
+
           if (window.gameManager) {
-            window.gameManager.restart();
+            window.gameManager.over = false;
+
+            if (typeof window.forceCloseGameOver === "function") {
+              window.forceCloseGameOver();
+            }
+
+            window.gameManager.actuate();
           }
         }
       };
@@ -2042,7 +2091,7 @@
           console.log("❌ No game history. Make at least 1 move first.");
           console.log(
             "Current history length:",
-            window.gameStateHistory ? window.gameStateHistory.length : 0
+            window.gameStateHistory ? window.gameStateHistory.length : 0,
           );
           return;
         }
@@ -2050,7 +2099,7 @@
         const availableSteps = window.gameStateHistory.length;
         const stepsBack = Math.min(5, availableSteps);
         console.log(
-          `✅ History available for ${stepsBack}-step back (${availableSteps} total states)`
+          `✅ History available for ${stepsBack}-step back (${availableSteps} total states)`,
         );
         console.log("1. Showing reward video popup...");
         showRewardVideoPopup();
@@ -2080,27 +2129,27 @@
         console.log("=== Testing Reward Video Completion ===");
         console.log(
           "Current game state history length:",
-          window.gameStateHistory ? window.gameStateHistory.length : 0
+          window.gameStateHistory ? window.gameStateHistory.length : 0,
         );
         console.log(
           "MAX_HISTORY:",
-          typeof MAX_HISTORY !== "undefined" ? MAX_HISTORY : "undefined"
+          typeof MAX_HISTORY !== "undefined" ? MAX_HISTORY : "undefined",
         );
 
         if (window.gameStateHistory && window.gameStateHistory.length >= 1) {
           const availableSteps = window.gameStateHistory.length;
           const stepsBack = Math.min(5, availableSteps);
           console.log(
-            `✅ History available for ${stepsBack}-step back (${availableSteps} total states)`
+            `✅ History available for ${stepsBack}-step back (${availableSteps} total states)`,
           );
           console.log("Simulating reward video completion...");
           giveReward();
         } else {
           console.log(
-            "❌ No history available. Make at least 1 move in the game first."
+            "❌ No history available. Make at least 1 move in the game first.",
           );
           console.log(
-            "For best results, make 5+ moves to get full 5-step back."
+            "For best results, make 5+ moves to get full 5-step back.",
           );
         }
       };
@@ -2110,11 +2159,11 @@
         console.log("=== Game State History ===");
         console.log(
           "History length:",
-          window.gameStateHistory ? window.gameStateHistory.length : 0
+          window.gameStateHistory ? window.gameStateHistory.length : 0,
         );
         console.log(
           "MAX_HISTORY:",
-          typeof MAX_HISTORY !== "undefined" ? MAX_HISTORY : "undefined"
+          typeof MAX_HISTORY !== "undefined" ? MAX_HISTORY : "undefined",
         );
 
         if (window.gameStateHistory && window.gameStateHistory.length > 0) {
@@ -2122,7 +2171,7 @@
           window.gameStateHistory.slice(-3).forEach((state, index) => {
             const actualIndex = window.gameStateHistory.length - 3 + index;
             console.log(
-              `  State ${actualIndex}: Score=${state.score}, Over=${state.over}`
+              `  State ${actualIndex}: Score=${state.score}, Over=${state.over}`,
             );
           });
 
@@ -2131,7 +2180,7 @@
           console.log(`Next reward will go back ${stepsBack} steps`);
         } else {
           console.log(
-            "No history available. Make some moves in the game first."
+            "No history available. Make some moves in the game first.",
           );
         }
       };
@@ -2163,10 +2212,10 @@
         }
 
         console.log(
-          `✅ Built ${window.gameStateHistory.length} history states`
+          `✅ Built ${window.gameStateHistory.length} history states`,
         );
         console.log(
-          "Now you can test rewards with: window.testRewardVideoComplete()"
+          "Now you can test rewards with: window.testRewardVideoComplete()",
         );
       };
 
@@ -2175,13 +2224,13 @@
         console.log("=== Reward Video Status ===");
         console.log(
           "Reward video used:",
-          window.rewardVideoUsed ? "✅ Yes" : "❌ No"
+          window.rewardVideoUsed ? "✅ Yes" : "❌ No",
         );
         console.log(
           "Next game over will show:",
           window.rewardVideoUsed
             ? "Game Over popup directly"
-            : "Reward video popup"
+            : "Reward video popup",
         );
       };
 
@@ -2189,7 +2238,7 @@
       window.resetRewardVideoUsage = function () {
         window.rewardVideoUsed = false;
         console.log(
-          "✅ Reward video usage reset - next game over will show reward popup"
+          "✅ Reward video usage reset - next game over will show reward popup",
         );
       };
 
@@ -2237,7 +2286,7 @@
         // Check if popup element exists
         const popup = document.getElementById("rewardVideoPopup");
         console.log(
-          `rewardVideoPopup element: ${popup ? "✅ Found" : "❌ Missing"}`
+          `rewardVideoPopup element: ${popup ? "✅ Found" : "❌ Missing"}`,
         );
       };
 
@@ -2322,7 +2371,7 @@
           // Create new grid from previous state
           const newGrid = new Grid(
             previousState.grid.size,
-            previousState.grid.cells
+            previousState.grid.cells,
           );
 
           // Set up reverse animations by comparing current and previous positions
@@ -2588,7 +2637,7 @@
         const config = getCurrentLevelConfig();
         const movesRemaining = Math.max(
           0,
-          POWERUP_CONFIG.UNLOCK_MOVES - window.powerUpState.moveCount
+          POWERUP_CONFIG.UNLOCK_MOVES - window.powerUpState.moveCount,
         );
         const isLocked = !window.powerUpState.unlocked;
 
@@ -2598,8 +2647,8 @@
             type === "undo"
               ? ".undo-btn"
               : type === "swap"
-              ? ".replace-btn"
-              : ".menu-btn";
+                ? ".replace-btn"
+                : ".menu-btn";
           const counterId = `${type}-counter`;
 
           const btn = document.querySelector(btnClass);
@@ -2618,7 +2667,7 @@
               const totalAvailable = powerUp.uses + powerUp.lifetimeUsed;
               const remainingToEarn = Math.max(
                 0,
-                typeConfig.lifetime - totalAvailable
+                typeConfig.lifetime - totalAvailable,
               );
               btn.title = `${type.charAt(0).toUpperCase() + type.slice(1)} - ${
                 powerUp.uses
@@ -2769,19 +2818,19 @@
           "Undo:",
           window.powerUpState.undo.uses,
           "/",
-          getCurrentLevelConfig().undo.max
+          getCurrentLevelConfig().undo.max,
         );
         console.log(
           "Swap:",
           window.powerUpState.swap.uses,
           "/",
-          getCurrentLevelConfig().swap.max
+          getCurrentLevelConfig().swap.max,
         );
         console.log(
           "Delete:",
           window.powerUpState.delete.uses,
           "/",
-          getCurrentLevelConfig().delete.max
+          getCurrentLevelConfig().delete.max,
         );
       };
 
@@ -2844,8 +2893,9 @@
 
         initAudio() {
           try {
-            this.audioContext = new (window.AudioContext ||
-              window.webkitAudioContext)();
+            this.audioContext = new (
+              window.AudioContext || window.webkitAudioContext
+            )();
           } catch (e) {
             this.enabled = false;
           }
@@ -2866,7 +2916,7 @@
           duration,
           type = "sine",
           volume = this.volume,
-          envelope = "smooth"
+          envelope = "smooth",
         ) {
           if (!this.enabled || !this.audioContext || this.shouldBlockSound())
             return;
@@ -2883,7 +2933,7 @@
 
             oscillator.frequency.setValueAtTime(
               freq,
-              this.audioContext.currentTime
+              this.audioContext.currentTime,
             );
             oscillator.type = type;
 
@@ -2894,20 +2944,20 @@
             if (envelope === "smooth") {
               oscGain.gain.linearRampToValueAtTime(
                 oscVolume,
-                this.audioContext.currentTime + 0.02
+                this.audioContext.currentTime + 0.02,
               );
               oscGain.gain.exponentialRampToValueAtTime(
                 0.001,
-                this.audioContext.currentTime + duration
+                this.audioContext.currentTime + duration,
               );
             } else if (envelope === "sharp") {
               oscGain.gain.setValueAtTime(
                 oscVolume,
-                this.audioContext.currentTime
+                this.audioContext.currentTime,
               );
               oscGain.gain.exponentialRampToValueAtTime(
                 0.001,
-                this.audioContext.currentTime + duration
+                this.audioContext.currentTime + duration,
               );
             }
 
@@ -2929,21 +2979,21 @@
           oscillator.type = "sine"; // Changed from sawtooth to sine for smoother sound
           oscillator.frequency.setValueAtTime(
             300,
-            this.audioContext.currentTime
+            this.audioContext.currentTime,
           );
           oscillator.frequency.exponentialRampToValueAtTime(
             150,
-            this.audioContext.currentTime + 0.15
+            this.audioContext.currentTime + 0.15,
           );
 
           gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
           gainNode.gain.linearRampToValueAtTime(
             0.06,
-            this.audioContext.currentTime + 0.02
+            this.audioContext.currentTime + 0.02,
           );
           gainNode.gain.exponentialRampToValueAtTime(
             0.001,
-            this.audioContext.currentTime + 0.15
+            this.audioContext.currentTime + 0.15,
           );
 
           oscillator.start(this.audioContext.currentTime);
@@ -2975,7 +3025,7 @@
             setTimeout(
               () =>
                 this.createComplexTone([587, 740, 880, 1175], 0.4, "sine", 0.2),
-              200
+              200,
             );
           } else if (tileValue >= 256) {
             // Epic orchestral-like sound for high values
@@ -2986,14 +3036,14 @@
                   [440, 587, 740, 880],
                   0.6,
                   "triangle",
-                  0.25
+                  0.25,
                 ),
-              300
+              300,
             );
             setTimeout(
               () =>
                 this.createComplexTone([523, 659, 784, 1047], 0.4, "sine", 0.2),
-              600
+              600,
             );
           } else {
             // Default pleasant chime
@@ -3002,7 +3052,7 @@
               [baseFreq, baseFreq * 1.25],
               0.25,
               "sine",
-              0.15
+              0.15,
             );
           }
         }
@@ -3018,7 +3068,7 @@
                 0.2,
                 "sine",
                 0.2,
-                "sharp"
+                "sharp",
               );
             }, i * 80);
           });
@@ -3045,7 +3095,7 @@
               [523, 659, 784, 1047, 1319],
               0.8,
               "triangle",
-              0.3
+              0.3,
             );
           }, 700);
         }
@@ -3063,21 +3113,21 @@
           oscillator.type = "triangle"; // Changed from square to triangle for smoother sound
           oscillator.frequency.setValueAtTime(
             250,
-            this.audioContext.currentTime
+            this.audioContext.currentTime,
           );
           oscillator.frequency.exponentialRampToValueAtTime(
             450,
-            this.audioContext.currentTime + 0.25
+            this.audioContext.currentTime + 0.25,
           );
 
           gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
           gainNode.gain.linearRampToValueAtTime(
             0.15,
-            this.audioContext.currentTime + 0.05
+            this.audioContext.currentTime + 0.05,
           );
           gainNode.gain.exponentialRampToValueAtTime(
             0.001,
-            this.audioContext.currentTime + 0.25
+            this.audioContext.currentTime + 0.25,
           );
 
           oscillator.start(this.audioContext.currentTime);
@@ -3116,21 +3166,21 @@
           oscillator.type = "triangle"; // Changed from sawtooth to triangle for smoother sound
           oscillator.frequency.setValueAtTime(
             600,
-            this.audioContext.currentTime
+            this.audioContext.currentTime,
           );
           oscillator.frequency.exponentialRampToValueAtTime(
             200,
-            this.audioContext.currentTime + 0.2
+            this.audioContext.currentTime + 0.2,
           );
 
           gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
           gainNode.gain.linearRampToValueAtTime(
             0.18,
-            this.audioContext.currentTime + 0.01
+            this.audioContext.currentTime + 0.01,
           );
           gainNode.gain.exponentialRampToValueAtTime(
             0.001,
-            this.audioContext.currentTime + 0.2
+            this.audioContext.currentTime + 0.2,
           );
 
           oscillator.start(this.audioContext.currentTime);
@@ -3138,15 +3188,18 @@
 
           // Add gentle sparkle effects instead of crackling
           for (let i = 0; i < 3; i++) {
-            setTimeout(() => {
-              this.createComplexTone(
-                [800 + Math.random() * 400, 1200 + Math.random() * 400],
-                0.08,
-                "sine",
-                0.08,
-                "sharp"
-              );
-            }, 50 + i * 40);
+            setTimeout(
+              () => {
+                this.createComplexTone(
+                  [800 + Math.random() * 400, 1200 + Math.random() * 400],
+                  0.08,
+                  "sine",
+                  0.08,
+                  "sharp",
+                );
+              },
+              50 + i * 40,
+            );
           }
         }
 
@@ -3173,7 +3226,7 @@
               [523, 659, 784, 1047, 1319],
               1.0,
               "triangle",
-              0.4
+              0.4,
             );
           }, 1000);
         }
@@ -3208,7 +3261,7 @@
               0.08,
               "triangle",
               0.1,
-              "sharp"
+              "sharp",
             );
           }, 80);
         }
@@ -3319,7 +3372,7 @@
       // Check if any tiles are currently highlighted (simplified)
       window.checkHighlighted = function () {
         const highlightedTiles = document.querySelectorAll(
-          ".currently-highlighted"
+          ".currently-highlighted",
         );
         return highlightedTiles.length;
       };
@@ -3339,7 +3392,7 @@
         firstTile.style.setProperty(
           "box-shadow",
           "0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 15px rgba(0, 255, 255, 0.1)",
-          "important"
+          "important",
         );
         firstTile.style.setProperty("z-index", "1000", "important");
 
@@ -3348,12 +3401,12 @@
           tileInner.style.setProperty(
             "border",
             "1px solid rgba(0, 255, 255, 0.8)",
-            "important"
+            "important",
           );
           tileInner.style.setProperty(
             "box-shadow",
             "inset 0 0 10px rgba(0, 255, 255, 0.2), 0 0 8px rgba(0, 255, 255, 0.4)",
-            "important"
+            "important",
           );
         }
 
@@ -3481,12 +3534,12 @@
             gameContainer.style.setProperty(
               "touch-action",
               "auto",
-              "important"
+              "important",
             );
             gameContainer.style.setProperty(
               "pointer-events",
               "auto",
-              "important"
+              "important",
             );
             gameContainer.style.setProperty("user-select", "auto", "important");
 
@@ -3494,37 +3547,37 @@
             gameContainer.addEventListener(
               "click",
               this.handleClick.bind(this),
-              true
+              true,
             );
             gameContainer.addEventListener(
               "mousedown",
               this.handleClick.bind(this),
-              true
+              true,
             );
             gameContainer.addEventListener(
               "mouseup",
               this.handleClick.bind(this),
-              true
+              true,
             );
             gameContainer.addEventListener(
               "pointerdown",
               this.handleClick.bind(this),
-              true
+              true,
             );
             gameContainer.addEventListener(
               "pointerup",
               this.handleClick.bind(this),
-              true
+              true,
             );
             gameContainer.addEventListener(
               "touchstart",
               this.handleClick.bind(this),
-              true
+              true,
             );
             gameContainer.addEventListener(
               "touchend",
               this.handleClick.bind(this),
-              true
+              true,
             );
           }
 
@@ -3533,12 +3586,12 @@
           document.addEventListener(
             "mousedown",
             this.handleClick.bind(this),
-            true
+            true,
           );
           document.addEventListener(
             "pointerdown",
             this.handleClick.bind(this),
-            true
+            true,
           );
 
           // Fix all tiles
@@ -3553,7 +3606,7 @@
             tile.addEventListener(
               "mousedown",
               this.handleClick.bind(this),
-              true
+              true,
             );
           });
 
@@ -3565,7 +3618,7 @@
           // Create a unique ID based on tile position classes
           const classes = Array.from(tileElement.classList);
           const positionClass = classes.find((c) =>
-            c.startsWith("tile-position-")
+            c.startsWith("tile-position-"),
           );
           return (
             positionClass || "tile-" + Math.random().toString(36).substr(2, 9)
@@ -3610,7 +3663,7 @@
 
             // Check if already selected by ID
             const alreadySelectedIndex = this.selectedTiles.findIndex(
-              (t) => t.id === tileId
+              (t) => t.id === tileId,
             );
 
             if (alreadySelectedIndex >= 0) {
@@ -3638,12 +3691,12 @@
           tileElement.style.setProperty(
             "border",
             "2px solid #00ffff",
-            "important"
+            "important",
           );
           tileElement.style.setProperty(
             "box-shadow",
             "0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 15px rgba(0, 255, 255, 0.1)",
-            "important"
+            "important",
           );
           tileElement.style.setProperty("z-index", "1000", "important");
 
@@ -3653,12 +3706,12 @@
             tileInner.style.setProperty(
               "border",
               "1px solid rgba(0, 255, 255, 0.8)",
-              "important"
+              "important",
             );
             tileInner.style.setProperty(
               "box-shadow",
               "inset 0 0 10px rgba(0, 255, 255, 0.2), 0 0 8px rgba(0, 255, 255, 0.4)",
-              "important"
+              "important",
             );
           } else {
           }
@@ -3771,7 +3824,7 @@
             domTiles.forEach((tile, index) => {
               const classes = Array.from(tile.classList);
               const positionClass = classes.find((c) =>
-                c.startsWith("tile-position-")
+                c.startsWith("tile-position-"),
               );
               const value =
                 tile.querySelector(".tile-inner")?.textContent || "?";
@@ -4199,7 +4252,7 @@
             gameContainer.style.setProperty(
               "pointer-events",
               "auto",
-              "important"
+              "important",
             );
           }
 
@@ -4214,7 +4267,7 @@
             tile.addEventListener("mouseenter", this.addHoverEffect.bind(this));
             tile.addEventListener(
               "mouseleave",
-              this.removeHoverEffect.bind(this)
+              this.removeHoverEffect.bind(this),
             );
           });
 
@@ -4230,7 +4283,7 @@
             tile.style.setProperty(
               "box-shadow",
               "0 0 15px rgba(255, 68, 68, 0.8)",
-              "important"
+              "important",
             );
             tile.style.setProperty("transform", "scale(1.05)", "important");
           }
@@ -4268,7 +4321,7 @@
           // Get tile position from classes
           const classes = Array.from(tile.classList);
           const positionClass = classes.find((c) =>
-            c.startsWith("tile-position-")
+            c.startsWith("tile-position-"),
           );
 
           if (!positionClass) {
@@ -4300,7 +4353,7 @@
           tileValue,
           x,
           y,
-          positionClass
+          positionClass,
         ) {
           // Delete the tile from the game grid - ENHANCED PRECISE MATCHING
           if (window.gameManager && window.gameManager.grid) {
@@ -4394,9 +4447,9 @@
                     positionClass
                       .replace("tile-position-", "")
                       .split("-")
-                      .join("-")
+                      .join("-"),
                   );
-                }
+                },
               );
 
               if (
@@ -4447,7 +4500,7 @@
               allDomTiles.forEach((domTile, index) => {
                 const classes = Array.from(domTile.classList);
                 const posClass = classes.find((c) =>
-                  c.startsWith("tile-position-")
+                  c.startsWith("tile-position-"),
                 );
                 const value =
                   domTile.querySelector(".tile-inner")?.textContent || "?";
@@ -4473,7 +4526,7 @@
             document.removeEventListener(
               "pointerdown",
               this.clickHandler,
-              true
+              true,
             );
 
             const gameContainer = document.querySelector(".game-container");
@@ -4481,7 +4534,7 @@
               gameContainer.removeEventListener(
                 "click",
                 this.clickHandler,
-                true
+                true,
               );
             }
           }
@@ -4491,11 +4544,11 @@
           tiles.forEach((tile) => {
             tile.removeEventListener(
               "mouseenter",
-              this.addHoverEffect.bind(this)
+              this.addHoverEffect.bind(this),
             );
             tile.removeEventListener(
               "mouseleave",
-              this.removeHoverEffect.bind(this)
+              this.removeHoverEffect.bind(this),
             );
             tile.style.removeProperty("border");
             tile.style.removeProperty("box-shadow");
@@ -4777,7 +4830,7 @@
               }, 100);
             }
           },
-          true
+          true,
         ); // Use capture phase for more reliable event handling
       });
 
@@ -4799,12 +4852,12 @@
             if (retryBtn)
               console.log(
                 "Retry button clickable:",
-                retryBtn.style.pointerEvents !== "none"
+                retryBtn.style.pointerEvents !== "none",
               );
             if (homeBtn)
               console.log(
                 "Home button clickable:",
-                homeBtn.style.pointerEvents !== "none"
+                homeBtn.style.pointerEvents !== "none",
               );
           }, 100);
 
@@ -5183,7 +5236,7 @@
               gridSize,
               KeyboardInputManager,
               HTMLActuator,
-              LocalStorageManager
+              LocalStorageManager,
             );
 
             // CRITICAL FIX: Hook moves for history tracking (needed for reward video)
@@ -5670,7 +5723,7 @@
                                 <span>Best Score</span>
                             </div>
                             <div class="score-value best-score">${parseInt(
-                              bestScore
+                              bestScore,
                             ).toLocaleString()}</div>
                         </div>
                         `
@@ -5714,7 +5767,8 @@
                                 <span>Win Rate</span>
                             </div>
                             <div class="score-value">${Math.round(
-                              (parseInt(gamesWon) / parseInt(gamesPlayed)) * 100
+                              (parseInt(gamesWon) / parseInt(gamesPlayed)) *
+                                100,
                             )}%</div>
                         </div>
                         `
@@ -5805,7 +5859,7 @@
       function clearScores(button) {
         if (
           confirm(
-            "Are you sure you want to clear all scores? This cannot be undone."
+            "Are you sure you want to clear all scores? This cannot be undone.",
           )
         ) {
           localStorage.removeItem("bestScore");
@@ -5951,7 +6005,7 @@
                 newGridSize,
                 KeyboardInputManager,
                 HTMLActuator,
-                LocalStorageManager
+                LocalStorageManager,
               );
 
               // CRITICAL FIX: Re-hook the move counter to the new InputManager!
@@ -5992,7 +6046,7 @@
         // CRITICAL FIX: details
         // Remove lingering "measured" CSS from 6x6/5x5 auto-fitting that breaks 4x4 alignment
         const measuredStyle = document.getElementById(
-          "measured-grid-positions"
+          "measured-grid-positions",
         );
         if (measuredStyle) {
           console.log("Clearing measured-grid-positions style");
@@ -6202,7 +6256,7 @@
           5,
           KeyboardInputManager,
           HTMLActuator,
-          LocalStorageManager
+          LocalStorageManager,
         );
 
         // Configure powerups for level 2 (5x5)
@@ -6313,7 +6367,7 @@
               gridSize,
               KeyboardInputManager,
               HTMLActuator,
-              LocalStorageManager
+              LocalStorageManager,
             );
 
             // Reset power-ups
@@ -6378,7 +6432,7 @@
         domTiles.forEach((tile, index) => {
           const classes = Array.from(tile.classList);
           const positionClass = classes.find((c) =>
-            c.startsWith("tile-position-")
+            c.startsWith("tile-position-"),
           );
           const value = tile.querySelector(".tile-inner")?.textContent || "?";
 
@@ -6501,7 +6555,7 @@
             tilesAfter.forEach((tile, index) => {
               const classes = Array.from(tile.classList);
               const positionClass = classes.find((c) =>
-                c.startsWith("tile-position-")
+                c.startsWith("tile-position-"),
               );
               const rect = tile.getBoundingClientRect();
               const value =
@@ -6975,7 +7029,7 @@
 
         // Check undo availability
         const undoButton = document.querySelector(
-          '.power-up-button[onclick*="undo"]'
+          '.power-up-button[onclick*="undo"]',
         );
         const hasUndoUses = window.powerUps.undo.uses > 0;
         const hasHistory =
@@ -7004,7 +7058,7 @@
         // Check swap availability
         const hasSwapUses = window.powerUps.swap.uses > 0;
         const swapButton = document.querySelector(
-          '.power-up-button[onclick*="swap"]'
+          '.power-up-button[onclick*="swap"]',
         );
 
         // Test tile position validation for 6x6
@@ -7012,7 +7066,7 @@
         tiles.forEach((tile, index) => {
           const classes = Array.from(tile.classList);
           const positionClass = classes.find((c) =>
-            c.startsWith("tile-position-")
+            c.startsWith("tile-position-"),
           );
 
           if (positionClass) {
@@ -7050,7 +7104,7 @@
         domTiles.forEach((tile, index) => {
           const classes = Array.from(tile.classList);
           const positionClass = classes.find((c) =>
-            c.startsWith("tile-position-")
+            c.startsWith("tile-position-"),
           );
           const value = tile.querySelector(".tile-inner")?.textContent || "?";
 
@@ -7164,7 +7218,7 @@
           tiles.forEach((tile, index) => {
             const classes = Array.from(tile.classList);
             const positionClass = classes.find((c) =>
-              c.startsWith("tile-position-")
+              c.startsWith("tile-position-"),
             );
             const rect = tile.getBoundingClientRect();
           });
@@ -7217,7 +7271,7 @@
 
         // Find duplicates
         const duplicates = Object.keys(tileValues).filter(
-          (value) => tileValues[value] > 1
+          (value) => tileValues[value] > 1,
         );
 
         if (duplicates.length > 0) {
@@ -7261,7 +7315,7 @@
         domTiles.forEach((tile, index) => {
           const classes = Array.from(tile.classList);
           const positionClass = classes.find((c) =>
-            c.startsWith("tile-position-")
+            c.startsWith("tile-position-"),
           );
           const value = tile.querySelector(".tile-inner")?.textContent || "?";
 
@@ -7410,7 +7464,7 @@
           tiles.forEach((tile, index) => {
             const classes = Array.from(tile.classList);
             const positionClass = classes.find((c) =>
-              c.startsWith("tile-position-")
+              c.startsWith("tile-position-"),
             );
             if (positionClass) {
               const coords = positionClass
@@ -7536,7 +7590,7 @@
 
         // Apply the measured CSS
         const existingStyle = document.getElementById(
-          "measured-grid-positions"
+          "measured-grid-positions",
         );
         if (existingStyle) {
           existingStyle.remove();
@@ -7584,7 +7638,7 @@
         tiles.forEach((tile, index) => {
           const classes = Array.from(tile.classList);
           const positionClass = classes.find((c) =>
-            c.startsWith("tile-position-")
+            c.startsWith("tile-position-"),
           );
           const computedStyle = window.getComputedStyle(tile);
           const tileRect = tile.getBoundingClientRect();
@@ -7619,7 +7673,7 @@
       window.fix4x4TileSizing = function () {
         // Remove any conflicting styles
         const conflictingStyles = document.querySelectorAll(
-          'style[id*="dynamic"], style[id*="exact-tile"]'
+          'style[id*="dynamic"], style[id*="exact-tile"]',
         );
         conflictingStyles.forEach((style) => {
           if (style.id !== "dynamic-grid-styles") {
@@ -7639,13 +7693,13 @@
           // Ensure tile has proper base classes
           const classes = Array.from(tile.classList);
           const positionClass = classes.find((c) =>
-            c.startsWith("tile-position-")
+            c.startsWith("tile-position-"),
           );
           const valueClass = classes.find(
             (c) =>
               c.startsWith("tile-") &&
               c !== positionClass &&
-              !c.includes("position")
+              !c.includes("position"),
           );
 
           // Reset to base classes
@@ -7665,7 +7719,7 @@
             const rect = tile.getBoundingClientRect();
             const classes = Array.from(tile.classList);
             const positionClass = classes.find((c) =>
-              c.startsWith("tile-position-")
+              c.startsWith("tile-position-"),
             );
           });
         }, 100);
@@ -7850,7 +7904,7 @@
 
         // Method 3: Hide any visible game over modals
         const gameOverModals = document.querySelectorAll(
-          '.game-message, .game-over-content, [class*="game-over"]'
+          '.game-message, .game-over-content, [class*="game-over"]',
         );
         gameOverModals.forEach((modal, index) => {
           modal.style.display = "none";
@@ -8211,7 +8265,7 @@
       window.apply6x6TileFitting = function (cellWidth, cellHeight) {
         // Remove any existing 6x6 fitting styles
         const existingStyles = document.querySelectorAll(
-          "#comprehensive-6x6-fitting, #exact-6x6-tile-sizes, #dynamic-6x6-tiles, #aggressive-6x6-sizing, #super-aggressive-6x6"
+          "#comprehensive-6x6-fitting, #exact-6x6-tile-sizes, #dynamic-6x6-tiles, #aggressive-6x6-sizing, #super-aggressive-6x6",
         );
         existingStyles.forEach((style) => style.remove());
 
@@ -8392,7 +8446,7 @@
 
         // Remove any existing 6x6 tile size styles
         const existingStyles = document.querySelectorAll(
-          "#exact-6x6-tile-sizes, #dynamic-6x6-tiles"
+          "#exact-6x6-tile-sizes, #dynamic-6x6-tiles",
         );
         existingStyles.forEach((style) => style.remove());
 
@@ -8470,7 +8524,7 @@
           5,
           KeyboardInputManager,
           HTMLActuator,
-          LocalStorageManager
+          LocalStorageManager,
         );
 
         // Verify immediately
@@ -8488,7 +8542,7 @@
       window.cleanupGridLayout = function () {
         // Remove any stray grid elements
         const strayGrids = document.querySelectorAll(
-          ".grid-container:not(.game-container .grid-container)"
+          ".grid-container:not(.game-container .grid-container)",
         );
         strayGrids.forEach((grid) => {
           grid.remove();
@@ -8679,10 +8733,10 @@
                     
                     .grid-cell {
                         width: ${Math.floor(
-                          (280 - (size - 1) * 8) / size
+                          (280 - (size - 1) * 8) / size,
                         )}px !important;
                         height: ${Math.floor(
-                          (280 - (size - 1) * 8) / size
+                          (280 - (size - 1) * 8) / size,
                         )}px !important;
                     }
                     
@@ -8690,7 +8744,7 @@
                         gap: 8px !important;
                         margin-bottom: 8px !important;
                         height: ${Math.floor(
-                          (280 - (size - 1) * 8) / size
+                          (280 - (size - 1) * 8) / size,
                         )}px !important;
                     }
                     
@@ -8703,22 +8757,22 @@
                     
                     .tile {
                         width: ${Math.floor(
-                          (280 - (size - 1) * 8) / size
+                          (280 - (size - 1) * 8) / size,
                         )}px !important;
                         height: ${Math.floor(
-                          (280 - (size - 1) * 8) / size
+                          (280 - (size - 1) * 8) / size,
                         )}px !important;
                     }
                     
                     .tile .tile-inner {
                         width: ${Math.floor(
-                          (280 - (size - 1) * 8) / size
+                          (280 - (size - 1) * 8) / size,
                         )}px !important;
                         height: ${Math.floor(
-                          (280 - (size - 1) * 8) / size
+                          (280 - (size - 1) * 8) / size,
                         )}px !important;
                         line-height: ${Math.floor(
-                          (280 - (size - 1) * 8) / size
+                          (280 - (size - 1) * 8) / size,
                         )}px !important;
                         font-size: ${Math.max(12, fontSize - 4)}px !important;
                     }
@@ -8766,7 +8820,7 @@
                         : generateCorrectPositions(
                             size,
                             Math.floor((280 - (size - 1) * 8) / size),
-                            8
+                            8,
                           )
                     }
                 }
@@ -8881,7 +8935,7 @@
         tiles.forEach((tile, index) => {
           const classes = Array.from(tile.classList);
           const positionClass = classes.find((c) =>
-            c.startsWith("tile-position-")
+            c.startsWith("tile-position-"),
           );
           const value = tile.querySelector(".tile-inner")?.textContent || "?";
           const computedStyle = window.getComputedStyle(tile);
@@ -8896,7 +8950,7 @@
             newSize,
             KeyboardInputManager,
             HTMLActuator,
-            LocalStorageManager
+            LocalStorageManager,
           );
 
           // Reset power-ups if they exist
@@ -9046,7 +9100,7 @@
           gridSize,
           KeyboardInputManager,
           HTMLActuator,
-          LocalStorageManager
+          LocalStorageManager,
         );
 
         // Update UI text for winning target
@@ -9074,7 +9128,7 @@
             "Grid size mismatch:",
             size,
             "vs",
-            window.currentGridSize
+            window.currentGridSize,
           );
           return {
             isGameOver: false,
@@ -9269,14 +9323,14 @@
         }
 
         console.log(
-          "Click detection listeners added. Try clicking the buttons now."
+          "Click detection listeners added. Try clicking the buttons now.",
         );
       };
 
       // Function to find what element is blocking clicks
       window.findClickBlocker = function () {
         console.log(
-          "Click anywhere on the screen to see what element receives the click..."
+          "Click anywhere on the screen to see what element receives the click...",
         );
 
         // Remove any existing click listeners
@@ -9291,18 +9345,18 @@
           console.log("Element classes:", e.target.className);
           console.log(
             "Element z-index:",
-            window.getComputedStyle(e.target).zIndex
+            window.getComputedStyle(e.target).zIndex,
           );
           console.log(
             "Element pointer-events:",
-            window.getComputedStyle(e.target).pointerEvents
+            window.getComputedStyle(e.target).pointerEvents,
           );
           console.log("Click coordinates:", e.clientX, e.clientY);
 
           // Check what element is at this position
           const elementAtPoint = document.elementFromPoint(
             e.clientX,
-            e.clientY
+            e.clientY,
           );
           console.log("Element at click point:", elementAtPoint);
 
@@ -9310,7 +9364,7 @@
           const allElements = document.elementsFromPoint(e.clientX, e.clientY);
           console.log(
             "All elements at click point (top to bottom):",
-            allElements
+            allElements,
           );
 
           console.log("==================");
@@ -9331,8 +9385,8 @@
             "Element at retry button center:",
             document.elementFromPoint(
               rect.left + rect.width / 2,
-              rect.top + rect.height / 2
-            )
+              rect.top + rect.height / 2,
+            ),
           );
         }
 
@@ -9343,8 +9397,8 @@
             "Element at home button center:",
             document.elementFromPoint(
               rect.left + rect.width / 2,
-              rect.top + rect.height / 2
-            )
+              rect.top + rect.height / 2,
+            ),
           );
         }
       };
@@ -9541,7 +9595,7 @@
                 }
               }, 100);
             },
-            true
+            true,
           );
 
           homeBtn.addEventListener(
@@ -9567,7 +9621,7 @@
                 window.goToHome();
               }, 100);
             },
-            true
+            true,
           );
         });
 
@@ -9649,33 +9703,33 @@
           console.log("=== Reward Video Functions Status (Fallback) ===");
           console.log(
             "testRewardVideoPopup:",
-            typeof window.testRewardVideoPopup === "function" ? "✅" : "❌"
+            typeof window.testRewardVideoPopup === "function" ? "✅" : "❌",
           );
           console.log(
             "showRewardVideoPopup:",
-            typeof window.showRewardVideoPopup === "function" ? "✅" : "❌"
+            typeof window.showRewardVideoPopup === "function" ? "✅" : "❌",
           );
           console.log(
             "hideRewardVideoPopup:",
-            typeof window.hideRewardVideoPopup === "function" ? "✅" : "❌"
+            typeof window.hideRewardVideoPopup === "function" ? "✅" : "❌",
           );
           console.log(
             "acceptRewardVideo:",
-            typeof window.acceptRewardVideo === "function" ? "✅" : "❌"
+            typeof window.acceptRewardVideo === "function" ? "✅" : "❌",
           );
           console.log(
             "declineRewardVideo:",
-            typeof window.declineRewardVideo === "function" ? "✅" : "❌"
+            typeof window.declineRewardVideo === "function" ? "✅" : "❌",
           );
           console.log(
             "giveReward:",
-            typeof window.giveReward === "function" ? "✅" : "❌"
+            typeof window.giveReward === "function" ? "✅" : "❌",
           );
 
           const popup = document.getElementById("rewardVideoPopup");
           console.log(
             "rewardVideoPopup element:",
-            popup ? "✅ Found" : "❌ Missing"
+            popup ? "✅ Found" : "❌ Missing",
           );
         };
       }
