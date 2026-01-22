@@ -424,6 +424,15 @@ HTMLActuator.prototype.showRewardVideoPopup = function () {
     console.log(
       "Reward video already used this session, showing game over directly",
     );
+
+    // Trigger interstitial ad and post score before final game over
+    if (typeof postScore === "function") {
+      postScore(self.score);
+    }
+    if (typeof showAd === "function") {
+      showAd();
+    }
+
     // Show game over directly
     setTimeout(function () {
       if (typeof window.ultimateButtonFix === "function") {
