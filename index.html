@@ -3835,6 +3835,15 @@
             return;
           }
 
+          // Prepare all tiles to prevent flickering
+          // This ensures every tile has a previousPosition set, so they don't render as "new" tiles
+          window.gameManager.grid.eachCell(function (x, y, tile) {
+            if (tile) {
+              tile.savePosition();
+              tile.mergedFrom = null; // Clear merge info to prevent 'pop' animations
+            }
+          });
+
           // Perform the swap
           // CRITICAL FIX: Disable mode immediately to prevent multiple swaps
           this.active = false;
@@ -3842,8 +3851,13 @@
           tileObj1.value = tileObj2.value;
           tileObj2.value = tempValue;
 
-          // Force update display
+          // Manually set cross-positions to animate the swap
+          // Tile 1 (at pos1) should appear to slide from pos2
+          tileObj1.previousPosition = { x: pos2.x, y: pos2.y };
+          // Tile 2 (at pos2) should appear to slide from pos1
+          tileObj2.previousPosition = { x: pos1.x, y: pos1.y };
 
+          // Force update display
           window.gameManager.actuate();
 
           showSelectionMessage("Tiles swapped!");
