@@ -2022,9 +2022,10 @@
             }
 
             // Reset session-based powerup counters if needed
-            if (typeof window.resetPowerUps === "function") {
-              window.resetPowerUps();
-            }
+            // FIX: DO NOT reset powerups when continuing! User should keep what they earned.
+            // if (typeof window.resetPowerUps === "function") {
+            //   window.resetPowerUps();
+            // }
 
             console.log(
               `✅ Success: Retained score ${currentScore} and restored grid from ${stepsToSubtract} steps ago.`,
@@ -4492,6 +4493,14 @@
               if (gridTile.value.toString() === tileValue.toString()) {
                 // CRITICAL FIX: Disable mode immediately to prevent multiple deletions
                 this.active = false;
+
+                // Prepare all tiles to prevent flickering (SAME FIX AS SWAP)
+                window.gameManager.grid.eachCell(function (x, y, tile) {
+                  if (tile) {
+                    tile.savePosition();
+                    tile.mergedFrom = null;
+                  }
+                });
 
                 window.gameManager.grid.removeTile(gridTile);
                 window.gameManager.actuate();
