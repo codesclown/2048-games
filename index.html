@@ -1842,7 +1842,7 @@
       window.rewardVideoUsed = false; // Track if reward video has been used in this session
 
       // Reward Video Popup Functions
-      window.showRewardVideoPopup = function () {
+      window.showRewardVideoPopup = function (score) {
         // Check if rewarded video is actually ready
         if (typeof isRVReady !== "undefined" && isRVReady) {
           const popup = document.getElementById("rewardVideoPopup");
@@ -1857,6 +1857,17 @@
         } else {
           console.log("Rewared video not ready, skipping popup");
           // Skip directly to game over (but show interstitial first)
+
+          // Fix: Post score before showing interstitial ad
+          if (typeof postScore === "function") {
+            // Use passed score or fallback to gameManager
+            var currentScore = score;
+            if (currentScore === undefined && window.gameManager) {
+              currentScore = window.gameManager.score;
+            }
+            postScore(currentScore);
+          }
+
           if (typeof showAd === "function") {
             console.log("Reward video not ready, showing interstitial instead");
             showAd();
@@ -1939,6 +1950,15 @@
 
         // Hide the reward video popup
         hideRewardVideoPopup();
+
+        // Fix: Post score before showing interstitial ad
+        if (typeof postScore === "function") {
+          var currentScore = 0;
+          if (window.gameManager) {
+            currentScore = window.gameManager.score;
+          }
+          postScore(currentScore);
+        }
 
         // 2. Show Interstitial Ad (as per requirement)
         if (typeof showAd === "function") {

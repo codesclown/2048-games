@@ -24,9 +24,6 @@ function HTMLActuator() {
         e.preventDefault();
 
         // Post score and show ad on retry
-        if (typeof postScore === "function") {
-          postScore(self.score);
-        }
         if (typeof showAd === "function") {
           showAd();
         }
@@ -445,7 +442,7 @@ HTMLActuator.prototype.showRewardVideoPopup = function () {
   // Show reward video popup for first time
   if (typeof window.showRewardVideoPopup === "function") {
     console.log("First game over - showing reward video popup");
-    window.showRewardVideoPopup();
+    window.showRewardVideoPopup(self.score);
   } else {
     // Fallback to direct game over if popup function doesn't exist
     setTimeout(function () {
