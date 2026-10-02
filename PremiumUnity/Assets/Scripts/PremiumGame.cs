@@ -28,7 +28,8 @@ public class PremiumGame : MonoBehaviour {
  readonly List<RectTransform> activeGhosts=new List<RectTransform>();
  bool ready,animating,appPaused,focusLost;
  int selected=-1;
- Coroutine moveAnimation,scoreAnimation,boardPulseAnimation;AudioSource audioSource;AudioClip moveTone,mergeTone,clickTone,winTone;
+ Coroutine moveAnimation,scoreAnimation,boardPulseAnimation;AudioSource audioSource;AudioClip moveTone,mergeTone,clickTone,winTone,slideTone,undoTone,swapTone,deleteTone,lossTone,spawnTone;
+ readonly Dictionary<int,AudioClip> mergeClips=new Dictionary<int,AudioClip>();
  int lastWidth,lastHeight;Rect lastSafe;
  Color Gold=>PremiumTheme.Accent;Color Ink=>PremiumTheme.Ink;Color White=>PremiumTheme.Text;
  [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -53,8 +54,12 @@ public class PremiumGame : MonoBehaviour {
   if(rewardProvider==null) rewardProvider=GetComponent<RewardProvider>();
   BuildHome();BuildGame();
   audioSource=gameObject.AddComponent<AudioSource>();audioSource.playOnAwake=false;
-  moveTone=Tone("Slide",220,0.07f);mergeTone=Tone("Merge",440,0.13f);clickTone=Tone("Click",660,0.06f);winTone=Tone("Win",880,0.35f);
-  ready=true;ShowHome();FitScreen();
+  if(GetComponent<AudioListener>()==null && FindFirstObjectByType<AudioListener>()==null) gameObject.AddComponent<AudioListener>();
+  slideTone=PremiumAudio.Slide();undoTone=PremiumAudio.Undo();swapTone=PremiumAudio.Swap();
+  deleteTone=PremiumAudio.Delete();lossTone=PremiumAudio.Loss();spawnTone=PremiumAudio.Spawn();
+  winTone=PremiumAudio.Win();clickTone=PremiumAudio.Click();
+  moveTone=slideTone;mergeTone=PremiumAudio.Merge(4);mergeClips[4]=mergeTone;
+  ready=true;ShowHome();FitScreen(true);
  }
  void Progress(float value,string text) {if(loadFill!=null)loadFill.fillAmount=value;if(loadText!=null)loadText.text=text+"\n"+Mathf.RoundToInt(value*100)+"%";}
  void Update() {
@@ -74,13 +79,27 @@ public class PremiumGame : MonoBehaviour {
   if(!ready)return;
   if(change==GameChange.Settings){ApplyPresentation();return;}
   if(change==GameChange.Move && manager.ReducedMotion){StopScore();Refresh(false);PremiumHaptics.Trigger(manager.LastScoreGain>0?HapticImpact.Medium:HapticImpact.Light);manager.ResolveAnimation();return;}
-  if(change==GameChange.Move){Play(manager.LastScoreGain>0?mergeTone:moveTone);moveAnimation=StartCoroutine(AnimateMove(manager.LastScoreGain));return;}
+  if(change==GameChange.Move){
+   AudioClip clip=slideTone;
+   if(manager.LastScoreGain>0){
+    int maxMerge=4;
+    if(session!=null && session.board!=null && session.board.merges!=null){
+     foreach(int idx in session.board.merges){
+      if(idx>=0 && idx<session.board.cells.Length && session.board.cells[idx]>maxMerge)maxMerge=session.board.cells[idx];
+     }
+    }
+    if(!mergeClips.TryGetValue(maxMerge,out clip)){clip=PremiumAudio.Merge(maxMerge);mergeClips[maxMerge]=clip;}
+   }
+   Play(clip);
+   moveAnimation=StartCoroutine(AnimateMove(manager.LastScoreGain));
+   return;
+  }
   if(change==GameChange.NewGame || change==GameChange.Undo || change==GameChange.Continue){StopScore();BuildBoard();}
   Refresh();
  }
  void OnNavigationChanged() {
   controller.Cancel();if(!ready)return;
-  home.SetActive(navigation.Screen==GameScreen.Home);game.SetActive(navigation.Screen==GameScreen.Game);loading.SetActive(navigation.Screen==GameScreen.Loading);
+  home.SetActive(navigation.Screen==GameScreen.Home);game.SetActive(navigation.Screen==GameScreen.Game);loading.SetActive(navigation.Screen==GameScreen.Loading);FitScreen(true);
   if(navigation.State==GameState.Animating)return;
   if(animating)FinishAnimation();
   if(selection<0)ClearSelectionVisuals();
@@ -168,89 +187,107 @@ public class PremiumGame : MonoBehaviour {
  void RenderDialog() {
   switch(navigation.Dialog) {
    case GameDialog.Pause:
-    Modal("Paused","Take a breath. Your board is saved.");
-    DialogButton("Resume",150,ShowGame,true);DialogButton("Change level",78,ShowLevels);DialogButton("How to Play",6,ShowInstructions);DialogButton("High Scores",-66,ShowScores);DialogButton("Settings",-138,ShowSettings);DialogButton("Home",-210,ShowHome);break;
+    Modal("PAUSED","Take a breath. Your board is saved.");
+    DialogButton("Resume",140,ShowGame,true);
+    DialogButton("Change level",68,ShowLevels);
+    DialogButton("How to Play",-4,ShowInstructions);
+    DialogButton("High Scores",-76,ShowScores);
+    DialogButton("Settings",-148,ShowSettings);
+    DialogButton("Home",-220,ShowHome);break;
    case GameDialog.Levels:
-    Modal("Choose your pace",session!=null?"Starting a board replaces your saved game.":"Three boards. One satisfying challenge.");
-    LevelCard(4,132,"Classic","Short and focused");LevelCard(5,-16,"Advanced","Room to build");LevelCard(6,-164,"Expert","Think a few moves ahead");break;
+    Modal("CHOOSE YOUR PACE",session!=null?"Starting a board replaces your saved game.":"Three boards. One satisfying challenge.");
+    LevelCard(4,125,"Classic","Short and focused");
+    LevelCard(5,-15,"Advanced","Room to build");
+    LevelCard(6,-155,"Expert","Think a few moves ahead");
+    Button("Back",modalPanel,new Vector2(0,-248),new Vector2(200,54),CloseModal);break;
    case GameDialog.Instructions:
-    Modal("How to Play","Simple moves. Thoughtful choices.");BuildInstructions();break;
+    Modal("HOW TO PLAY","Simple moves. Thoughtful choices.");
+    BuildInstructions();
+    Button("Close",modalPanel,new Vector2(0,-285),new Vector2(200,54),CloseModal,true);break;
    case GameDialog.Scores:
     Modal("HIGH SCORES","Your personal hall of fame & career records");
     string[] modeNames=new[]{"CLASSIC 4×4","ADVANCED 5×5","EXPERT 6×6"};
     int[] targets=new[]{2048,4096,8192};
     for(int i=0;i<3;i++){
-     var card=Panel("Record "+i,modalPanel,new Vector2(0,138-i*102),new Vector2(456,92),Hex("111E31"));
-     var border=Rect("Record Border",card.transform,Vector2.zero,new Vector2(452,88)).gameObject.AddComponent<PremiumSelectionFrame>();border.color=Hex("243C5E");border.raycastTarget=false;
-     var emblem=Panel("Trophy Emblem",card.transform,new Vector2(-172,0),new Vector2(58,58),Hex("091220"));
-     AddIcon(emblem.transform,Vector2.zero,30,IconKind.Trophy,Gold);
-     var modeTitle=Label("Mode",card.transform,modeNames[i],new Vector2(-30,14),new Vector2(190,30),20);Emphasis(modeTitle);modeTitle.alignment=TextAnchor.MiddleLeft;
-     var targetLabel=Label("Grid",card.transform,"Target {0}  ·  Level {1}",new Vector2(-30,-16),new Vector2(190,24),14,targets[i],i+1);targetLabel.color=PremiumTheme.Muted;targetLabel.alignment=TextAnchor.MiddleLeft;
-     var scoreBox=Panel("Score Box",card.transform,new Vector2(148,0),new Vector2(128,64),Hex("091220"));
-     var scoreCap=Label("Score Cap",scoreBox.transform,"RECORD",new Vector2(0,16),new Vector2(120,20),12);scoreCap.color=Gold;Emphasis(scoreCap);
-     var scoreVal=Label("Best score",scoreBox.transform,"{0}",new Vector2(0,-10),new Vector2(120,36),26,stats.best[i]);Emphasis(scoreVal);scoreVal.color=White;
+     var card=Panel("Record "+i,modalPanel,new Vector2(0,140-i*92),new Vector2(456,82),Hex("111E31"));
+     var border=Rect("Record Border",card.transform,Vector2.zero,new Vector2(452,78)).gameObject.AddComponent<PremiumSelectionFrame>();border.color=Hex("243C5E");border.raycastTarget=false;
+     var emblem=Panel("Trophy Emblem",card.transform,new Vector2(-172,0),new Vector2(52,52),Hex("091220"));
+     AddIcon(emblem.transform,Vector2.zero,26,IconKind.Trophy,Gold);
+     var modeTitle=Label("Mode",card.transform,modeNames[i],new Vector2(-30,12),new Vector2(190,26),18);Emphasis(modeTitle);modeTitle.alignment=TextAnchor.MiddleLeft;
+     var targetLabel=Label("Grid",card.transform,"Target {0}  ·  Level {1}",new Vector2(-30,-14),new Vector2(190,22),13,targets[i],i+1);targetLabel.color=PremiumTheme.Muted;targetLabel.alignment=TextAnchor.MiddleLeft;
+     var scoreBox=Panel("Score Box",card.transform,new Vector2(148,0),new Vector2(128,58),Hex("091220"));
+     var scoreCap=Label("Score Cap",scoreBox.transform,"RECORD",new Vector2(0,14),new Vector2(120,18),11);scoreCap.color=Gold;Emphasis(scoreCap);
+     var scoreVal=Label("Best score",scoreBox.transform,stats.best[i].ToString("N0"),new Vector2(0,-8),new Vector2(120,32),22);Emphasis(scoreVal);scoreVal.color=White;
     }
-    var statsCard=Panel("Summary Card",modalPanel,new Vector2(0,-164),new Vector2(456,62),Hex("0D1728"));
-    var statsBorder=Rect("Stats Border",statsCard.transform,Vector2.zero,new Vector2(452,58)).gameObject.AddComponent<PremiumSelectionFrame>();statsBorder.color=Hex("1E3048");statsBorder.raycastTarget=false;
+    var statsCard=Panel("Summary Card",modalPanel,new Vector2(0,-132),new Vector2(456,66),Hex("0D1728"));
+    var statsBorder=Rect("Stats Border",statsCard.transform,Vector2.zero,new Vector2(452,62)).gameObject.AddComponent<PremiumSelectionFrame>();statsBorder.color=Hex("1E3048");statsBorder.raycastTarget=false;
     int totalP=stats.played, totalW=stats.won, winR=totalP==0?0:Mathf.RoundToInt(100f*totalW/totalP);
-    var pBox=Rect("Played Col",statsCard.transform,new Vector2(-140,0),new Vector2(130,50));
-    Label("Played Cap",pBox,"PLAYED",new Vector2(0,12),new Vector2(130,18),12).color=PremiumTheme.Muted;
-    var pVal=Label("Played Val",pBox,"{0}",new Vector2(0,-10),new Vector2(130,28),22,totalP);Emphasis(pVal);pVal.color=Gold;
-    var wBox=Rect("Won Col",statsCard.transform,new Vector2(0,0),new Vector2(130,50));
-    Label("Won Cap",wBox,"VICTORIES",new Vector2(0,12),new Vector2(130,18),12).color=PremiumTheme.Muted;
-    var wVal=Label("Won Val",wBox,"{0}",new Vector2(0,-10),new Vector2(130,28),22,totalW);Emphasis(wVal);wVal.color=Gold;
-    var rBox=Rect("Rate Col",statsCard.transform,new Vector2(140,0),new Vector2(130,50));
-    Label("Rate Cap",rBox,"WIN RATE",new Vector2(0,12),new Vector2(130,18),12).color=PremiumTheme.Muted;
-    var rVal=Label("Rate Val",rBox,"{0}%",new Vector2(0,-10),new Vector2(130,28),22,winR);Emphasis(rVal);rVal.color=Gold;
-    DialogButton("Clear scores",-244,()=>navigation.Open(GameDialog.ClearScores),false,true);break;
+    var pBox=Rect("Played Col",statsCard.transform,new Vector2(-140,0),new Vector2(130,58));
+    Label("Played Cap",pBox,"PLAYED",new Vector2(0,14),new Vector2(130,18),11).color=PremiumTheme.Muted;
+    var pVal=Label("Played Val",pBox,totalP.ToString(),new Vector2(0,-10),new Vector2(130,30),18);Emphasis(pVal);pVal.color=Gold;
+    var wBox=Rect("Won Col",statsCard.transform,new Vector2(0,0),new Vector2(130,58));
+    Label("Won Cap",wBox,"VICTORIES",new Vector2(0,14),new Vector2(130,18),11).color=PremiumTheme.Muted;
+    var wVal=Label("Won Val",wBox,totalW.ToString(),new Vector2(0,-10),new Vector2(130,30),18);Emphasis(wVal);wVal.color=Gold;
+    var rBox=Rect("Rate Col",statsCard.transform,new Vector2(140,0),new Vector2(130,58));
+    Label("Rate Cap",rBox,"WIN RATE",new Vector2(0,14),new Vector2(130,18),11).color=PremiumTheme.Muted;
+    var rVal=Label("Rate Val",rBox,winR.ToString()+"%",new Vector2(0,-10),new Vector2(130,30),18);Emphasis(rVal);rVal.color=Gold;
+    Button("Close",modalPanel,new Vector2(-118,-205),new Vector2(210,54),CloseModal,true);
+    Button("Clear scores",modalPanel,new Vector2(118,-205),new Vector2(210,54),()=>navigation.Open(GameDialog.ClearScores),false,true);break;
    case GameDialog.Settings:
-    Modal("Settings","Make the game comfortable for you");
-    SettingRow("Sound",166,sound,ToggleSound);
-    SettingRow("Haptic feedback",94,manager.Haptics,ToggleHaptics);
-    SettingRow("Reduced motion",22,manager.ReducedMotion,manager.ToggleReducedMotion);
-    SettingRow("Large text",-50,manager.LargeText,manager.ToggleLargeText);
-    SettingRow("High contrast",-122,manager.HighContrast,manager.ToggleHighContrast);
-    var languageButton=Button("Language",modalPanel,new Vector2(0,-194),new Vector2(456,64),manager.ToggleLanguage);
-    SetText(languageButton.GetComponentInChildren<Text>(),"Language · {0}",manager.Language=="es"?"Español":"English");break;
+    Modal("SETTINGS","Make the game comfortable for you");
+    SettingRow("Sound",155,sound,ToggleSound);
+    SettingRow("Haptic feedback",90,manager.Haptics,ToggleHaptics);
+    SettingRow("Reduced motion",25,manager.ReducedMotion,manager.ToggleReducedMotion);
+    SettingRow("Large text",-40,manager.LargeText,manager.ToggleLargeText);
+    SettingRow("High contrast",-105,manager.HighContrast,manager.ToggleHighContrast);
+    var languageButton=Button("Language",modalPanel,new Vector2(0,-170),new Vector2(456,58),manager.ToggleLanguage);
+    SetText(languageButton.GetComponentInChildren<Text>(),"Language · {0}",manager.Language=="es"?"Español":"English");
+    Button("Close",modalPanel,new Vector2(0,-242),new Vector2(200,54),CloseModal,true);break;
    case GameDialog.ClearScores:
-    Modal("Clear saved scores?","This clears scores, statistics and the saved game.");DialogButton("Clear",-10,manager.ResetProgress,false,true);DialogButton("Cancel",-94,CloseModal);break;
+    Modal("Clear saved scores?","This clears scores, statistics and the saved game.");
+    DialogButton("Clear all",10,manager.ResetProgress,false,true);
+    DialogButton("Cancel",-66,CloseModal);break;
    case GameDialog.Restart:
-    Modal("Restart level?","Start a fresh board and reset power-ups. Your best score stays saved.");DialogButton("Restart",-10,()=>NewGame(session.board.size),false,true);DialogButton("Cancel",-94,CloseModal);break;
+    Modal("Restart level?","Start a fresh board and reset power-ups. Your best score stays saved.");
+    DialogButton("Restart",10,()=>NewGame(session.board.size),false,true);
+    DialogButton("Cancel",-66,CloseModal);break;
    case GameDialog.Win:
     Play(winTone);PremiumHaptics.Trigger(HapticImpact.Success);
     Modal("VICTORY!","Target reached! Keep going to set a new record.");
     ResultCard("TARGET REACHED",session.board.target);
     DialogButton("Keep going",-35,()=>manager.KeepGoing(),true);
-    DialogButton("Play again",-108,()=>NewGame(session.board.size));
-    DialogButton("Home",-180,ShowHome);break;
+    DialogButton("Play again",-110,()=>NewGame(session.board.size));
+    DialogButton("Home",-185,ShowHome);break;
    case GameDialog.Loss:
+    Play(lossTone);
     Modal("GAME OVER","No moves remain. Choose your next move.");
     ResultCard("FINAL SCORE",session.board.score);
     if(session.CanReward){
      DialogButton(rewardProvider==null?"Continue: rewind 5 moves":"Watch video to continue",-35,AskReward,true);
-     DialogButton("Play again",-108,()=>NewGame(session.board.size));
-     DialogButton("Home",-180,ShowHome);
+     DialogButton("Play again",-110,()=>NewGame(session.board.size));
+     DialogButton("Home",-185,ShowHome);
     } else {
-     DialogButton("Play again",-50,()=>NewGame(session.board.size),true);
-     DialogButton("Home",-128,ShowHome);
+     DialogButton("Play again",-45,()=>NewGame(session.board.size),true);
+     DialogButton("Home",-125,ShowHome);
     }break;
    case GameDialog.Continue:
     Modal("Continue playing?","Rewind up to 5 previous actions and keep your current score. Available once per game.");
-    DialogButton("Continue",-10,GrantOfflineReward,true);
-    DialogButton("No thanks",-94,CloseModal);break;
+    DialogButton("Continue",10,GrantOfflineReward,true);
+    DialogButton("No thanks",-66,CloseModal);break;
    case GameDialog.VideoUnavailable:
-    Modal("Video unavailable","The ad provider is not ready. Your board remains saved.");DialogButton("Back",0,CloseModal);break;
+    Modal("Video unavailable","The ad provider is not ready. Your board remains saved.");
+    DialogButton("Back",0,CloseModal,true);break;
    case GameDialog.RewardVideo:
     Modal("Reward video","Waiting for the ad provider. Reward is granted only after completion.");break;
   }
  }
- void ToggleSound(){manager.ToggleSound();if(sound)Play(clickTone);}
+ void ToggleSound(){manager.ToggleSound();if(sound)Play(spawnTone);}
  void ToggleHaptics(){manager.ToggleHaptics();if(manager.Haptics)PremiumHaptics.Trigger(HapticImpact.Medium);}
  void UsePower(Power power){
   if(!Playing)return;
   if(power==Power.Undo){
    if(manager.Undo()){
-    Play(clickTone);PremiumHaptics.Trigger(HapticImpact.Light);
+    Play(undoTone);PremiumHaptics.Trigger(HapticImpact.Light);
     if(!manager.ReducedMotion){if(boardPulseAnimation!=null)StopCoroutine(boardPulseAnimation);boardPulseAnimation=StartCoroutine(PulseBoard());}
    }
   }else manager.BeginSelection(power);
@@ -268,10 +305,10 @@ public class PremiumGame : MonoBehaviour {
   Vector2 local;if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(grid,screen,null,out local))return;
   int index=-1;for(int i=0;i<tiles.Length;i++){Vector2 d=local-CellPosition(i);if(Mathf.Abs(d.x)<=CellSize/2 && Mathf.Abs(d.y)<=CellSize/2){index=i;break;}}
   if(index<0 || session.board.cells[index]==0)return;
-  if(selection==(int)Power.Delete){if(manager.Delete(index)){Play(clickTone);PremiumHaptics.Trigger(HapticImpact.Medium);}return;}
+  if(selection==(int)Power.Delete){if(manager.Delete(index)){Play(deleteTone);PremiumHaptics.Trigger(HapticImpact.Medium);}return;}
   if(selected<0){selected=index;MarkSelection(index);SetText(hint,"Tile 1 selected · Tap an adjacent tile");return;}
   if(index==selected){CancelSelection();Refresh();return;}
-  if(manager.Swap(selected,index)){Play(clickTone);PremiumHaptics.Trigger(HapticImpact.Medium);}else SetText(hint,"Choose a different tile next to tile 1");
+  if(manager.Swap(selected,index)){Play(swapTone);PremiumHaptics.Trigger(HapticImpact.Medium);}else SetText(hint,"Choose a different tile next to tile 1");
  }
  void AskReward() {
   if(!session.CanReward || rewardPending)return;
@@ -296,15 +333,55 @@ public class PremiumGame : MonoBehaviour {
   for(int i=0;i<samples;i++){float t=i/44100f;float envelope=Mathf.Sin(Mathf.PI*i/samples);data[i]=Mathf.Sin(2*Mathf.PI*frequency*t)*envelope*0.5f;}
   var clip=AudioClip.Create(name,samples,1,44100,false);clip.SetData(data,0);return clip;
  }
- void FitScreen() {
-  if(safeRoot==null || (lastWidth==Screen.width && lastHeight==Screen.height && lastSafe==Screen.safeArea))return;
+ void FitScreen(bool force=false) {
+  if(!force && (safeRoot==null || (lastWidth==Screen.width && lastHeight==Screen.height && lastSafe==Screen.safeArea)))return;
   lastWidth=Screen.width;lastHeight=Screen.height;lastSafe=Screen.safeArea;if(lastWidth==0 || lastHeight==0)return;
   var anchors=PremiumLayout.CalculateSafeAnchors(lastWidth,lastHeight,lastSafe);
   safeRoot.anchorMin=new Vector2(anchors.xMin,anchors.yMin);safeRoot.anchorMax=new Vector2(anchors.xMax,anchors.yMax);safeRoot.offsetMin=safeRoot.offsetMax=Vector2.zero;
-  scaler.scaleFactor=PremiumLayout.CalculateScale(lastWidth,lastHeight,lastSafe,new Vector2(600,960));
+  scaler.scaleFactor=PremiumLayout.CalculateScale(lastWidth,lastHeight,lastSafe,new Vector2(540,960));
+  float safeH=(lastSafe.height>0?lastSafe.height:lastHeight)/Mathf.Max(0.01f,scaler.scaleFactor);
+  safeH=Mathf.Max(960f,safeH);
+  if(root!=null)root.sizeDelta=new Vector2(540,safeH);
+  if(home!=null)home.GetComponent<RectTransform>().sizeDelta=new Vector2(540,safeH);
+  if(game!=null)game.GetComponent<RectTransform>().sizeDelta=new Vector2(540,safeH);
+  if(loading!=null)loading.GetComponent<RectTransform>().sizeDelta=new Vector2(540,safeH);
+  RepositionResponsiveElements(safeH);
+ }
+ void RepositionResponsiveElements(float H) {
+  float topY=H*0.5f-42f;float botY=-H*0.5f+45f;
+  bool hasResume=session!=null && !session.board.Over;
+  if(home!=null) {
+   var hSound=home.transform.Find("Sound: On");if(hSound!=null)hSound.GetComponent<RectTransform>().anchoredPosition=new Vector2(-234,topY);
+   var hSettings=home.transform.Find("Settings");if(hSettings!=null)hSettings.GetComponent<RectTransform>().anchoredPosition=new Vector2(234,topY);
+   var hBrand=home.transform.Find("Brand");if(hBrand!=null)hBrand.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-78f);
+   var hEdition=home.transform.Find("Edition");if(hEdition!=null)hEdition.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-146f);
+   var hDesc=home.transform.Find("Description");if(hDesc!=null)hDesc.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-186f);
+   float heroY=(topY-186f+botY+(hasResume?310f:240f))*0.5f;
+   var hHero=home.transform.Find("Preview Board");if(hHero!=null)hHero.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,heroY);
+   var hNew=home.transform.Find("New Game");if(hNew!=null)hNew.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+(hasResume?295f:225f));
+   var hResume=home.transform.Find("Resume");if(hResume!=null)hResume.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+210f);
+   var hStats=home.transform.Find("Stats Summary");if(hStats!=null)hStats.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+135f);
+   var hHow=home.transform.Find("How to Play");if(hHow!=null)hHow.GetComponent<RectTransform>().anchoredPosition=new Vector2(-128,botY+70f);
+   var hHigh=home.transform.Find("High Scores");if(hHigh!=null)hHigh.GetComponent<RectTransform>().anchoredPosition=new Vector2(128,botY+70f);
+   var hFoot=home.transform.Find("Footer");if(hFoot!=null)hFoot.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+10f);
+  }
+  if(game!=null) {
+   var menu=game.transform.Find("Menu");if(menu!=null)menu.GetComponent<RectTransform>().anchoredPosition=new Vector2(-234,topY);
+   var title=game.transform.Find("Title");if(title!=null)title.GetComponent<RectTransform>().anchoredPosition=new Vector2(-20,topY);
+   var sound=game.transform.Find("Sound: On");if(sound!=null)sound.GetComponent<RectTransform>().anchoredPosition=new Vector2(172,topY);
+   var restart=game.transform.Find("Restart");if(restart!=null)restart.GetComponent<RectTransform>().anchoredPosition=new Vector2(234,topY);
+   if(score!=null && score.transform.parent!=null)score.transform.parent.GetComponent<RectTransform>().anchoredPosition=new Vector2(-128,topY-92f);
+   if(best!=null && best.transform.parent!=null)best.transform.parent.GetComponent<RectTransform>().anchoredPosition=new Vector2(128,topY-92f);
+   var lvlPill=game.transform.Find("Level Pill");if(lvlPill!=null)lvlPill.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-168f);
+   if(grid!=null)grid.anchoredPosition=new Vector2(0,(topY+botY-53f)*0.5f);
+   var actionDock=game.transform.Find("Action Bar");if(actionDock!=null)actionDock.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+95f);
+   if(hint!=null)hint.rectTransform.anchoredPosition=new Vector2(0,botY+38f);
+   if(cancelSelection!=null)cancelSelection.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY-8f);
+  }
+  if(modalPanel!=null)modalPanel.sizeDelta=new Vector2(520,Mathf.Min(740f,H-40f));
  }
  static Color Hex(string value) {ColorUtility.TryParseHtmlString("#"+value,out var c);return c;}
- static Color TileColor(int value) {return value==0?Hex("253149"):Color.white;}
+ static Color TileColor(int value) {return value==0?Hex("201642"):Color.white;}
  Color TileText(int value){return PremiumTheme.TileText(value,manager.HighContrast);}
  Sprite TileSprite(int value) {
   if(manager.HighContrast && value>0)return contrastTile;
@@ -329,7 +406,7 @@ public class PremiumGame : MonoBehaviour {
   var rt=Rect(name,parent,position,size);var img=rt.gameObject.AddComponent<Image>();img.sprite=rounded;img.type=Image.Type.Sliced;img.color=color;img.raycastTarget=raycast;return img;
  }
  Text Label(string name,Transform parent,string text,Vector2 position,Vector2 size,int fontSize,params object[] arguments) {
-  var rt=Rect(name,parent,position,size);var label=rt.gameObject.AddComponent<Text>();label.font=font;label.text=text;label.fontSize=fontSize;label.alignment=TextAnchor.MiddleCenter;label.color=White;label.raycastTarget=false;label.horizontalOverflow=HorizontalWrapMode.Wrap;label.verticalOverflow=VerticalWrapMode.Truncate;rt.gameObject.AddComponent<PremiumText>().Initialize(manager,text,fontSize,arguments);return label;
+  var rt=Rect(name,parent,position,size);var label=rt.gameObject.AddComponent<Text>();label.font=font;label.text=text;label.fontSize=fontSize;label.alignment=TextAnchor.MiddleCenter;label.color=White;label.raycastTarget=false;label.horizontalOverflow=HorizontalWrapMode.Wrap;label.verticalOverflow=VerticalWrapMode.Overflow;rt.gameObject.AddComponent<PremiumText>().Initialize(manager,text,fontSize,arguments);return label;
  }
  Button Button(string name,Transform parent,Vector2 position,Vector2 size,Action action,bool primary=false,bool destructive=false) {
   var img=Panel(name,parent,position,size,primary?Gold:Hex("26334B"),true);var button=img.gameObject.AddComponent<Button>();button.targetGraphic=img;button.navigation=new Navigation{mode=Navigation.Mode.None};
@@ -342,8 +419,8 @@ public class PremiumGame : MonoBehaviour {
  Button IconButton(string name,Transform parent,Vector2 position,Action action,IconKind kind) {
   var button=Button(name,parent,position,new Vector2(58,58),action);
   var txt=button.GetComponentInChildren<Text>();
-  if(txt!=null)txt.gameObject.SetActive(false);
-  AddIcon(button.transform,Vector2.zero,26,kind,White);
+  if(txt!=null){SetText(txt,"");txt.gameObject.SetActive(false);}
+  AddIcon(button.transform,Vector2.zero,28,kind,White);
   return button;
  }
  void AddIcon(Transform parent,Vector2 position,float size,IconKind kind,Color color) {
@@ -363,16 +440,16 @@ public class PremiumGame : MonoBehaviour {
   home=Rect("Home",root,Vector2.zero,new Vector2(600,960)).gameObject;game=Rect("Game",root,Vector2.zero,new Vector2(600,960)).gameObject;loading=Rect("Loading",root,Vector2.zero,new Vector2(600,960)).gameObject;
   Brand(loading.transform,new Vector2(0,90),1.1f);
   Label("Subtitle",loading.transform,"A moment of focus",new Vector2(0,-12),new Vector2(500,48),22).color=PremiumTheme.Muted;
-  Panel("Track",loading.transform,new Vector2(0,-100),new Vector2(380,12),Hex("26334B"));loadFill=Panel("Progress",loading.transform,new Vector2(0,-100),new Vector2(380,12),Gold);loadFill.type=Image.Type.Filled;loadFill.fillMethod=Image.FillMethod.Horizontal;
+  Panel("Track",loading.transform,new Vector2(0,-100),new Vector2(380,12),Hex("201642"));loadFill=Panel("Progress",loading.transform,new Vector2(0,-100),new Vector2(380,12),Gold);loadFill.type=Image.Type.Filled;loadFill.fillMethod=Image.FillMethod.Horizontal;
   loadText=Label("Status",loading.transform,"",new Vector2(0,-160),new Vector2(500,70),19);
-  modal=Panel("Modal Overlay",safeRoot,Vector2.zero,Vector2.zero,new Color(0.04f,0.06f,0.12f,0.96f),true).gameObject;
+  modal=Panel("Modal Overlay",safeRoot,Vector2.zero,Vector2.zero,new Color(0.06f,0.06f,0.14f,0.96f),true).gameObject;
   var overlay=modal.GetComponent<RectTransform>();overlay.anchorMin=Vector2.zero;overlay.anchorMax=Vector2.one;overlay.offsetMin=overlay.offsetMax=Vector2.zero;
-  modalPanel=Panel("Dialog",modal.transform,Vector2.zero,new Vector2(520,740),Hex("142236"),true).rectTransform;
-  var modalBorder=Rect("Modal Border",modalPanel,Vector2.zero,new Vector2(516,736)).gameObject.AddComponent<PremiumSelectionFrame>();modalBorder.color=Hex("263C5B");modalBorder.raycastTarget=false;
+  modalPanel=Panel("Dialog",modal.transform,Vector2.zero,new Vector2(520,740),Hex("1A1A3A"),true).rectTransform;
+  var modalBorder=Rect("Modal Border",modalPanel,Vector2.zero,new Vector2(516,736)).gameObject.AddComponent<PremiumSelectionFrame>();modalBorder.color=Hex("3D2B79");modalBorder.raycastTarget=false;
   home.SetActive(false);game.SetActive(false);loading.SetActive(false);modal.SetActive(false);FitScreen();
  }
  Sprite GradientSprite() {
-  var texture=new Texture2D(64,64,TextureFormat.RGBA32,false);for(int y=0;y<64;y++)for(int x=0;x<64;x++)texture.SetPixel(x,y,Color.Lerp(Hex("070E1A"),Hex("18283F"),(x+y)/126f));texture.Apply();return Sprite.Create(texture,new Rect(0,0,64,64),new Vector2(0.5f,0.5f));
+  var texture=new Texture2D(64,64,TextureFormat.RGBA32,false);for(int y=0;y<64;y++)for(int x=0;x<64;x++)texture.SetPixel(x,y,Color.Lerp(Hex("0F0F23"),Hex("1A1A3A"),(x+y)/126f));texture.Apply();return Sprite.Create(texture,new Rect(0,0,64,64),new Vector2(0.5f,0.5f));
  }
  void BuildHome() {
   var mute=IconButton("Sound: On",home.transform,new Vector2(-234,420),ToggleSound,sound?IconKind.Sound:IconKind.Mute);soundLabel=mute.GetComponentInChildren<Text>(true);
@@ -406,30 +483,33 @@ public class PremiumGame : MonoBehaviour {
   Label("Footer",home.transform,"SWIPE · MERGE · MASTER",new Vector2(0,-438),new Vector2(500,28),14).color=PremiumTheme.Muted;
  }
  void BuildGame() {
-  IconButton("Menu",game.transform,new Vector2(-234,416),ShowMenu,IconKind.Menu);
-  var wordmark=Label("Title",game.transform,"2048",new Vector2(-20,416),new Vector2(190,64),50);wordmark.color=Gold;Emphasis(wordmark);
-  var mute=IconButton("Sound: On",game.transform,new Vector2(172,416),ToggleSound,sound?IconKind.Sound:IconKind.Mute);soundLabel=mute.GetComponentInChildren<Text>(true);
-  IconButton("Restart",game.transform,new Vector2(234,416),ConfirmRestart,IconKind.Restart);
-  score=ScoreCard("SCORE",new Vector2(-128,324));best=ScoreCard("BEST",new Vector2(128,324));addition=Label("Score addition",score.transform.parent,"",new Vector2(0,25),new Vector2(220,60),28);
-  var levelPill=Panel("Level Pill",game.transform,new Vector2(0,246),new Vector2(496,40),Hex("111D30"));
-  var levelBorder=Rect("Level Border",levelPill.transform,Vector2.zero,new Vector2(492,36)).gameObject.AddComponent<PremiumSelectionFrame>();levelBorder.color=Hex("223650");levelBorder.raycastTarget=false;
+  IconButton("Menu",game.transform,new Vector2(-234,420),ShowMenu,IconKind.Menu);
+  var wordmark=Label("Title",game.transform,"2048",new Vector2(-20,420),new Vector2(190,64),50);wordmark.color=Gold;Emphasis(wordmark);
+  var mute=IconButton("Sound: On",game.transform,new Vector2(172,420),ToggleSound,sound?IconKind.Sound:IconKind.Mute);soundLabel=mute.GetComponentInChildren<Text>(true);
+  IconButton("Restart",game.transform,new Vector2(234,420),ConfirmRestart,IconKind.Restart);
+  score=ScoreCard("SCORE",new Vector2(-128,330),Hex("1A4A5C"),Hex("00D4FF"));best=ScoreCard("BEST",new Vector2(128,330),Hex("1A4A3C"),Hex("00FF88"));addition=Label("Score addition",score.transform.parent,"",new Vector2(0,25),new Vector2(220,60),28);
+  var levelPill=Panel("Level Pill",game.transform,new Vector2(0,252),new Vector2(496,40),Hex("1E163E"));
+  var levelBorder=Rect("Level Border",levelPill.transform,Vector2.zero,new Vector2(492,36)).gameObject.AddComponent<PremiumSelectionFrame>();levelBorder.color=Hex("3D2B79");levelBorder.raycastTarget=false;
   level=Label("Level",levelPill.transform,"",Vector2.zero,new Vector2(480,36),17);level.color=Gold;Emphasis(level);
-  grid=Panel("Board",game.transform,new Vector2(0,-35),new Vector2(520,520),Hex("0E182A")).rectTransform;
-  var boardBorder=Rect("Board Border",grid,Vector2.zero,new Vector2(516,516)).gameObject.AddComponent<PremiumSelectionFrame>();boardBorder.color=Hex("223650");boardBorder.raycastTarget=false;
-  var actionDock=Panel("Action Bar",game.transform,new Vector2(0,-338),new Vector2(520,80),Hex("111D30"));
-  var dockBorder=Rect("Dock Border",actionDock.transform,Vector2.zero,new Vector2(516,76)).gameObject.AddComponent<PremiumSelectionFrame>();dockBorder.color=Hex("223650");dockBorder.raycastTarget=false;
+  grid=Panel("Board",game.transform,new Vector2(0,-25),new Vector2(520,520),Hex("2D1B69")).rectTransform;
+  var boardBorder=Rect("Board Border",grid,Vector2.zero,new Vector2(516,516)).gameObject.AddComponent<PremiumSelectionFrame>();boardBorder.color=Hex("4A3585");boardBorder.raycastTarget=false;
+  var actionDock=Panel("Action Bar",game.transform,new Vector2(0,-328),new Vector2(520,80),Hex("1D143D"));
+  var dockBorder=Rect("Dock Border",actionDock.transform,Vector2.zero,new Vector2(516,76)).gameObject.AddComponent<PremiumSelectionFrame>();dockBorder.color=Hex("3D2B79");dockBorder.raycastTarget=false;
   for(int i=0;i<3;i++) {
    int action=i;powers[i]=Button(((Power)i).ToString(),actionDock.transform,new Vector2(-168+i*168,0),new Vector2(156,70),()=>UsePower((Power)action));
-   powerLabels[i]=powers[i].GetComponentInChildren<Text>();Size(powerLabels[i],17);powerLabels[i].rectTransform.anchoredPosition=new Vector2(16,11);powerLabels[i].rectTransform.sizeDelta=new Vector2(110,28);
-   AddIcon(powers[i].transform,new Vector2(-48,11),22,(IconKind)((int)IconKind.Undo+i),White);
-   powerStatuses[i]=Label("Availability",powers[i].transform,"LOCKED",new Vector2(0,-18),new Vector2(145,20),12);
+   powerLabels[i]=powers[i].GetComponentInChildren<Text>();Size(powerLabels[i],16);
+   powerLabels[i].alignment=TextAnchor.MiddleLeft;
+   powerLabels[i].rectTransform.anchoredPosition=new Vector2(22,11);powerLabels[i].rectTransform.sizeDelta=new Vector2(95,26);
+   AddIcon(powers[i].transform,new Vector2(-42,0),30,(IconKind)((int)IconKind.Undo+i),White);
+   powerStatuses[i]=Label("Availability",powers[i].transform,"LOCKED",new Vector2(22,-14),new Vector2(95,20),12);
+   powerStatuses[i].alignment=TextAnchor.MiddleLeft;
   }
-  hint=Label("Hint",game.transform,"",new Vector2(0,-396),new Vector2(520,32),15);hint.color=PremiumTheme.Muted;
-  cancelSelection=Button("Cancel selection",game.transform,new Vector2(0,-438),new Vector2(230,50),()=>{CancelSelection();Refresh();}).gameObject;Size(cancelSelection.GetComponentInChildren<Text>(),15);cancelSelection.SetActive(false);
+  hint=Label("Hint",game.transform,"",new Vector2(0,-386),new Vector2(520,32),15);hint.color=PremiumTheme.Muted;
+  cancelSelection=Button("Cancel selection",game.transform,new Vector2(0,-428),new Vector2(230,50),()=>{CancelSelection();Refresh();}).gameObject;Size(cancelSelection.GetComponentInChildren<Text>(),15);cancelSelection.SetActive(false);
  }
- Text ScoreCard(string title,Vector2 position) {
-  var card=Panel(title,game.transform,position,new Vector2(240,86),Hex("142236"));
-  var cardBorder=Rect("Card Border",card.transform,Vector2.zero,new Vector2(236,82)).gameObject.AddComponent<PremiumSelectionFrame>();cardBorder.color=Hex("243854");cardBorder.raycastTarget=false;
+ Text ScoreCard(string title,Vector2 position,Color cardBg,Color borderColor) {
+  var card=Panel(title,game.transform,position,new Vector2(240,86),cardBg);
+  var cardBorder=Rect("Card Border",card.transform,Vector2.zero,new Vector2(236,82)).gameObject.AddComponent<PremiumSelectionFrame>();cardBorder.color=borderColor;cardBorder.raycastTarget=false;
   var caption=Label("Caption",card.transform,title,new Vector2(0,23),new Vector2(220,24),15);caption.color=Gold;Emphasis(caption);
   var number=Label("Number",card.transform,"0",new Vector2(0,-13),new Vector2(220,44),34);Emphasis(number);number.resizeTextForBestFit=true;number.resizeTextMinSize=18;number.resizeTextMaxSize=34;return number;
  }
@@ -449,7 +529,6 @@ public class PremiumGame : MonoBehaviour {
   foreach(Transform child in modalPanel){if(child.name=="Modal Border")continue;child.gameObject.SetActive(false);Destroy(child.gameObject);}
   var heading=Label("Title",modalPanel,title,new Vector2(0,296),new Vector2(456,58),32);Emphasis(heading);heading.color=Gold;
   Label("Description",modalPanel,description,new Vector2(0,225),new Vector2(456,78),19).color=PremiumTheme.Muted;
-  Button("Close",modalPanel,new Vector2(0,-314),new Vector2(180,56),CloseModal);
  }
  void DialogButton(string title,float y,Action action,bool primary=false,bool destructive=false){Button(title,modalPanel,new Vector2(0,y),new Vector2(456,66),action,primary,destructive);}
  string T(string english,params object[] arguments){return GameLocalization.Translate(manager.Language,english,arguments);}
@@ -503,11 +582,11 @@ public class PremiumGame : MonoBehaviour {
   tilePreview.sprite=TileSprite(showTile);tilePreview.type=Image.Type.Simple;
   var tileNumber=Label("Tile Value",tilePreview.transform,showTile.ToString(),Vector2.zero,new Vector2(84,84),showTile>=1024?22:30);
   Emphasis(tileNumber);tileNumber.color=TileText(showTile);
-  var title=Label("Caption",card.transform,caption,new Vector2(48,38),new Vector2(280,28),15);title.color=Gold;title.alignment=TextAnchor.MiddleLeft;Emphasis(title);
-  var number=Label("Result value",card.transform,"{0}",new Vector2(48,2),new Vector2(280,50),40,value);Emphasis(number);number.color=White;number.alignment=TextAnchor.MiddleLeft;
+  var title=Label("Caption",card.transform,caption,new Vector2(40,36),new Vector2(260,26),14);title.color=Gold;title.alignment=TextAnchor.MiddleLeft;Emphasis(title);
+  var number=Label("Result value",card.transform,value.ToString("N0"),new Vector2(40,2),new Vector2(260,54),34);Emphasis(number);number.color=White;number.alignment=TextAnchor.MiddleLeft;
   long bestScore = session!=null && session.board!=null ? stats.best[session.board.size-4] : 0;
   bool isNewBest = value >= bestScore && value > 0;
-  var subNote=Label("Best note",card.transform,isNewBest?"NEW BEST RECORD!":"BEST: {0}",new Vector2(48,-36),new Vector2(280,24),15,bestScore);
+  var subNote=Label("Best note",card.transform,isNewBest?"NEW BEST RECORD!":("BEST: "+bestScore.ToString("N0")),new Vector2(40,-34),new Vector2(260,24),14);
   subNote.color=isNewBest?Gold:PremiumTheme.Muted;subNote.alignment=TextAnchor.MiddleLeft;Emphasis(subNote);
  }
  void MarkSelection(int index) {
@@ -526,7 +605,7 @@ public class PremiumGame : MonoBehaviour {
   var scroll=view.gameObject.AddComponent<ScrollRect>();scroll.viewport=view;scroll.content=content;scroll.horizontal=false;scroll.movementType=ScrollRect.MovementType.Clamped;scroll.inertia=!manager.ReducedMotion;scroll.scrollSensitivity=22;
   Label("Scroll hint",modalPanel,"Scroll to read all rules",new Vector2(0,-252),new Vector2(456,28),14).color=PremiumTheme.Muted;
  }
- void CloseModal(){navigation.Back();manager.ShowResult();}
+ void CloseModal(){navigation.Back();}
  void OnDestroy() {
   if(instance!=this)return;
   instance=null;
@@ -535,6 +614,14 @@ public class PremiumGame : MonoBehaviour {
   if(mergeTone!=null)Destroy(mergeTone);
   if(clickTone!=null)Destroy(clickTone);
   if(winTone!=null)Destroy(winTone);
+  if(slideTone!=null && slideTone!=moveTone)Destroy(slideTone);
+  if(undoTone!=null)Destroy(undoTone);
+  if(swapTone!=null)Destroy(swapTone);
+  if(deleteTone!=null)Destroy(deleteTone);
+  if(lossTone!=null)Destroy(lossTone);
+  if(spawnTone!=null)Destroy(spawnTone);
+  foreach(var kv in mergeClips)if(kv.Value!=null && kv.Value!=mergeTone)Destroy(kv.Value);
+  mergeClips.Clear();
   foreach(var kv in tileSprites)if(kv.Value!=null){if(kv.Value.texture!=null)Destroy(kv.Value.texture);Destroy(kv.Value);}
   tileSprites.Clear();
   if(rounded!=null){if(rounded.texture!=null)Destroy(rounded.texture);Destroy(rounded);}

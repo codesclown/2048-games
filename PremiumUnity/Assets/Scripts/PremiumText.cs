@@ -26,7 +26,7 @@ public sealed class PremiumText : MonoBehaviour {
  public void Apply() {
   if(label==null || manager==null)return;
   if(regular==null)regular=Resources.Load<Font>("Fonts/NotoSans-Regular");if(bold==null)bold=Resources.Load<Font>("Fonts/NotoSans-Bold");
-  label.font=label.fontStyle==FontStyle.Bold?bold:regular;
+  if(label.fontStyle==FontStyle.Bold && bold!=null){label.font=bold;label.fontStyle=FontStyle.Normal;}else if(regular!=null){label.font=regular;}
   if(label.font==null)label.font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
   if(label.font==null)label.font=Font.CreateDynamicFontFromOSFont(new[]{"Arial","Helvetica","sans-serif"},label.fontSize);
   label.text=GameLocalization.Translate(manager.Language,Source??"",arguments);
