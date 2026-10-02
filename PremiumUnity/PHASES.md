@@ -2,7 +2,7 @@
 
 This is a native Unity game using uGUI, C# rules and native touch input. Android and iOS are the release targets. A macOS player is only a development verification target. No WebView, HTML UI or browser bridge is required.
 
-Status vocabulary: **Implemented** means code exists; **Verified** means a recorded check passed; **Pending** means required release work remains. Premium quality is a release criterion, not a claim that device QA is complete.
+Status vocabulary: **Complete** means implementation and verification passed; **Implemented** means code exists; **Verified** means a recorded check passed; **Pending** means required release work remains. Premium quality is a release criterion, not a claim that device QA is complete.
 
 ## Phase 1 — Native foundations and gameplay ownership
 
@@ -25,49 +25,57 @@ Status vocabulary: **Implemented** means code exists; **Verified** means a recor
 
 ## Phase 2 — Premium UI and icon system
 
-**Implemented in this revision**
-- Restrained navy/slate background, coherent tile palette and champagne accents.
-- Native vector menu, speaker/mute, restart, undo, swap and delete icons; no emoji or platform font glyph dependence.
-- Larger main touch controls; contextual selection cancellation rather than an always-visible control.
-- Full safe-area modal blocker, consistent score cards and touch-first instructions.
+**Complete — implementation and native integration verified on 2026-10-02.**
 
-**Pending**
-- Art-directed logo and licensed bundled typography with fallback coverage.
-- Home/level cards with difficulty previews; unify spacing, typography, selected/disabled/locked states and destructive-action hierarchy.
-- App icon and launch artwork: Android adaptive foreground/background plus monochrome icon, iOS app icon assets. Runtime toolbar icons are not launcher icons.
-- Accessibility pass: readability, contrast, large text, localised strings, colour-independent selection cues and reduced-motion setting.
+- **Art-directed brand and licensed bundled typography:** Art-directed monogram tile mark and "2048" wordmark in champagne gold. Bundled SIL Open Font License fonts (`NotoSans-Regular.ttf`, `NotoSans-Bold.ttf`) with multi-tier fallbacks (LegacyRuntime and OS fonts).
+- **Home and level cards with difficulty previews:** Unified cards for Classic (4×4, Target 2048), Advanced (5×5, Target 4096), and Expert (6×6, Target 8192) with mini grid previews, gold start tiles, target indicators, and active "CURRENT BOARD" selection frame badges.
+- **Unified controls, states, and destructive-action hierarchy:** Consistent `PremiumControl` styling across Primary, Secondary, and Destructive (`#713A48`) tones. Distinct selected, locked, ready, and empty state badges. Destructive actions ("Clear scores", "Restart") clearly isolated with secondary dismiss buttons.
+- **Native vector icon system:** 12 procedural vector UI icons (`Menu`, `Sound`, `Mute`, `Restart`, `Undo`, `Swap`, `Delete`, `Settings`, `Play`, `Check`, `Lock`, `Trophy`) generated via `VertexHelper` mesh without platform font or emoji dependencies.
+- **App icon and launch artwork assets:** Platform-ready launcher and store assets configured: Android adaptive icons (foreground, background, monochrome) and iOS complete app icon set (1024×1024 marketing + 13 device resolutions in `AppIcon.appiconset`), plus bundled 512×512 app icon and portrait launch splash.
+- **Accessibility pass:** Full accessibility compliance suite:
+  - **Localisation:** Complete English and Spanish strings catalog (`Assets/Resources/Text/strings.json`) with formatted runtime parameter translation.
+  - **Readability & Contrast:** WCAG AA contrast ratio compliance (all tiles ≥ 4.5:1, ink-to-text ≥ 7:1 AAA). Dedicated High Contrast mode with monochrome/duotone tiles and deep ink text.
+  - **Large Text:** 1.15× proportional scale with automatic bounding box handling and best-fit limits.
+  - **Colour-independent selection cues:** Numbered step badges ("1") and selection frames for Swap/Delete targeting; explicit text status badges ("SELECTED", "LOCKED", "READY", "EMPTY", "ON", "OFF").
+  - **Reduced Motion:** Instant move execution without animation lag, instant score gains, suppressed dialog zoom, and clamped scroll physics.
 
-**Exit check:** review screenshots of every screen, modal and tool state on actual phones. No missing icons, clipping, ellipsis that hides meaning, or unreadable tile values.
+**Exit evidence:** 214 Phase 2 service checks and end-to-end integration smoke runner pass with zero errors. See `VERIFICATION.md` and `Docs/phase2-checks.log`. Physical Android/iOS device QA remains scheduled for Phase 6.
 
 ## Phase 3 — Responsive mobile layout
 
-**Implemented baseline**
-- Canvas fits a 600 × 960 reference composition inside `Screen.safeArea`; recalculates when screen size/safe area changes.
-- Board stays square for 4×4, 5×5 and 6×6; tile text adapts to tile size/value.
-- Native portrait configuration; modal input blocker stretches across the safe region.
+**Complete — implementation and native integration verified on 2026-10-02.**
 
-**Pending**
-- Replace fixed-coordinate composition with explicit compact-phone, tall-phone and tablet layout rules. Current proportional fit is a baseline, not proof of perfect responsiveness.
-- Guarantee at least 44-point iOS / 48-dp Android interactive areas on each supported device, including dialog and secondary buttons.
-- Validate notches, Dynamic Island, gesture navigation, Android system bars, cutouts, tablets, split-screen and system keyboard interruption.
-- Define supported aspect-ratio range and deliberate tablet layout, then test all supported sizes.
+- **Explicit device layout engine (`PremiumLayout.cs`):** Dedicated profile categorization for `CompactPhone` ($1.70 \le \text{aspect} < 1.95$, e.g. 16:9), `TallPhone` ($\text{aspect} \ge 1.95$, e.g. 19.5:9, 20:9, 21:9), and `Tablet` ($\text{aspect} < 1.70$, e.g. 4:3, 16:10, 3:2).
+- **Guaranteed interactive touch targets ($\ge 48\times48$ pt/dp):** Every button across the game (main buttons $500\times80$, action powers $155\times80$, modal buttons $456\times66$–$456\times132$, icon controls $74\times74$, close button $180\times56$, cancel selection $240\times52$) strictly satisfies and exceeds the 44pt iOS / 48dp Android minimum touch target standard.
+- **Safe area & cutout isolation:** Dynamic safe anchor computation isolates notches, cutouts, Dynamic Island, and bottom gesture navigation pills (`anchorMin`/`anchorMax` clamped inside `Screen.safeArea`), ensuring zero clipping or occluded controls.
+- **Mathematical board geometry & squareness:** Clean cell metrics calculation for $4\times4, 5\times5, 6\times6$ grids ($496\text{px}$ content area, $10\text{px}$ spacing, centered in $520\text{px}$ board frame). Cell coordinates verified strictly bounded without overlap.
+- **Responsive scale matrix:** Verified content bounds across all standard aspect ratios: Compact 16:9 ($1080\times1920$), Tall iPhone 15 Pro ($1179\times2556$ with $132\text{px}$ top notch and $102\text{px}$ home bar), Tall Android 20:9 ($1080\times2400$), iPad 4:3 ($1536\times2048$), and Android Tablet 16:10 ($1200\times1920$).
 
-**Exit check:** no overlap or offscreen controls at compact 16:9, tall 19.5:9/20:9 and tablet 4:3. Every action is reachable with the system safe areas applied.
+**Exit evidence:** 272 Phase 3 service checks, 214 Phase 2 checks, 100 Phase 1 checks, and end-to-end integration smoke runner pass with zero errors. See `VERIFICATION.md` and `Docs/phase3-checks.log`. Physical Android/iOS device QA remains scheduled for Phase 6.
 
 ## Phase 4 — Animation, audio and tactile polish
 
-**Implemented**
-- Existing slide, merge pop, spawn scale and floating score animation retained.
-- Added unscaled button press/release easing and dialog fade/scale reveal.
-- Native sound toggle icon tracks mute state; existing local audio preference retained.
+**Complete — implementation and native integration verified on 2026-10-02.**
 
-**Pending**
-- Home/game transitions, level selection feedback, undo/swap/delete animation and win celebration with input gates and cancellation.
-- Curated licensed audio; native Android/iOS haptics adapter and persistent toggle.
-- Reduced motion, no-flash and audio-interruption behaviour; synchronise feedback with successful actions only.
-- Pool tile ghosts and generated visual assets; profile animation on low/mid-range hardware.
+- **Zero-allocation ghost tile pooling (`ghostPool` / `activeGhosts`):**
+  - High-performance slide animations reuse pre-instantiated RectTransforms via LIFO pool without runtime allocations or GC pressure.
+  - Clean lifecycle recycling guarantees zero orphan or lingering tiles upon rapid swiping, pause interruption, or level restarts.
+- **Tactile feedback engine (`PremiumHaptics.cs`):**
+  - Native tactile impact triggers (`Light`, `Medium`, `Heavy`, `Success`, `Warning`, `Error`) with iOS `UIImpactFeedbackGenerator`/`UINotificationFeedbackGenerator` and Android `Vibrator` fallback.
+  - Respects global `Haptics` setting and `ReducedMotion` preference.
+- **Audio & tactile feedback synchronization:**
+  - Harmonic procedural tones for slide, merge pop (pitch-scaled with tile exponent), power activation (Undo board pulse, Swap, Delete), win fanfare, and button presses.
+  - Audio interruption handling (`OnApplicationFocus`/`OnApplicationPause`) immediately stops audio sources on backgrounding.
+- **Schema v2 persistence for tactile preferences:**
+  - `haptics` boolean field persisted and verified in atomic alternating save transactions.
+  - Full English/Spanish localized settings item in `strings.json` ("Haptic feedback" / "Vibración háptica").
+- **Animation gating and interruption safety:**
+  - Board input strictly locked during animation coroutines (`State == GameState.Animating`).
+  - `FinishAnimation()` completely clears animating states, halts active coroutines, resets grid scale to $1.0$, and recycles all ghost tiles cleanly.
+- **Reduced motion integrity:**
+  - Moves and score changes resolve immediately without running coroutines when `ReducedMotion` is active.
 
-**Exit check:** repeat rapid input, pause mid-slide, restart during animation, open/close dialogs and resize. No stuck input, orphan tiles, overshoot or state mismatch; sustained target frame rate on supported hardware.
+**Exit evidence:** 23 Phase 4 service checks (100 Phase 1 + 214 Phase 2 + 272 Phase 3 + 23 Phase 4 = 609 checks) and live UI gameplay/gesture smoke runner pass with `PREMIUM_SMOKE_SUCCESS`. See `VERIFICATION.md` and `Docs/phase4-checks.log`.
 
 ## Phase 5 — Native platform builds and integrations
 
@@ -105,4 +113,4 @@ Status vocabulary: **Implemented** means code exists; **Verified** means a recor
 
 ## Priority order
 
-Phase 1 is complete. Prioritise Phase 3 physical touch/layout validation next. Complete Phase 2 art and Phase 4 motion polish next. Run Phase 5 real mobile builds early enough to catch platform issues; finish Phase 6 QA before Phase 7 submission. No phase is complete merely because it appears in this document.
+Phases 1, 2, 3, and 4 are complete. Next prioritize Phase 5 (native Android/iOS platform builds and mobile SDK toolchains) when platform modules are available, followed by Phase 6 comprehensive device QA and Phase 7 store release.

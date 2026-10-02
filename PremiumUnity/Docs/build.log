@@ -1,0 +1,103 @@
+attempt to write a readonly database
+attempt to write a readonly database
+Unity Editor version:    6000.3.25f1 (e1dba0a9aba4)
+Branch:                  6000.3/staging
+Build type:              Release
+Batch mode:              YES
+macOS version:           Version 26.5.2 (Build 25F84)
+Darwin version:          25.5.0
+Architecture:            arm64
+Running under Rosetta:   NO
+Available memory:        8192 MB
+Date:                    2026-10-02T12:15:56Z
+[Licensing::Module] Trying to connect to existing licensing client channel...
+No explicit failure code handling for error of type 1
+[Licensing::IpcConnector] Error: Failed to connect to LicenseClient-chandanvishwakarma channel (error code: 0x80000000) .
+[Licensing::IpcConnector] Error: Connection to channel: "LicenseClient-chandanvishwakarma" failed; code: "0x80000000"
+[Licensing::IpcConnector] Error: Failed to connect to LicenseClient-chandanvishwakarma channel (error code: 0x80000000) .
+[Licensing::IpcConnector] Channel LicenseClient-chandanvishwakarma-6000.3.25 doesn't exist
+Launching external process: /Applications/Unity/Hub/Editor/6000.3.25f1/Unity.app/Contents/Helpers/UnityLicensingClient.app/Contents/MacOS/Unity.Licensing.Client
+[Licensing::Module] Successfully launched the LicensingClient (PId: 20049)
+Launching external process: /Applications/Unity/Hub/Editor/6000.3.25f1/Unity.app/Contents/Resources/PackageManager/Server/UnityPackageManager
+
+COMMAND LINE ARGUMENTS:
+/Applications/Unity/Hub/Editor/6000.3.25f1/Unity.app/Contents/MacOS/Unity
+-batchmode
+-quit
+-projectPath
+/Users/chandanvishwakarma/2048-games/PremiumUnity
+-executeMethod
+BuildVerifier.BuildMac
+-logFile
+Docs/build.log
+Successfully changed project path to: /Users/chandanvishwakarma/2048-games/PremiumUnity
+Could not lock editor preferences. Preferences updates for this instance of Unity will not be saved./Users/chandanvishwakarma/2048-games/PremiumUnity
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-remapper-allocator-initial-capacity=32768"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gfx=262144"
+Player connection [8354667904]  Target information:
+
+Player connection [8354667904]  * "[IP] 10.79.239.43 [Port] 55505 [Flags] 2 [Guid] 174806551 [EditorId] 174806551 [Version] 1048832 [Id] OSXEditor(0,Chandans-MacBook-Air-2.local) [Debug] 1 [PackageName] OSXEditor [ProjectName] Editor" 
+
+Player connection [8354667904] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [8354667904] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+Exception caught while configuring logging
+Attempting with simple FileAppender
+System.IO.IOException: The system cannot open the device or file specified. : '_Applications_Unity_Hub_Editor_6000.3.25f1_Unity.app_Contents_Helpers_UnityLicensingClient.app_Contents_MacOS_Library_Logs_Unity_Unity.Licensing.Client.log_rolling'
+   at System.Threading.Mutex.CreateMutexCore(Boolean initiallyOwned, String name, Boolean& createdNew)
+   at System.Threading.Mutex..ctor(Boolean initiallyOwned, String name)
+   at log4net.Appender.RollingFileAppender.ActivateOptions()
+   at Unity.Licensing.Logging.Log4Net.Log4NetProviderBuilder.WithRollingFile(String logFilePath, String logPattern, Int32 maxFileSizeMb, Int32 maxBackups)
+Unhandled exception. System.IO.IOException: The system cannot open the device or file specified. : 'Global\Unity.Licensing.Client.Pipe.Unity-LicenseClient-chandanvishwakarma-6000.3.25'
+   at System.Threading.Mutex.CreateMutexCore(Boolean initiallyOwned, String name, Boolean& createdNew)
+   at Unity.Licensing.Client.GlobalMutex.AcquireMutex()
+   at System.Threading.Thread.StartHelper.Callback(Object state)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+[Unity Package Manager (Upm)]
+Application terminated due to an uncaught exception:
+  Error: listen EPERM: operation not permitted /tmp/Unity-Upm-20048.sock
+    at Server.setupListenHandle [as _listen2] (node:net:1986:21)
+    at listenInCluster (node:net:2065:12)
+    at Server.listen (node:net:2187:5)
+    at Server.startServer3 (/home/bokken/build/output/unity/upm/dist/temp/bundle/app.js:213:6198)
+    at FSReqCallback.oncomplete (node:fs:185:23)
+[Package Manager] Could not connect to IPC stream "Upm-20048" after 30.0 seconds.
+[Package Manager] Failed to start the Unity Package Manager local server process. Make sure the process [/Applications/Unity/Hub/Editor/6000.3.25f1/Unity.app/Contents/Resources/PackageManager/Server/UnityPackageManager] is not blocked by your anti-virus configuration.

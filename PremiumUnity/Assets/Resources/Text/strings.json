@@ -1,0 +1,400 @@
+{
+  "entries": [
+    {
+      "en": "Preparing premium interface",
+      "es": "Preparando interfaz premium"
+    },
+    {
+      "en": "Loading scores and saved game",
+      "es": "Cargando puntuaciones y partida guardada"
+    },
+    {
+      "en": "Preparing controls and audio",
+      "es": "Preparando controles y sonido"
+    },
+    {
+      "en": "Ready",
+      "es": "Listo"
+    },
+    {
+      "en": "A moment of focus",
+      "es": "Un momento de concentración"
+    },
+    {
+      "en": "THE NUMBER COLLECTION",
+      "es": "LA COLECCIÓN DE NÚMEROS"
+    },
+    {
+      "en": "A little focus. A better move.",
+      "es": "Un poco de enfoque. Un mejor movimiento."
+    },
+    {
+      "en": "One swipe can change everything",
+      "es": "Un deslizamiento puede cambiarlo todo"
+    },
+    {
+      "en": "New Game",
+      "es": "Nueva Partida"
+    },
+    {
+      "en": "Resume",
+      "es": "Continuar"
+    },
+    {
+      "en": "{0} × {0}  ·  Score {1}",
+      "es": "{0} × {0}  ·  Puntos {1}"
+    },
+    {
+      "en": "How to Play",
+      "es": "Cómo Jugar"
+    },
+    {
+      "en": "High Scores",
+      "es": "Récords"
+    },
+    {
+      "en": "Settings",
+      "es": "Ajustes"
+    },
+    {
+      "en": "SWIPE · MERGE · MASTER",
+      "es": "DESLIZA · COMBINA · DOMINA"
+    },
+    {
+      "en": "SCORE",
+      "es": "PUNTOS"
+    },
+    {
+      "en": "BEST",
+      "es": "RÉCORD"
+    },
+    {
+      "en": "Level {0}  /  {1} × {1}  /  Target {2}",
+      "es": "Nivel {0}  /  {1} × {1}  /  Objetivo {2}"
+    },
+    {
+      "en": "Undo",
+      "es": "Deshacer"
+    },
+    {
+      "en": "Swap",
+      "es": "Intercambiar"
+    },
+    {
+      "en": "Delete",
+      "es": "Eliminar"
+    },
+    {
+      "en": "{0}  {1}",
+      "es": "{0}  {1}"
+    },
+    {
+      "en": "SELECTED",
+      "es": "SELECCIONADO"
+    },
+    {
+      "en": "LOCKED",
+      "es": "BLOQUEADO"
+    },
+    {
+      "en": "READY",
+      "es": "LISTO"
+    },
+    {
+      "en": "EMPTY",
+      "es": "AGOTADO"
+    },
+    {
+      "en": "Hold 128 / 256 / 512 to earn tools",
+      "es": "Mantén 128 / 256 / 512 para ganar herramientas"
+    },
+    {
+      "en": "Tools unlock after {0} more moves",
+      "es": "Herramientas se desbloquean en {0} movimientos"
+    },
+    {
+      "en": "Tap two different adjacent tiles",
+      "es": "Toca dos fichas adyacentes distintas"
+    },
+    {
+      "en": "Tap the tile to remove · Cancel to exit",
+      "es": "Toca la ficha a eliminar · Cancelar para salir"
+    },
+    {
+      "en": "Tile 1 selected · Tap an adjacent tile",
+      "es": "Ficha 1 seleccionada · Toca una ficha adyacente"
+    },
+    {
+      "en": "Choose a different tile next to tile 1",
+      "es": "Elige una ficha diferente junto a la ficha 1"
+    },
+    {
+      "en": "Cancel selection",
+      "es": "Cancelar selección"
+    },
+    {
+      "en": "Preparing {0} × {0} level",
+      "es": "Preparando nivel {0} × {0}"
+    },
+    {
+      "en": "Level ready",
+      "es": "Nivel listo"
+    },
+    {
+      "en": "Paused",
+      "es": "Pausa"
+    },
+    {
+      "en": "Take a breath. Your board is saved.",
+      "es": "Toma un respiro. Tu tablero está guardado."
+    },
+    {
+      "en": "Change level",
+      "es": "Cambiar nivel"
+    },
+    {
+      "en": "Home",
+      "es": "Inicio"
+    },
+    {
+      "en": "Choose your pace",
+      "es": "Elige tu ritmo"
+    },
+    {
+      "en": "Starting a board replaces your saved game.",
+      "es": "Iniciar un tablero reemplaza tu partida guardada."
+    },
+    {
+      "en": "Three boards. One satisfying challenge.",
+      "es": "Tres tableros. Un desafío gratificante."
+    },
+    {
+      "en": "Level 1",
+      "es": "Nivel 1"
+    },
+    {
+      "en": "Level 2",
+      "es": "Nivel 2"
+    },
+    {
+      "en": "Level 3",
+      "es": "Nivel 3"
+    },
+    {
+      "en": "Classic",
+      "es": "Clásico"
+    },
+    {
+      "en": "Short and focused",
+      "es": "Rápido y concentrado"
+    },
+    {
+      "en": "Advanced",
+      "es": "Avanzado"
+    },
+    {
+      "en": "Room to build",
+      "es": "Espacio para construir"
+    },
+    {
+      "en": "Expert",
+      "es": "Experto"
+    },
+    {
+      "en": "Think a few moves ahead",
+      "es": "Piensa varias jugadas adelante"
+    },
+    {
+      "en": "CURRENT BOARD",
+      "es": "TABLERO ACTUAL"
+    },
+    {
+      "en": "{0} × {0}  ·  Target {1}",
+      "es": "{0} × {0}  ·  Objetivo {1}"
+    },
+    {
+      "en": "Simple moves. Thoughtful choices.",
+      "es": "Movimientos simples. Decisiones meditadas."
+    },
+    {
+      "en": "Your personal bests, saved on this device",
+      "es": "Tus mejores récords, guardados en este dispositivo"
+    },
+    {
+      "en": "{0} × {0}",
+      "es": "{0} × {0}"
+    },
+    {
+      "en": "Played {0}  ·  Won {1}  ·  Win rate {2}%",
+      "es": "Jugadas {0}  ·  Victorias {1}  ·  Efectividad {2}%"
+    },
+    {
+      "en": "Clear scores",
+      "es": "Borrar récords"
+    },
+    {
+      "en": "Clear saved scores?",
+      "es": "¿Borrar récords guardados?"
+    },
+    {
+      "en": "This clears scores, statistics and the saved game.",
+      "es": "Esto borrará récords, estadísticas y la partida guardada."
+    },
+    {
+      "en": "Clear",
+      "es": "Borrar"
+    },
+    {
+      "en": "Cancel",
+      "es": "Cancelar"
+    },
+    {
+      "en": "Restart level?",
+      "es": "¿Reiniciar nivel?"
+    },
+    {
+      "en": "Start a fresh board and reset power-ups. Your best score stays saved.",
+      "es": "Inicia un tablero nuevo y restablece poderes. Tu récord se conserva."
+    },
+    {
+      "en": "Restart",
+      "es": "Reiniciar"
+    },
+    {
+      "en": "You win!",
+      "es": "¡Has ganado!"
+    },
+    {
+      "en": "A new milestone. Keep building.",
+      "es": "Un nuevo hito. Sigue construyendo."
+    },
+    {
+      "en": "TARGET REACHED",
+      "es": "OBJETIVO ALCANZADO"
+    },
+    {
+      "en": "Keep going",
+      "es": "Seguir jugando"
+    },
+    {
+      "en": "Play again",
+      "es": "Jugar de nuevo"
+    },
+    {
+      "en": "Game over",
+      "es": "Fin de la partida"
+    },
+    {
+      "en": "No moves remain. A fresh challenge awaits.",
+      "es": "No quedan movimientos. Te espera un nuevo desafío."
+    },
+    {
+      "en": "FINAL SCORE",
+      "es": "PUNTUACIÓN FINAL"
+    },
+    {
+      "en": "Continue: rewind 5 moves",
+      "es": "Continuar: retrocede 5 jugadas"
+    },
+    {
+      "en": "Watch video to continue",
+      "es": "Ver video para continuar"
+    },
+    {
+      "en": "Continue playing?",
+      "es": "¿Continuar jugando?"
+    },
+    {
+      "en": "Rewind up to 5 previous actions and keep your current score. Available once per game.",
+      "es": "Retrocede hasta 5 acciones y conserva tus puntos. Disponible una vez por partida."
+    },
+    {
+      "en": "Continue",
+      "es": "Continuar"
+    },
+    {
+      "en": "No thanks",
+      "es": "No, gracias"
+    },
+    {
+      "en": "Video unavailable",
+      "es": "Video no disponible"
+    },
+    {
+      "en": "The ad provider is not ready. Your board remains saved.",
+      "es": "El proveedor de anuncios no está listo. Tu partida sigue guardada."
+    },
+    {
+      "en": "Back",
+      "es": "Volver"
+    },
+    {
+      "en": "Reward video",
+      "es": "Video con recompensa"
+    },
+    {
+      "en": "Waiting for the ad provider. Reward is granted only after completion.",
+      "es": "Esperando al proveedor. La recompensa se otorga al finalizar."
+    },
+    {
+      "en": "Close",
+      "es": "Cerrar"
+    },
+    {
+      "en": "Make the game comfortable for you",
+      "es": "Adapta el juego a tu comodidad"
+    },
+    {
+      "en": "Sound",
+      "es": "Sonido"
+    },
+    {
+      "en": "Haptic feedback",
+      "es": "Vibración háptica"
+    },
+    {
+      "en": "Reduced motion",
+      "es": "Movimiento reducido"
+    },
+    {
+      "en": "Large text",
+      "es": "Texto grande"
+    },
+    {
+      "en": "High contrast",
+      "es": "Alto contraste"
+    },
+    {
+      "en": "Language · {0}",
+      "es": "Idioma · {0}"
+    },
+    {
+      "en": "ON",
+      "es": "SÍ"
+    },
+    {
+      "en": "OFF",
+      "es": "NO"
+    },
+    {
+      "en": "<b>MOVE & MERGE</b>\nSwipe in any direction. Matching tiles merge once per move. Reach your board's target.\n\n<b>YOUR TOOLS</b>\nUnlock after 2 valid moves. Undo reverses the last action. Swap two different adjacent occupied tiles. Delete removes one tile. Cancel spends nothing.\n\n<b>EARN MORE</b>\nAfter use, hold 128 / 256 / 512 to earn Undo / Swap / Delete on valid moves. Cooldown: 1 second. Lifetime cap: 4 / 5 / 6 per board.\n\n<b>ONE MORE CHANCE</b>\nOne continuation rewinds up to 5 actions and keeps your score.",
+      "es": "<b>DESLIZA Y COMBINA</b>\nDesliza en cualquier dirección. Las fichas iguales se combinan una vez por movimiento. Alcanza el objetivo de tu tablero.\n\n<b>TUS HERRAMIENTAS</b>\nSe desbloquean tras 2 movimientos válidos. Deshacer revierte la última acción. Intercambiar cambia dos fichas adyacentes ocupadas. Eliminar quita una ficha. Cancelar no consume nada.\n\n<b>GANA MÁS</b>\nTras usarlas, mantén 128 / 256 / 512 para obtener Deshacer / Intercambiar / Eliminar en movimientos válidos. Enfriamiento: 1 segundo. Límite: 4 / 5 / 6 por tablero.\n\n<b>UNA OPORTUNIDAD MÁS</b>\nUna continuación retrocede hasta 5 acciones y conserva tu puntuación."
+    },
+    {
+      "en": "Scroll to read all rules",
+      "es": "Desplaza para leer todas las reglas"
+    },
+    {
+      "en": "Sound: On",
+      "es": "Sonido: Activado"
+    },
+    {
+      "en": "Sound: Off",
+      "es": "Sonido: Silenciado"
+    },
+    {
+      "en": "Menu",
+      "es": "Menú"
+    }
+  ]
+}

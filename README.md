@@ -37,3 +37,7 @@ Take your game to the next level with strategic tools (limited use):
 - **CSS3**: Advanced styling, animations, and responsive layout without frameworks.
 - **JavaScript**: Pure Vanilla JS for game logic and state management.
 
+
+## Native Unity version
+
+The complete native Unity adaptation is in [PremiumUnity](PremiumUnity/README.md). Open that folder in Unity Hub, or launch `PremiumUnity/Builds/2048Premium.app` on macOS. Includes the premium UI, three levels, power-ups, audio, persistence and offline continuation. See [verification results](PremiumUnity/VERIFICATION.md).

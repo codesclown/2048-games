@@ -10,11 +10,18 @@ using Premium2048;
   SessionState.SetBool("Premium2048.configured",true);
   if(!System.IO.File.Exists("Assets/Scenes/Premium.unity")) CreateScene();
   EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene("Assets/Scenes/Premium.unity",true)};
-  PlayerSettings.productName="2048 Premium";PlayerSettings.companyName="Premium2048";
+  PlayerSettings.productName="2048 Premium";PlayerSettings.companyName="GSV Infotech";
   PlayerSettings.defaultScreenWidth=600;PlayerSettings.defaultScreenHeight=960;PlayerSettings.defaultInterfaceOrientation=UIOrientation.Portrait;
   PlayerSettings.allowedAutorotateToPortrait=true;PlayerSettings.allowedAutorotateToPortraitUpsideDown=false;PlayerSettings.allowedAutorotateToLandscapeLeft=false;PlayerSettings.allowedAutorotateToLandscapeRight=false;
-  PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Android,"com.premium2048.game");
-  PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.iOS,"com.premium2048.game");
+  PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Android,"com.gsvinfotech.twozerofoureight");
+  PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.iOS,"com.gsvinfotech.twozerofoureight");
+  var icon=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Resources/Brand/AppIcon.png");
+  if(icon!=null){
+   PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Unknown,new[]{icon});
+   PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Android,new[]{icon});
+   PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.iOS,new[]{icon});
+   PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Standalone,new[]{icon});
+  }
   var settings=new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/ProjectSettings.asset")[0]);var input=settings.FindProperty("activeInputHandler");if(input!=null){input.intValue=0;settings.ApplyModifiedProperties();}AssetDatabase.SaveAssets();
  }
  [MenuItem("2048 Premium/Create scene")]

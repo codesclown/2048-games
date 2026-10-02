@@ -8,7 +8,12 @@ public sealed class GameManager : MonoBehaviour {
  public Session Session {get;private set;}
  public Stats Statistics {get;private set;}=new Stats();
  public long LastScoreGain {get;private set;}
+ public bool LargeText {get;private set;}
+ public bool ReducedMotion {get;private set;}
+ public bool HighContrast {get;private set;}
+ public string Language {get;private set;}="en";
  public bool Sound {get;private set;}=true;
+ public bool Haptics {get;private set;}=true;
  public readonly GameNavigation Navigation=new GameNavigation();
  public bool HasUnsavedChanges {get;private set;}
  public GamePersistence Persistence {get;private set;}
@@ -19,7 +24,7 @@ public sealed class GameManager : MonoBehaviour {
  void OnDestroy(){if(Instance==this)Instance=null;}
  public void Initialize(string prefix,IPreferenceStore preferences=null) {
   Persistence=new GamePersistence(prefix,preferences);var save=Persistence.Load();HasUnsavedChanges=Persistence.ReadOnly || Persistence.NeedsCommit;
-  Session=save.session;Statistics=save.stats;Sound=save.sound;
+  Session=save.session;Statistics=save.stats;Sound=save.sound;Haptics=save.haptics;LargeText=save.largeText;ReducedMotion=save.reducedMotion;HighContrast=save.highContrast;Language=save.language=="es"?"es":"en";
   if(Session!=null)foreach(var stock in Session.stock)stock.lastEarn=-1;
  }
  public void StartGame(int dimension) {
@@ -63,6 +68,11 @@ public sealed class GameManager : MonoBehaviour {
   Navigation.Play();Commit(GameChange.Continue);return true;
  }
  public void ToggleSound(){if(Navigation.Suspended)return;Sound=!Sound;Commit(GameChange.Settings);}
+ public void ToggleHaptics(){if(Navigation.Suspended)return;Haptics=!Haptics;Commit(GameChange.Settings);}
+ public void ToggleLargeText(){if(Navigation.Suspended)return;LargeText=!LargeText;Commit(GameChange.Settings);}
+ public void ToggleReducedMotion(){if(Navigation.Suspended)return;ReducedMotion=!ReducedMotion;Commit(GameChange.Settings);}
+ public void ToggleHighContrast(){if(Navigation.Suspended)return;HighContrast=!HighContrast;Commit(GameChange.Settings);}
+ public void ToggleLanguage(){if(Navigation.Suspended)return;Language=Language=="en"?"es":"en";Commit(GameChange.Settings);}
  public void ResetProgress() {
   if(Navigation.Suspended || Navigation.Dialog!=GameDialog.ClearScores)return;
   Session=null;Statistics=new Stats();Persistence.Reset();Navigation.Home();Commit(GameChange.Reset);
@@ -75,7 +85,7 @@ public sealed class GameManager : MonoBehaviour {
  void Commit(GameChange change){Save();Changed?.Invoke(change);}
  public void Save() {
   if(Persistence==null)return;Record();
-  try{Persistence.Save(new GameSave{session=Session,stats=Statistics,sound=Sound});HasUnsavedChanges=Persistence.ReadOnly;}
+  try{Persistence.Save(new GameSave{session=Session,stats=Statistics,sound=Sound,haptics=Haptics,largeText=LargeText,reducedMotion=ReducedMotion,highContrast=HighContrast,language=Language});HasUnsavedChanges=Persistence.ReadOnly;}
   catch(Exception e){HasUnsavedChanges=true;Debug.LogWarning("Game save failed; retrying at the next action or lifecycle boundary: "+e.Message);}
  }
  public void SetBackground(bool background){if(background){Navigation.Suspend();Save();}else Navigation.Foreground();}

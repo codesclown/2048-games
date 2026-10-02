@@ -35,7 +35,8 @@ public sealed class NativeSaveStore : IPreferenceStore {
   Directory.CreateDirectory(directory);string path=PathFor(key),temporary=path+".tmp";
   byte[] bytes=Encoding.UTF8.GetBytes(value);
   using(var stream=new FileStream(temporary,FileMode.Create,FileAccess.Write,FileShare.None)){stream.Write(bytes,0,bytes.Length);stream.Flush(true);}
-  if(File.Exists(path))File.Replace(temporary,path,null);else File.Move(temporary,path);
+  if(File.Exists(path))File.Delete(path);
+  File.Move(temporary,path);
  }
  public void Delete(string key) {
   if(key.Contains(".save.v2.")){var path=PathFor(key);if(File.Exists(path))File.Delete(path);if(File.Exists(path+".tmp"))File.Delete(path+".tmp");}
@@ -48,7 +49,10 @@ public sealed class NativeSaveStore : IPreferenceStore {
  public Session session;
  public Stats stats=new Stats();
  public bool sound=true;
- public bool Valid(){return version==2 && stats!=null && stats.Valid() && (session==null || session.Valid());}
+ public bool haptics=true;
+ public bool largeText,reducedMotion,highContrast;
+ public string language="en";
+ public bool Valid(){return version==2 && (language==null || language=="en" || language=="es") && stats!=null && stats.Valid() && (session==null || session.Valid());}
 }
 [Serializable] sealed class SaveSlot {
  public long revision;

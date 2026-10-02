@@ -1,0 +1,377 @@
+PHASE1 PASS: native atomic replacement reloads newest slot
+PHASE1 PASS: separate native slot recovers from corruption and leftover temp file
+PHASE1 PASS: failed migration remains playable and preserves legacy data
+PHASE1 PASS: legacy session/stats/integer sound migrate together
+PHASE1 PASS: unchanged refresh/save does not flush
+PHASE1 PASS: migrated save reloads
+PHASE1 PASS: newest complete transaction reloads
+PHASE1 PASS: corrupt newest slot falls back to previous commit
+PHASE1 PASS: checksum rejects changed payload
+PHASE1 PASS: interrupted write preserves previous session and stats
+PHASE1 PASS: invalid save cannot replace a committed record
+PHASE1 PASS: future schema is preserved by an older app
+PHASE1 PASS: reset cannot resurrect legacy or backup session
+PHASE1 PASS: loading blocks input
+PHASE1 PASS: home blocks board input
+PHASE1 PASS: animation gates selection and board input
+PHASE1 PASS: selection accepts targeting
+PHASE1 PASS: background cancels selection into pause
+PHASE1 PASS: foreground does not auto-resume gameplay
+PHASE1 PASS: instructions return to pause menu
+PHASE1 PASS: reset cancellation returns to scores
+PHASE1 PASS: nested scores cancellation preserves its pause parent
+PHASE1 PASS: continuation cancellation returns to loss
+PHASE1 PASS: reward cannot be dismissed into active play
+PHASE1 PASS: reward completion in background returns to pause
+PHASE1 PASS: invalid move spends/writes nothing: 4
+PHASE1 PASS: valid move enters animation: 4
+PHASE1 PASS: concurrent gameplay actions rejected: 4
+PHASE1 PASS: pause mid-animation preserves committed move: 4
+PHASE1 PASS: resume accepts next valid move: 4
+PHASE1 PASS: manager owns undo: 4
+PHASE1 PASS: tools require the matching selection state: 4
+PHASE1 PASS: invalid swap does not consume/save: 4
+PHASE1 PASS: valid swap commits and exits selection: 4
+PHASE1 PASS: manager owns delete: 4
+PHASE1 PASS: cancel selection returns to playing: 4
+PHASE1 PASS: home rejects moves: 4
+PHASE1 PASS: target merge commits: 4
+PHASE1 PASS: win is recorded once and opens result: 4
+PHASE1 PASS: keep going is a manager action: 4
+PHASE1 PASS: repeated save cannot count win twice: 4
+PHASE1 PASS: loss opens result: 4
+PHASE1 PASS: offline continuation preserves score and commits: 4
+PHASE1 PASS: continuation cannot be granted twice: 4
+PHASE1 PASS: pending reward blocks input: 4
+PHASE1 PASS: failed reward grants nothing: 4
+PHASE1 PASS: reward callback is granted exactly once: 4
+PHASE1 PASS: repeated lifecycle save is deduplicated: 4
+PHASE1 PASS: board/history/inventory/stats resume together: 4
+PHASE1 PASS: invalid move spends/writes nothing: 5
+PHASE1 PASS: valid move enters animation: 5
+PHASE1 PASS: concurrent gameplay actions rejected: 5
+PHASE1 PASS: pause mid-animation preserves committed move: 5
+PHASE1 PASS: resume accepts next valid move: 5
+PHASE1 PASS: manager owns undo: 5
+PHASE1 PASS: tools require the matching selection state: 5
+PHASE1 PASS: invalid swap does not consume/save: 5
+PHASE1 PASS: valid swap commits and exits selection: 5
+PHASE1 PASS: manager owns delete: 5
+PHASE1 PASS: cancel selection returns to playing: 5
+PHASE1 PASS: home rejects moves: 5
+PHASE1 PASS: target merge commits: 5
+PHASE1 PASS: win is recorded once and opens result: 5
+PHASE1 PASS: keep going is a manager action: 5
+PHASE1 PASS: repeated save cannot count win twice: 5
+PHASE1 PASS: loss opens result: 5
+PHASE1 PASS: offline continuation preserves score and commits: 5
+PHASE1 PASS: continuation cannot be granted twice: 5
+PHASE1 PASS: pending reward blocks input: 5
+PHASE1 PASS: failed reward grants nothing: 5
+PHASE1 PASS: reward callback is granted exactly once: 5
+PHASE1 PASS: repeated lifecycle save is deduplicated: 5
+PHASE1 PASS: board/history/inventory/stats resume together: 5
+PHASE1 PASS: invalid move spends/writes nothing: 6
+PHASE1 PASS: valid move enters animation: 6
+PHASE1 PASS: concurrent gameplay actions rejected: 6
+PHASE1 PASS: pause mid-animation preserves committed move: 6
+PHASE1 PASS: resume accepts next valid move: 6
+PHASE1 PASS: manager owns undo: 6
+PHASE1 PASS: tools require the matching selection state: 6
+PHASE1 PASS: invalid swap does not consume/save: 6
+PHASE1 PASS: valid swap commits and exits selection: 6
+PHASE1 PASS: manager owns delete: 6
+PHASE1 PASS: cancel selection returns to playing: 6
+PHASE1 PASS: home rejects moves: 6
+PHASE1 PASS: target merge commits: 6
+PHASE1 PASS: win is recorded once and opens result: 6
+PHASE1 PASS: keep going is a manager action: 6
+PHASE1 PASS: repeated save cannot count win twice: 6
+PHASE1 PASS: loss opens result: 6
+PHASE1 PASS: offline continuation preserves score and commits: 6
+PHASE1 PASS: continuation cannot be granted twice: 6
+PHASE1 PASS: pending reward blocks input: 6
+PHASE1 PASS: failed reward grants nothing: 6
+PHASE1 PASS: reward callback is granted exactly once: 6
+PHASE1 PASS: repeated lifecycle save is deduplicated: 6
+PHASE1 PASS: board/history/inventory/stats resume together: 6
+PHASE1 PASS: failed commit retains the live state and signals a pending retry
+PHASE1 PASS: next lifecycle boundary retries the pending save
+PHASE1 PASS: committed actions publish view events
+PHASE1_SERVICE_SUCCESS: 100 checks
+PHASE2 PASS: localization catalog contains key: Preparing premium interface
+PHASE2 PASS: spanish translation exists and is distinct: Preparing premium interface
+PHASE2 PASS: localization catalog contains key: Loading scores and saved game
+PHASE2 PASS: spanish translation exists and is distinct: Loading scores and saved game
+PHASE2 PASS: localization catalog contains key: Preparing controls and audio
+PHASE2 PASS: spanish translation exists and is distinct: Preparing controls and audio
+PHASE2 PASS: localization catalog contains key: Ready
+PHASE2 PASS: spanish translation exists and is distinct: Ready
+PHASE2 PASS: localization catalog contains key: THE NUMBER COLLECTION
+PHASE2 PASS: spanish translation exists and is distinct: THE NUMBER COLLECTION
+PHASE2 PASS: localization catalog contains key: A little focus. A better move.
+PHASE2 PASS: spanish translation exists and is distinct: A little focus. A better move.
+PHASE2 PASS: localization catalog contains key: One swipe can change everything
+PHASE2 PASS: spanish translation exists and is distinct: One swipe can change everything
+PHASE2 PASS: localization catalog contains key: New Game
+PHASE2 PASS: spanish translation exists and is distinct: New Game
+PHASE2 PASS: localization catalog contains key: Resume
+PHASE2 PASS: spanish translation exists and is distinct: Resume
+PHASE2 PASS: localization catalog contains key: How to Play
+PHASE2 PASS: spanish translation exists and is distinct: How to Play
+PHASE2 PASS: localization catalog contains key: High Scores
+PHASE2 PASS: spanish translation exists and is distinct: High Scores
+PHASE2 PASS: localization catalog contains key: Settings
+PHASE2 PASS: spanish translation exists and is distinct: Settings
+PHASE2 PASS: localization catalog contains key: SWIPE · MERGE · MASTER
+PHASE2 PASS: spanish translation exists and is distinct: SWIPE · MERGE · MASTER
+PHASE2 PASS: localization catalog contains key: SCORE
+PHASE2 PASS: spanish translation exists and is distinct: SCORE
+PHASE2 PASS: localization catalog contains key: BEST
+PHASE2 PASS: spanish translation exists and is distinct: BEST
+PHASE2 PASS: localization catalog contains key: Undo
+PHASE2 PASS: spanish translation exists and is distinct: Undo
+PHASE2 PASS: localization catalog contains key: Swap
+PHASE2 PASS: spanish translation exists and is distinct: Swap
+PHASE2 PASS: localization catalog contains key: Delete
+PHASE2 PASS: spanish translation exists and is distinct: Delete
+PHASE2 PASS: localization catalog contains key: SELECTED
+PHASE2 PASS: spanish translation exists and is distinct: SELECTED
+PHASE2 PASS: localization catalog contains key: LOCKED
+PHASE2 PASS: spanish translation exists and is distinct: LOCKED
+PHASE2 PASS: localization catalog contains key: READY
+PHASE2 PASS: spanish translation exists and is distinct: READY
+PHASE2 PASS: localization catalog contains key: EMPTY
+PHASE2 PASS: spanish translation exists and is distinct: EMPTY
+PHASE2 PASS: localization catalog contains key: Hold 128 / 256 / 512 to earn tools
+PHASE2 PASS: spanish translation exists and is distinct: Hold 128 / 256 / 512 to earn tools
+PHASE2 PASS: localization catalog contains key: Tools unlock after {0} more moves
+PHASE2 PASS: spanish translation exists and is distinct: Tools unlock after {0} more moves
+PHASE2 PASS: localization catalog contains key: Tap two different adjacent tiles
+PHASE2 PASS: spanish translation exists and is distinct: Tap two different adjacent tiles
+PHASE2 PASS: localization catalog contains key: Tap the tile to remove · Cancel to exit
+PHASE2 PASS: spanish translation exists and is distinct: Tap the tile to remove · Cancel to exit
+PHASE2 PASS: localization catalog contains key: Tile 1 selected · Tap an adjacent tile
+PHASE2 PASS: spanish translation exists and is distinct: Tile 1 selected · Tap an adjacent tile
+PHASE2 PASS: localization catalog contains key: Choose a different tile next to tile 1
+PHASE2 PASS: spanish translation exists and is distinct: Choose a different tile next to tile 1
+PHASE2 PASS: localization catalog contains key: Cancel selection
+PHASE2 PASS: spanish translation exists and is distinct: Cancel selection
+PHASE2 PASS: localization catalog contains key: Paused
+PHASE2 PASS: spanish translation exists and is distinct: Paused
+PHASE2 PASS: localization catalog contains key: Take a breath. Your board is saved.
+PHASE2 PASS: spanish translation exists and is distinct: Take a breath. Your board is saved.
+PHASE2 PASS: localization catalog contains key: Change level
+PHASE2 PASS: spanish translation exists and is distinct: Change level
+PHASE2 PASS: localization catalog contains key: Home
+PHASE2 PASS: spanish translation exists and is distinct: Home
+PHASE2 PASS: localization catalog contains key: Choose your pace
+PHASE2 PASS: spanish translation exists and is distinct: Choose your pace
+PHASE2 PASS: localization catalog contains key: Classic
+PHASE2 PASS: spanish translation exists and is distinct: Classic
+PHASE2 PASS: localization catalog contains key: Short and focused
+PHASE2 PASS: spanish translation exists and is distinct: Short and focused
+PHASE2 PASS: localization catalog contains key: Advanced
+PHASE2 PASS: spanish translation exists and is distinct: Advanced
+PHASE2 PASS: localization catalog contains key: Room to build
+PHASE2 PASS: spanish translation exists and is distinct: Room to build
+PHASE2 PASS: localization catalog contains key: Expert
+PHASE2 PASS: spanish translation exists and is distinct: Expert
+PHASE2 PASS: localization catalog contains key: Think a few moves ahead
+PHASE2 PASS: spanish translation exists and is distinct: Think a few moves ahead
+PHASE2 PASS: localization catalog contains key: CURRENT BOARD
+PHASE2 PASS: spanish translation exists and is distinct: CURRENT BOARD
+PHASE2 PASS: localization catalog contains key: Simple moves. Thoughtful choices.
+PHASE2 PASS: spanish translation exists and is distinct: Simple moves. Thoughtful choices.
+PHASE2 PASS: localization catalog contains key: Your personal bests, saved on this device
+PHASE2 PASS: spanish translation exists and is distinct: Your personal bests, saved on this device
+PHASE2 PASS: localization catalog contains key: Played {0}  ·  Won {1}  ·  Win rate {2}%
+PHASE2 PASS: spanish translation exists and is distinct: Played {0}  ·  Won {1}  ·  Win rate {2}%
+PHASE2 PASS: localization catalog contains key: Clear scores
+PHASE2 PASS: spanish translation exists and is distinct: Clear scores
+PHASE2 PASS: localization catalog contains key: Clear saved scores?
+PHASE2 PASS: spanish translation exists and is distinct: Clear saved scores?
+PHASE2 PASS: localization catalog contains key: Clear
+PHASE2 PASS: spanish translation exists and is distinct: Clear
+PHASE2 PASS: localization catalog contains key: Cancel
+PHASE2 PASS: spanish translation exists and is distinct: Cancel
+PHASE2 PASS: localization catalog contains key: Restart level?
+PHASE2 PASS: spanish translation exists and is distinct: Restart level?
+PHASE2 PASS: localization catalog contains key: Restart
+PHASE2 PASS: spanish translation exists and is distinct: Restart
+PHASE2 PASS: localization catalog contains key: You win!
+PHASE2 PASS: spanish translation exists and is distinct: You win!
+PHASE2 PASS: localization catalog contains key: A new milestone. Keep building.
+PHASE2 PASS: spanish translation exists and is distinct: A new milestone. Keep building.
+PHASE2 PASS: localization catalog contains key: TARGET REACHED
+PHASE2 PASS: spanish translation exists and is distinct: TARGET REACHED
+PHASE2 PASS: localization catalog contains key: Keep going
+PHASE2 PASS: spanish translation exists and is distinct: Keep going
+PHASE2 PASS: localization catalog contains key: Play again
+PHASE2 PASS: spanish translation exists and is distinct: Play again
+PHASE2 PASS: localization catalog contains key: Game over
+PHASE2 PASS: spanish translation exists and is distinct: Game over
+PHASE2 PASS: localization catalog contains key: No moves remain. A fresh challenge awaits.
+PHASE2 PASS: spanish translation exists and is distinct: No moves remain. A fresh challenge awaits.
+PHASE2 PASS: localization catalog contains key: FINAL SCORE
+PHASE2 PASS: spanish translation exists and is distinct: FINAL SCORE
+PHASE2 PASS: localization catalog contains key: Continue: rewind 5 moves
+PHASE2 PASS: spanish translation exists and is distinct: Continue: rewind 5 moves
+PHASE2 PASS: localization catalog contains key: Continue playing?
+PHASE2 PASS: spanish translation exists and is distinct: Continue playing?
+PHASE2 PASS: localization catalog contains key: Continue
+PHASE2 PASS: spanish translation exists and is distinct: Continue
+PHASE2 PASS: localization catalog contains key: No thanks
+PHASE2 PASS: spanish translation exists and is distinct: No thanks
+PHASE2 PASS: localization catalog contains key: Close
+PHASE2 PASS: spanish translation exists and is distinct: Close
+PHASE2 PASS: localization catalog contains key: Sound
+PHASE2 PASS: spanish translation exists and is distinct: Sound
+PHASE2 PASS: localization catalog contains key: Reduced motion
+PHASE2 PASS: spanish translation exists and is distinct: Reduced motion
+PHASE2 PASS: localization catalog contains key: Large text
+PHASE2 PASS: spanish translation exists and is distinct: Large text
+PHASE2 PASS: localization catalog contains key: High contrast
+PHASE2 PASS: spanish translation exists and is distinct: High contrast
+PHASE2 PASS: localization catalog contains key: ON
+PHASE2 PASS: spanish translation exists and is distinct: ON
+PHASE2 PASS: localization catalog contains key: OFF
+PHASE2 PASS: spanish translation exists and is distinct: OFF
+PHASE2 PASS: localized string formats arguments correctly
+PHASE2 PASS: missing localization falls back to english key
+PHASE2 PASS: NotoSans-Regular font bundled in Resources/Fonts
+PHASE2 PASS: NotoSans-Bold font bundled in Resources/Fonts
+PHASE2 PASS: brand mark sprite/texture bundled in Resources/Brand
+PHASE2 PASS: brand app icon bundled in Resources/Brand (>= 512px)
+PHASE2 PASS: launch portrait art bundled in Resources/Brand
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 0 (contrast: 12.01)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 2 (contrast: 6.79)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 4 (contrast: 4.86)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 8 (contrast: 5.18)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 16 (contrast: 5.50)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 32 (contrast: 6.44)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 64 (contrast: 7.02)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 128 (contrast: 8.30)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 256 (contrast: 7.29)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 512 (contrast: 7.32)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 1024 (contrast: 7.98)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 2048 (contrast: 9.03)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 4096 (contrast: 7.07)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 8192 (contrast: 7.07)
+PHASE2 PASS: high contrast tile text returns Ink
+PHASE2 PASS: ink to text contrast exceeds WCAG AAA (>= 7.0)
+PHASE2 PASS: accent to ink contrast meets WCAG AA
+PHASE2 PASS: vector icon renders mesh vertices: Menu (12 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Sound (216 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Mute (32 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Restart (104 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Undo (104 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Swap (24 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Delete (28 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Settings (224 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Play (12 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Check (8 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Lock (112 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Trophy (24 verts)
+PHASE2 PASS: selection frame generates 16 outline vertices
+PHASE2 PASS: primary control applies accent background
+PHASE2 PASS: destructive control applies destructive tone
+PHASE2 PASS: selected state applies accent background
+PHASE2 PASS: locked state applies muted tone
+PHASE2 PASS: toggle large text modifies manager state
+PHASE2 PASS: toggle reduced motion modifies manager state
+PHASE2 PASS: toggle high contrast modifies manager state
+PHASE2 PASS: toggle language switches between en and es
+PHASE2 PASS: Android adaptive background asset exists
+PHASE2 PASS: Android adaptive foreground asset exists
+PHASE2 PASS: Android monochrome icon asset exists
+PHASE2 PASS: iOS 1024x1024 app store icon asset exists
+PHASE2 PASS: iOS AppIcon.appiconset catalog exists
+PHASE2 PASS: iOS icon asset present: icon-20.png
+PHASE2 PASS: iOS icon asset present: icon-29.png
+PHASE2 PASS: iOS icon asset present: icon-40.png
+PHASE2 PASS: iOS icon asset present: icon-58.png
+PHASE2 PASS: iOS icon asset present: icon-60.png
+PHASE2 PASS: iOS icon asset present: icon-76.png
+PHASE2 PASS: iOS icon asset present: icon-80.png
+PHASE2 PASS: iOS icon asset present: icon-87.png
+PHASE2 PASS: iOS icon asset present: icon-120.png
+PHASE2 PASS: iOS icon asset present: icon-152.png
+PHASE2 PASS: iOS icon asset present: icon-167.png
+PHASE2 PASS: iOS icon asset present: icon-180.png
+PHASE2 PASS: iOS icon asset present: icon-1024.png
+PHASE2_SERVICE_SUCCESS: 214 checks
+QA PASS: tiny gesture does not move or persist
+QA PASS: gesture starting outside board is ignored
+QA PASS: cancelled gesture cannot apply later
+QA PASS: real controller swipe reaches manager and animation
+QA PASS: pause mid-animation resolves visuals and overlapping focus loss stays suspended
+QA PASS: background gesture cannot alter saved board
+QA PASS: foreground retains pause menu
+QA PASS: button enabled: Resume
+QA PASS: explicit resume preserves score after interrupted animation
+QA PASS: lifecycle boundary persisted committed swipe
+QA PASS: exactly one game manager and controller
+QA PASS: home initializes
+QA PASS: button enabled: Settings
+QA PASS: settings modal opened
+QA PASS: button enabled: Large text
+QA PASS: large text toggled on
+QA PASS: button enabled: Large text
+QA PASS: large text toggled off
+QA PASS: button enabled: High contrast
+QA PASS: high contrast toggled on
+QA PASS: button enabled: High contrast
+QA PASS: high contrast toggled off
+QA PASS: button enabled: Language
+QA PASS: language toggled to Spanish
+QA PASS: button enabled: Language
+QA PASS: language toggled back to English
+QA PASS: button enabled: Close
+QA PASS: button enabled: New Game
+QA PASS: levels modal opened
+QA PASS: button enabled: Level 1
+QA PASS: 4x4 UI and board
+QA PASS: input to animated move and score
+QA PASS: powers unlocked by actual moves
+QA PASS: button enabled: Undo
+QA PASS: Undo UI consumes stock
+QA PASS: button enabled: Swap
+QA PASS: Swap selection UI
+QA PASS: button enabled: Delete
+QA PASS: Delete selection UI
+QA PASS: button enabled: Menu
+QA PASS: pause menu
+QA PASS: button enabled: Resume
+QA PASS: 5x5 UI and board
+QA PASS: 6x6 UI and board
+QA PASS: 8192 win dialog
+QA PASS: button enabled: Keep going
+QA PASS: keep going UI
+QA PASS: loss dialog
+QA PASS: button enabled: Continue: rewind 5 moves
+QA PASS: button enabled: Continue
+QA PASS: offline continuation UI
+QA PASS: button enabled: Menu
+QA PASS: button enabled: How to Play
+QA PASS: instructions fit dialog
+QA PASS: button enabled: Close
+QA PASS: high score dialog
+QA PASS: button enabled: Close
+QA PASS: home navigation
+QA PASS: button enabled: Resume
+QA PASS: saved game resume
+PREMIUM_SMOKE_SUCCESS

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 namespace Premium2048 {
-public enum IconKind {Menu,Sound,Mute,Restart,Undo,Swap,Delete}
+public enum IconKind {Menu,Sound,Mute,Restart,Undo,Swap,Delete,Settings,Play,Check,Lock,Trophy}
 // Vector geometry avoids emoji/font fallback differences between Android and iOS.
 public sealed class PremiumIcon : MaskableGraphic {
  IconKind kind;
@@ -17,6 +17,12 @@ public sealed class PremiumIcon : MaskableGraphic {
     Arc(mesh,0,0,.68f,-55,225);Line(mesh,-.48f,.48f,-.48f,.85f);Line(mesh,-.48f,.48f,-.08f,.48f);break;
    case IconKind.Swap:
     Line(mesh,-.8f,.35f,.8f,.35f);Line(mesh,.8f,.35f,.45f,.7f);Line(mesh,.8f,.35f,.45f,0);Line(mesh,.8f,-.35f,-.8f,-.35f);Line(mesh,-.8f,-.35f,-.45f,0);Line(mesh,-.8f,-.35f,-.45f,-.7f);break;
+   case IconKind.Settings:
+    Arc(mesh,0,0,.38f,0,360);Arc(mesh,0,0,.73f,0,360);for(int i=0;i<8;i++){float a=i*Mathf.PI/4;Line(mesh,Mathf.Cos(a)*.7f,Mathf.Sin(a)*.7f,Mathf.Cos(a)*.95f,Mathf.Sin(a)*.95f);}break;
+   case IconKind.Play:Line(mesh,-.45f,-.7f,-.45f,.7f);Line(mesh,-.45f,.7f,.7f,0);Line(mesh,.7f,0,-.45f,-.7f);break;
+   case IconKind.Check:Line(mesh,-.7f,0,-.2f,-.5f);Line(mesh,-.2f,-.5f,.75f,.65f);break;
+   case IconKind.Lock:Line(mesh,-.6f,-.75f,.6f,-.75f);Line(mesh,.6f,-.75f,.6f,.2f);Line(mesh,.6f,.2f,-.6f,.2f);Line(mesh,-.6f,.2f,-.6f,-.75f);Arc(mesh,0,.2f,.4f,0,180);break;
+   case IconKind.Trophy:Line(mesh,-.6f,.7f,.6f,.7f);Line(mesh,-.6f,.7f,-.4f,-.1f);Line(mesh,-.4f,-.1f,.4f,-.1f);Line(mesh,.4f,-.1f,.6f,.7f);Line(mesh,0,-.1f,0,-.7f);Line(mesh,-.4f,-.7f,.4f,-.7f);break;
    case IconKind.Delete:
     Line(mesh,-.75f,.5f,.75f,.5f);Line(mesh,-.3f,.8f,.3f,.8f);Line(mesh,-.55f,.5f,-.45f,-.75f);Line(mesh,-.45f,-.75f,.45f,-.75f);Line(mesh,.45f,-.75f,.55f,.5f);Line(mesh,-.18f,.2f,-.18f,-.45f);Line(mesh,.18f,.2f,.18f,-.45f);break;
   }
