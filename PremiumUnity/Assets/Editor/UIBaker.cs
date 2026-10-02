@@ -7,18 +7,75 @@ using Premium2048;
 
 namespace Premium2048.EditorTools {
 public static class UIBaker {
-    [MenuItem("2048 Premium/Bake All Screens to Scene and Prefabs")]
+    [MenuItem("2048 Premium/Bake All Screens to Dedicated Scenes and Prefabs")]
     public static void BakeAll() {
         EnsureDirectories();
-        var scene = EditorSceneManager.OpenScene("Assets/Scenes/Premium.unity", OpenSceneMode.Single);
-        if (!scene.IsValid()) {
-            scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        }
+        
+        // 1. Bake Master Unified Scene
+        BakeMasterScene();
 
-        // Clean existing root objects
-        foreach (var rootObj in scene.GetRootGameObjects()) {
-            Object.DestroyImmediate(rootObj);
-        }
+        // 2. Bake Individual Dedicated Preview Scenes for Every Screen
+        BakeIndividualScene("01_HomeScreen", BuildHomeScreen);
+        BakeIndividualScene("02_GameScreen_4x4", BuildGameScreen);
+        BakeIndividualScene("03_Dialog_Levels", BuildLevelsDialog);
+        BakeIndividualScene("04_Dialog_HighScores", BuildScoresDialog);
+        BakeIndividualScene("05_Dialog_HowToPlay", BuildRulesDialog);
+        BakeIndividualScene("06_Dialog_Settings", BuildSettingsDialog);
+        BakeIndividualScene("07_Dialog_Pause", BuildPauseDialog);
+        BakeIndividualScene("08_Dialog_GameOver", BuildGameOverDialog);
+        BakeIndividualScene("09_Dialog_Victory", BuildVictoryDialog);
+        BakeIndividualScene("10_Dialog_Restart", BuildRestartDialog);
+
+        AssetDatabase.Refresh();
+        Debug.Log("<color=green><b>[UIBaker]</b> All dedicated scenes and prefabs successfully baked into Assets/Scenes/ and Assets/Prefabs/!</color>");
+    }
+
+    static void EnsureDirectories() {
+        if (!Directory.Exists("Assets/Scenes")) Directory.CreateDirectory("Assets/Scenes");
+        if (!Directory.Exists("Assets/Prefabs")) Directory.CreateDirectory("Assets/Prefabs");
+        if (!Directory.Exists("Assets/Prefabs/Screens")) Directory.CreateDirectory("Assets/Prefabs/Screens");
+        if (!Directory.Exists("Assets/Prefabs/Dialogs")) Directory.CreateDirectory("Assets/Prefabs/Dialogs");
+    }
+
+    static void BakeIndividualScene(string sceneName, System.Func<RectTransform, RectTransform> screenBuilder) {
+        var scenePath = "Assets/Scenes/" + sceneName + ".unity";
+        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+        // EventSystem
+        new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem), typeof(UnityEngine.EventSystems.StandaloneInputModule));
+
+        // Canvas
+        var canvasGo = new GameObject("Canvas_" + sceneName, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        var canvas = canvasGo.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.pixelPerfect = true;
+
+        var scaler = canvasGo.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1080, 1920);
+        scaler.matchWidthOrHeight = 0.5f;
+
+        // Background
+        var bg = CreateUIObject("Background", canvasGo.transform);
+        Stretch(bg);
+        var bgImg = bg.gameObject.AddComponent<Image>();
+        bgImg.color = PremiumTheme.Ink;
+
+        // SafeArea
+        var safeArea = CreateUIObject("SafeArea", canvasGo.transform);
+        Stretch(safeArea);
+        safeArea.offsetMin = new Vector2(24, 48);
+        safeArea.offsetMax = new Vector2(-24, -48);
+
+        // Build the specific screen
+        var screenRt = screenBuilder(safeArea);
+        screenRt.gameObject.SetActive(true);
+
+        EditorSceneManager.SaveScene(scene, scenePath);
+    }
+
+    static void BakeMasterScene() {
+        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
         // 1. Create EventSystem
         var eventSystem = new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem), typeof(UnityEngine.EventSystems.StandaloneInputModule));
@@ -98,14 +155,6 @@ public static class UIBaker {
         gameScreen.gameObject.SetActive(false);
 
         EditorSceneManager.SaveScene(scene, "Assets/Scenes/Premium.unity");
-        AssetDatabase.Refresh();
-        Debug.Log("<color=green><b>[UIBaker]</b> All 13 UI screens successfully baked to Scene and Assets/Prefabs/!</color>");
-    }
-
-    static void EnsureDirectories() {
-        if (!Directory.Exists("Assets/Prefabs")) Directory.CreateDirectory("Assets/Prefabs");
-        if (!Directory.Exists("Assets/Prefabs/Screens")) Directory.CreateDirectory("Assets/Prefabs/Screens");
-        if (!Directory.Exists("Assets/Prefabs/Dialogs")) Directory.CreateDirectory("Assets/Prefabs/Dialogs");
     }
 
     static void SavePrefab(GameObject go, string path) {
@@ -125,11 +174,10 @@ public static class UIBaker {
         rt.offsetMax = Vector2.zero;
     }
 
-    static RectTransform BuildHomeScreen(RectTransform parent) {
+    public static RectTransform BuildHomeScreen(RectTransform parent) {
         var screen = CreateUIObject("HomeScreen", parent);
         Stretch(screen);
 
-        // Header / Logo
         var header = CreateUIObject("Header", screen);
         header.anchorMin = new Vector2(0, 0.75f);
         header.anchorMax = new Vector2(1, 1f);
@@ -162,7 +210,6 @@ public static class UIBaker {
         subTxt.text = "THE NUMBER COLLECTION";
         subTxt.color = PremiumTheme.Muted;
 
-        // Content Area / Hero Card
         var hero = CreateUIObject("HeroCard", screen);
         hero.anchorMin = new Vector2(0.05f, 0.35f);
         hero.anchorMax = new Vector2(0.95f, 0.72f);
@@ -190,7 +237,6 @@ public static class UIBaker {
         heroDescTxt.text = "Swipe to merge numbers and reach the legendary 2048 tile.";
         heroDescTxt.color = PremiumTheme.Text;
 
-        // Actions
         var newGameBtn = CreateUIObject("NewGameButton", screen);
         newGameBtn.anchorMin = new Vector2(0.05f, 0.22f);
         newGameBtn.anchorMax = new Vector2(0.95f, 0.30f);
@@ -208,33 +254,30 @@ public static class UIBaker {
         ngLabel.text = "NEW GAME";
         ngLabel.color = PremiumTheme.Ink;
 
-        // Bottom Actions Row (How to Play, High Scores, Settings)
         var bottomBar = CreateUIObject("BottomBar", screen);
         bottomBar.anchorMin = new Vector2(0.05f, 0.05f);
         bottomBar.anchorMax = new Vector2(0.95f, 0.18f);
         bottomBar.offsetMin = bottomBar.offsetMax = Vector2.zero;
 
-        var rulesBtn = CreateButton("HowToPlayButton", bottomBar, new Vector2(0, 0), new Vector2(0.31f, 1), "HOW TO PLAY");
-        var scoresBtn = CreateButton("HighScoresButton", bottomBar, new Vector2(0.345f, 0), new Vector2(0.655f, 1), "HIGH SCORES");
-        var settingsBtn = CreateButton("SettingsButton", bottomBar, new Vector2(0.69f, 0), new Vector2(1, 1), "SETTINGS");
+        CreateButton("HowToPlayButton", bottomBar, new Vector2(0, 0), new Vector2(0.31f, 1), "HOW TO PLAY");
+        CreateButton("HighScoresButton", bottomBar, new Vector2(0.345f, 0), new Vector2(0.655f, 1), "HIGH SCORES");
+        CreateButton("SettingsButton", bottomBar, new Vector2(0.69f, 0), new Vector2(1, 1), "SETTINGS");
 
         return screen;
     }
 
-    static RectTransform BuildGameScreen(RectTransform parent) {
+    public static RectTransform BuildGameScreen(RectTransform parent) {
         var screen = CreateUIObject("GameScreen", parent);
         Stretch(screen);
 
-        // Top Stats Bar
         var topBar = CreateUIObject("TopBar", screen);
         topBar.anchorMin = new Vector2(0.05f, 0.85f);
         topBar.anchorMax = new Vector2(0.95f, 0.98f);
         topBar.offsetMin = topBar.offsetMax = Vector2.zero;
 
-        var scoreCard = CreateCard("ScoreCard", topBar, new Vector2(0, 0), new Vector2(0.48f, 1), "SCORE", "0");
-        var bestCard = CreateCard("BestCard", topBar, new Vector2(0.52f, 0), new Vector2(1, 1), "BEST", "0");
+        CreateCard("ScoreCard", topBar, new Vector2(0, 0), new Vector2(0.48f, 1), "SCORE", "0");
+        CreateCard("BestCard", topBar, new Vector2(0.52f, 0), new Vector2(1, 1), "BEST", "0");
 
-        // Board Area Container
         var boardContainer = CreateUIObject("BoardContainer", screen);
         boardContainer.anchorMin = new Vector2(0.05f, 0.25f);
         boardContainer.anchorMax = new Vector2(0.95f, 0.80f);
@@ -246,15 +289,14 @@ public static class UIBaker {
         grid.anchorMin = grid.anchorMax = new Vector2(0.5f, 0.5f);
         grid.sizeDelta = new Vector2(400, 400);
 
-        // Power Ups Bar
         var powerBar = CreateUIObject("PowerUpsBar", screen);
         powerBar.anchorMin = new Vector2(0.05f, 0.08f);
         powerBar.anchorMax = new Vector2(0.95f, 0.20f);
         powerBar.offsetMin = powerBar.offsetMax = Vector2.zero;
 
-        var undoBtn = CreatePowerButton("UndoButton", powerBar, new Vector2(0, 0), new Vector2(0.31f, 1), "UNDO", "50 🪙");
-        var swapBtn = CreatePowerButton("SwapButton", powerBar, new Vector2(0.345f, 0), new Vector2(0.655f, 1), "SWAP", "100 🪙");
-        var deleteBtn = CreatePowerButton("DeleteButton", powerBar, new Vector2(0.69f, 0), new Vector2(1, 1), "DELETE", "150 🪙");
+        CreatePowerButton("UndoButton", powerBar, new Vector2(0, 0), new Vector2(0.31f, 1), "UNDO", "50 🪙");
+        CreatePowerButton("SwapButton", powerBar, new Vector2(0.345f, 0), new Vector2(0.655f, 1), "SWAP", "100 🪙");
+        CreatePowerButton("DeleteButton", powerBar, new Vector2(0.69f, 0), new Vector2(1, 1), "DELETE", "150 🪙");
 
         return screen;
     }
@@ -344,7 +386,7 @@ public static class UIBaker {
         return dialog;
     }
 
-    static RectTransform BuildLevelsDialog(Transform parent) {
+    public static RectTransform BuildLevelsDialog(RectTransform parent) {
         var d = CreateDialogBase("Dialog_Levels", parent, "CHOOSE YOUR PACE");
         CreateButton("Level4x4", d, new Vector2(0.1f, 0.60f), new Vector2(0.9f, 0.78f), "CLASSIC 4x4");
         CreateButton("Level5x5", d, new Vector2(0.1f, 0.38f), new Vector2(0.9f, 0.56f), "ADVANCED 5x5");
@@ -353,7 +395,7 @@ public static class UIBaker {
         return d;
     }
 
-    static RectTransform BuildScoresDialog(Transform parent) {
+    public static RectTransform BuildScoresDialog(RectTransform parent) {
         var d = CreateDialogBase("Dialog_HighScores", parent, "HIGH SCORES");
         CreateCard("Score4x4", d, new Vector2(0.1f, 0.64f), new Vector2(0.9f, 0.80f), "CLASSIC 4x4", "24,860");
         CreateCard("Score5x5", d, new Vector2(0.1f, 0.44f), new Vector2(0.9f, 0.60f), "ADVANCED 5x5", "68,420");
@@ -362,7 +404,7 @@ public static class UIBaker {
         return d;
     }
 
-    static RectTransform BuildRulesDialog(Transform parent) {
+    public static RectTransform BuildRulesDialog(RectTransform parent) {
         var d = CreateDialogBase("Dialog_HowToPlay", parent, "HOW TO PLAY");
         var content = CreateUIObject("Content", d);
         content.anchorMin = new Vector2(0.1f, 0.20f); content.anchorMax = new Vector2(0.9f, 0.82f);
@@ -376,7 +418,7 @@ public static class UIBaker {
         return d;
     }
 
-    static RectTransform BuildSettingsDialog(Transform parent) {
+    public static RectTransform BuildSettingsDialog(RectTransform parent) {
         var d = CreateDialogBase("Dialog_Settings", parent, "SETTINGS");
         CreateButton("ToggleSound", d, new Vector2(0.1f, 0.66f), new Vector2(0.9f, 0.78f), "SOUND: ON");
         CreateButton("ToggleHaptics", d, new Vector2(0.1f, 0.50f), new Vector2(0.9f, 0.62f), "HAPTICS: ON");
@@ -386,7 +428,7 @@ public static class UIBaker {
         return d;
     }
 
-    static RectTransform BuildPauseDialog(Transform parent) {
+    public static RectTransform BuildPauseDialog(RectTransform parent) {
         var d = CreateDialogBase("Dialog_Pause", parent, "GAME PAUSED");
         CreateButton("ResumeButton", d, new Vector2(0.1f, 0.62f), new Vector2(0.9f, 0.78f), "RESUME");
         CreateButton("RestartButton", d, new Vector2(0.1f, 0.42f), new Vector2(0.9f, 0.58f), "RESTART");
@@ -394,7 +436,7 @@ public static class UIBaker {
         return d;
     }
 
-    static RectTransform BuildGameOverDialog(Transform parent) {
+    public static RectTransform BuildGameOverDialog(RectTransform parent) {
         var d = CreateDialogBase("Dialog_GameOver", parent, "GAME OVER");
         CreateCard("FinalScoreCard", d, new Vector2(0.1f, 0.45f), new Vector2(0.9f, 0.75f), "FINAL SCORE", "12,480");
         CreateButton("PlayAgainButton", d, new Vector2(0.1f, 0.25f), new Vector2(0.9f, 0.40f), "PLAY AGAIN");
@@ -402,7 +444,7 @@ public static class UIBaker {
         return d;
     }
 
-    static RectTransform BuildVictoryDialog(Transform parent) {
+    public static RectTransform BuildVictoryDialog(RectTransform parent) {
         var d = CreateDialogBase("Dialog_Victory", parent, "VICTORY! 👑");
         CreateCard("VictoryScoreCard", d, new Vector2(0.1f, 0.52f), new Vector2(0.9f, 0.78f), "YOU REACHED 2048!", "Score: 20,480");
         CreateButton("KeepGoingButton", d, new Vector2(0.1f, 0.34f), new Vector2(0.9f, 0.48f), "KEEP GOING");
@@ -411,7 +453,7 @@ public static class UIBaker {
         return d;
     }
 
-    static RectTransform BuildRestartDialog(Transform parent) {
+    public static RectTransform BuildRestartDialog(RectTransform parent) {
         var d = CreateDialogBase("Dialog_Restart", parent, "RESTART GAME?");
         var txt = CreateUIObject("Desc", d);
         txt.anchorMin = new Vector2(0.1f, 0.45f); txt.anchorMax = new Vector2(0.9f, 0.75f);
