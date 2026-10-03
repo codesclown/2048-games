@@ -41,7 +41,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/Debug/2p12y2u3/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeSystem.cmake"
+			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/RelWithDebInfo/2t6o326j/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeSystem.cmake"
 		},
 		{
 			"isExternal" : true,
@@ -307,7 +307,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/Debug/2p12y2u3/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCCompiler.cmake"
+			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/RelWithDebInfo/2t6o326j/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCCompiler.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -541,7 +541,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/Debug/2p12y2u3/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCXXCompiler.cmake"
+			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/RelWithDebInfo/2t6o326j/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCXXCompiler.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -692,7 +692,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/Debug/2p12y2u3/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCCompiler.cmake"
+			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/RelWithDebInfo/2t6o326j/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCCompiler.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -786,27 +786,27 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/Debug/2p12y2u3/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCXXCompiler.cmake"
+			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/RelWithDebInfo/2t6o326j/arm64-v8a/CMakeFiles/3.22.1-g37088a8/CMakeCXXCompiler.cmake"
 		},
 		{
 			"path" : "GameActivity/CMakeLists.txt"
 		},
 		{
 			"isExternal" : true,
-			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/Debug/2p12y2u3/prefab/arm64-v8a/prefab/lib/aarch64-linux-android/cmake/game-activity/game-activityConfig.cmake"
+			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/RelWithDebInfo/2t6o326j/prefab/arm64-v8a/prefab/lib/aarch64-linux-android/cmake/game-activity/game-activityConfig.cmake"
 		},
 		{
 			"path" : "FramePacing/CMakeLists.txt"
 		},
 		{
 			"isExternal" : true,
-			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/Debug/2p12y2u3/prefab/arm64-v8a/prefab/lib/aarch64-linux-android/cmake/games-frame-pacing/games-frame-pacingConfig.cmake"
+			"path" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/RelWithDebInfo/2t6o326j/prefab/arm64-v8a/prefab/lib/aarch64-linux-android/cmake/games-frame-pacing/games-frame-pacingConfig.cmake"
 		}
 	],
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/Debug/2p12y2u3/arm64-v8a",
+		"build" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/.utmp/RelWithDebInfo/2t6o326j/arm64-v8a",
 		"source" : "/Users/chandanvishwakarma/2048-games/PremiumUnity/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp"
 	},
 	"version" : 

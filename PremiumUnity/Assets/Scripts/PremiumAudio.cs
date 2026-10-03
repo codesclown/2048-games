@@ -54,9 +54,17 @@ public static class PremiumAudio {
   var data = new float[samples];
   build(data);
 
-  // Normalize / Soft clip to prevent any distortion
+  // Normalize to full audible volume with safety ceiling
+  float maxPeak = 0f;
   for (int i = 0; i < samples; i++) {
-   data[i] = Mathf.Clamp(data[i], -0.95f, 0.95f);
+   float abs = Mathf.Abs(data[i]);
+   if (abs > maxPeak) maxPeak = abs;
+  }
+  if (maxPeak > 0.0001f) {
+   float boost = 0.92f / maxPeak;
+   for (int i = 0; i < samples; i++) {
+    data[i] = Mathf.Clamp(data[i] * boost, -0.98f, 0.98f);
+   }
   }
 
   var clip = AudioClip.Create(name, samples, 1, SampleRate, false);
@@ -72,12 +80,12 @@ public static class PremiumAudio {
    for (int i = 0; i < total; i++) {
     float t = (float)i / SampleRate;
     float progress = (float)i / total;
-    float freq = 300f * Mathf.Pow(150f / 300f, progress);
+    float freq = 360f * Mathf.Pow(180f / 360f, progress);
     float attack = Mathf.Clamp01(t / 0.02f);
-    float decay = Mathf.Exp(-4.0f * progress);
-    float env = attack * decay * 0.35f;
+    float decay = Mathf.Exp(-3.8f * progress);
+    float env = attack * decay;
 
-    data[i] = SineWave(phase) * env;
+    data[i] = (SineWave(phase) * 0.7f + SineWave(phase * 2f) * 0.3f) * env;
     phase += 2f * Mathf.PI * freq / SampleRate;
    }
   });
@@ -235,7 +243,7 @@ public static class PremiumAudio {
  // Crisp UI button click
  public static AudioClip Click() {
   return MakeClip("Click", 0.06f, data => {
-   AddTone(data, 0f, 0.06f, new[] { 660f, 880f }, "sine", 0.3f, "sharp");
+   AddTone(data, 0f, 0.05f, new[] { 740f, 1100f }, "triangle", 0.45f, "sharp");
   });
  }
 }

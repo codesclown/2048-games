@@ -64,8 +64,12 @@ public enum Power { Undo, Swap, Delete }
  public bool Reward() {
   if(!CanReward) return false;
   int targetIndex=Math.Max(0,history.Count-5);long score=board.score;
-  board=history[targetIndex].Copy();board.score=score;
+  board=history[targetIndex].Copy();board.score=score;board.continued=true;
   history.RemoveRange(targetIndex,history.Count-targetIndex);rewardUsed=true;
+  if(!board.HasMoves()){
+   int cleared=0;
+   for(int i=0;i<board.cells.Length && cleared<2;i++)if(board.cells[i]>0){board.cells[i]=0;cleared++;}
+  }
   return true;
  }
  public bool Valid() {

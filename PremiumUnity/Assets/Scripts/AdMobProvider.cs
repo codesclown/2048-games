@@ -12,7 +12,7 @@ public sealed class AdMobProvider : RewardProvider {
  float retryAt,rewardLoadedAt;
  public override bool IsReady=>completion==null && rewarded!=null && rewarded.CanShowAd();
  string BannerId=>Application.platform==RuntimePlatform.IPhonePlayer?"ca-app-pub-3940256099942544/2934735716":"ca-app-pub-3940256099942544/6300978111";
- string RewardId=>Application.platform==RuntimePlatform.IPhonePlayer?"ca-app-pub-3940256099942544/4411468910":"ca-app-pub-3940256099942544/1033173712";
+ string RewardId=>Application.platform==RuntimePlatform.IPhonePlayer?"ca-app-pub-3940256099942544/1712485313":"ca-app-pub-3940256099942544/5224354917";
  void Start(){
   if(!Application.isMobilePlatform && !Application.isEditor)return;
   MobileAds.Initialize(status=>Dispatch(()=>{
@@ -38,7 +38,12 @@ public sealed class AdMobProvider : RewardProvider {
    Dispatch(()=>{
     if(error!=null || ad==null){ad?.Destroy();return;}
     rewarded=ad;rewardLoadedAt=Time.realtimeSinceStartup;
-    ad.OnAdFullScreenContentClosed+=()=>Dispatch(()=>Finish(earned));
+    ad.OnAdFullScreenContentClosed+=()=>{
+     Dispatch(()=>{
+      bool success=earned || Application.isEditor;
+      Finish(success);
+     });
+    };
     ad.OnAdFullScreenContentFailed+=errorInfo=>Dispatch(()=>Finish(false));
    });
   });
@@ -46,7 +51,12 @@ public sealed class AdMobProvider : RewardProvider {
  public override void Show(Action<bool> completed){
   if(!IsReady){completed(false);return;}
   earned=false;completion=completed;banner?.Hide();
-  try{rewarded.Show(reward=>Dispatch(()=>earned=true));}
+  if(Application.isEditor){earned=true;}
+  try{
+   rewarded.Show(reward=>{
+    earned=true;
+   });
+  }
   catch{Finish(false);}
  }
  void Finish(bool success){

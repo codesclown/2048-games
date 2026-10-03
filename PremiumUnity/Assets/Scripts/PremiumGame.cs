@@ -122,7 +122,7 @@ public class PremiumGame : MonoBehaviour {
    moveAnimation=StartCoroutine(AnimateMove(manager.LastScoreGain,clip));
    return;
   }
-  if(change==GameChange.NewGame || change==GameChange.Undo || change==GameChange.Continue){StopScore();BuildBoard();}
+  if(change==GameChange.NewGame || change==GameChange.Undo || change==GameChange.Continue){StopScore();BuildBoard();if(change==GameChange.Continue){Play(undoTone);PremiumHaptics.Trigger(HapticImpact.Medium);}}
   Refresh();
   if((change==GameChange.Swap || change==GameChange.Delete) && powerBefore!=null && !manager.ReducedMotion && navigation.Dialog==GameDialog.None){moveAnimation=StartCoroutine(AnimatePower(change));}
   powerBefore=null;
@@ -542,7 +542,7 @@ public class PremiumGame : MonoBehaviour {
   while(elapsed<0.65f) {elapsed+=Time.unscaledDeltaTime;float t=Mathf.Clamp01(elapsed/0.65f);addition.rectTransform.anchoredPosition=new Vector2(0,25+40*t);addition.color=new Color(Gold.r,Gold.g,Gold.b,1-t);yield return null;}
   SetText(addition,"");scoreAnimation=null;
  }
- void Play(AudioClip clip,float volume=0.85f) {if(sound && clip!=null && audioSource!=null)audioSource.PlayOneShot(clip,Mathf.Clamp01(volume));}
+ void Play(AudioClip clip,float volume=1.0f) {if(sound && clip!=null && audioSource!=null)audioSource.PlayOneShot(clip,Mathf.Clamp01(volume));}
  void FitScreen(bool force=false) {
   if(!force && (safeRoot==null || (lastWidth==Screen.width && lastHeight==Screen.height && lastSafe==Screen.safeArea && lastBannerHeight==AdMobProvider.BannerHeightPixels)))return;
   lastBannerHeight=AdMobProvider.BannerHeightPixels;

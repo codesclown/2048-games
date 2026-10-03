@@ -131,7 +131,7 @@ public sealed class GameManager : MonoBehaviour {
   rewardingSession=Session;Navigation.Open(GameDialog.RewardVideo);return ++rewardSequence;
  }
  public bool CompleteReward(int request,bool success) {
-  if(request!=rewardSequence || rewardingSession!=Session || Navigation.State!=GameState.Rewarding)return false;
+  if(request!=rewardSequence || rewardingSession!=Session)return false;
   rewardingSession=null;
   if(success && Session.Reward()){Navigation.EndReward();Navigation.Play();Commit(GameChange.Continue);return true;}
   Navigation.EndReward();ShowResult();return false;
