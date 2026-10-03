@@ -28,11 +28,12 @@ public class PremiumGame : MonoBehaviour {
  readonly List<RectTransform> ghostPool=new List<RectTransform>();
  readonly List<RectTransform> activeGhosts=new List<RectTransform>();
  bool ready,animating,appPaused,focusLost;
+ GameScreen? presentedScreen; GameDialog presentedDialog; bool boardWasExpedition;
  Direction? queuedMove;
  int selected=-1,pendingDimension=4,powerFirst=-1,powerSecond=-1;int[] powerBefore;
  Coroutine moveAnimation,scoreAnimation,boardPulseAnimation;AudioSource audioSource;AudioClip moveTone,mergeTone,clickTone,winTone,slideTone,undoTone,swapTone,deleteTone,lossTone,spawnTone;
  readonly Dictionary<int,AudioClip> mergeClips=new Dictionary<int,AudioClip>();
- int lastWidth,lastHeight;Rect lastSafe;
+ int lastWidth,lastHeight;Rect lastSafe;float lastBannerHeight;
  Color Gold=>PremiumTheme.Accent;Color Ink=>PremiumTheme.Ink;Color White=>PremiumTheme.Text;
  [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
  static void Boot() { if(FindFirstObjectByType<PremiumGame>()==null) new GameObject("2048 Premium").AddComponent<PremiumGame>(); }
@@ -53,8 +54,9 @@ public class PremiumGame : MonoBehaviour {
   if(brandMark==null){var mt=Resources.Load<Texture2D>("Brand/Mark");if(mt!=null)brandMark=Sprite.Create(mt,new Rect(0,0,mt.width,mt.height),new Vector2(0.5f,0.5f));}
   BuildShell();
   if(rewardProvider==null) rewardProvider=GetComponent<RewardProvider>();
+  if(rewardProvider==null) rewardProvider=gameObject.AddComponent<AdMobProvider>();
   BuildHome();BuildGame();BuildExpeditionMap();
-  audioSource=gameObject.AddComponent<AudioSource>();audioSource.playOnAwake=false;
+  audioSource=gameObject.AddComponent<AudioSource>();audioSource.playOnAwake=false;audioSource.volume=1f;
   if(GetComponent<AudioListener>()==null && FindFirstObjectByType<AudioListener>()==null) gameObject.AddComponent<AudioListener>();
   slideTone=PremiumAudio.Slide();undoTone=PremiumAudio.Undo();swapTone=PremiumAudio.Swap();
   deleteTone=PremiumAudio.Delete();lossTone=PremiumAudio.Loss();spawnTone=PremiumAudio.Spawn();
@@ -127,7 +129,9 @@ public class PremiumGame : MonoBehaviour {
  }
  void OnNavigationChanged() {
   if(navigation.Suspended || (navigation.State!=GameState.Playing && navigation.State!=GameState.Animating && navigation.State!=GameState.Selecting)){controller.Cancel();queuedMove=null;}if(!ready)return;
-  bool screenChanged=home.activeSelf!=(navigation.Screen==GameScreen.Home);
+  bool screenChanged=presentedScreen!=navigation.Screen;
+  bool dialogChanged=presentedDialog!=navigation.Dialog;
+  presentedScreen=navigation.Screen;presentedDialog=navigation.Dialog;
   home.SetActive(navigation.Screen==GameScreen.Home);
   game.SetActive(navigation.Screen==GameScreen.Game || navigation.Screen==GameScreen.Expedition);
   if(expeditionMap!=null)expeditionMap.SetActive(navigation.Screen==GameScreen.ExpeditionMap);
@@ -135,12 +139,13 @@ public class PremiumGame : MonoBehaviour {
   if(navigation.State==GameState.Animating)return;
   if(animating)FinishAnimation();
   if(selection<0)ClearSelectionVisuals();
-  if(navigation.Screen==GameScreen.Home && (screenChanged || navigation.Dialog==GameDialog.None))RebuildHome();
-  if(navigation.Screen==GameScreen.ExpeditionMap)RefreshExpeditionMap();
+  if(navigation.Screen==GameScreen.Home && screenChanged)RebuildHome();
+  if(navigation.Screen==GameScreen.ExpeditionMap && screenChanged){RefreshExpeditionMap();FitExpeditionMap();}
   if(screenChanged && !manager.ReducedMotion && (navigation.Screen==GameScreen.Game || navigation.Screen==GameScreen.Expedition)){var reveal=game.GetComponent<PremiumPanelMotion>();if(reveal==null)reveal=game.AddComponent<PremiumPanelMotion>();reveal.Reveal(.985f);}
-  if(navigation.Screen==GameScreen.Home){var motion=home.GetComponent<PremiumHomeMotion>();if(motion==null)motion=home.AddComponent<PremiumHomeMotion>();if(navigation.Dialog==GameDialog.None)motion.Reveal(manager);}
+  if(navigation.Screen==GameScreen.ExpeditionMap && screenChanged){var entrance=expeditionMap.GetComponent<PremiumPanelMotion>();if(entrance==null)entrance=expeditionMap.AddComponent<PremiumPanelMotion>();entrance.Reveal();}
+  if(navigation.Screen==GameScreen.Home && screenChanged){var motion=home.GetComponent<PremiumHomeMotion>();if(motion==null)motion=home.AddComponent<PremiumHomeMotion>();if(navigation.Dialog==GameDialog.None)motion.Reveal(manager);}
   modal.SetActive(navigation.Dialog!=GameDialog.None);
-  if(navigation.Dialog!=GameDialog.None)RenderDialog();
+  if(navigation.Dialog!=GameDialog.None && (dialogChanged || screenChanged))RenderDialog();
   if((navigation.Screen==GameScreen.Game || navigation.Screen==GameScreen.Expedition) && manager.ActiveSession!=null){BuildBoard();Refresh();}
  }
  IEnumerator AnimateExpeditionMove(AudioClip contactTone) {
@@ -159,7 +164,7 @@ public class PremiumGame : MonoBehaviour {
   foreach(var motion in motions)AcquireGhost(grid,motion.from,motion.value);
   yield return null;
   float elapsed=0;
-  const float slideDuration=0.08f,settleDuration=0.07f;
+  const float slideDuration=0.11f,settleDuration=0.10f;
   while(elapsed<slideDuration) {
    elapsed+=Time.unscaledDeltaTime;float t=Mathf.Clamp01(elapsed/slideDuration);float ease=1f-Mathf.Pow(1f-t,3f);
    for(int i=0;i<moving.Count;i++)moving[i].anchoredPosition=Vector2.Lerp(CellPosition(motions[i].from),CellPosition(motions[i].to),ease);
@@ -208,7 +213,7 @@ public class PremiumGame : MonoBehaviour {
   if(moveAnimation!=null)StopCoroutine(moveAnimation);moveAnimation=null;animating=false;queuedMove=null;controller.Cancel();ClearGhosts();mergeFeedback?.Stop();
   if(boardPulseAnimation!=null)StopCoroutine(boardPulseAnimation);boardPulseAnimation=null;
   if(tiles!=null)foreach(var tile in tiles){tile.gameObject.SetActive(true);tile.transform.localScale=Vector3.one;}
-  if(grid!=null)grid.localScale=Vector3.one;
+  if(grid!=null)FitScreen(true);
  }
  void NewGame(int dimension){if(rewardPending || navigation.Suspended)return;FinishAnimation();manager.StartGame(dimension);}
  void ShowGame(){manager.Resume();}
@@ -254,10 +259,17 @@ public class PremiumGame : MonoBehaviour {
    for(int i=0;i<3;i++){
     bool active=selection==i;
     int available=exp.tools[i];
-    SetText(powerLabels[i],"{0}  {1}",T(((Power)i).ToString()),available);
-    SetText(powerStatuses[i],active?"SELECTED":available>0?"READY":"EMPTY");
     powers[i].interactable=!animating && !navigation.Suspended && exp.CanUseTool((Power)i);
     powers[i].GetComponent<PremiumControl>().State(active,available<=0);
+    SetText(powerLabels[i],"{0}",available);powerLabels[i].color=active?Gold:Ink;
+    var badge=powers[i].transform.Find("Count Badge");
+    if(badge!=null){badge.gameObject.SetActive(available>0);badge.GetComponent<Image>().color=active?Hex("192327"):Gold;}
+    var iconImg=powers[i].transform.Find("Icon")?.GetComponent<PremiumIcon>();
+    if(iconImg!=null)iconImg.color=active?Hex("192327"):available>0?White:PremiumTheme.Muted;
+    var toolLabel=powers[i].transform.Find("ToolName")?.GetComponent<Text>();
+    if(toolLabel!=null)toolLabel.color=active?Hex("192327"):White;
+    SetText(powerStatuses[i],active?"ACTIVE":available>0?"READY":"EMPTY");
+    powerStatuses[i].color=active?Hex("192327"):available>0?PremiumTheme.Cyan:PremiumTheme.Muted;
    }
    cancelSelection.SetActive(selection>=0);FitScreen(true);
    if(selection<0)SetText(hint,exp.mission.description);
@@ -270,10 +282,19 @@ public class PremiumGame : MonoBehaviour {
   for(int i=0;i<tiles.Length;i++){int v=b.cells[i];tiles[i].gameObject.SetActive(v!=0);tiles[i].sprite=TileSprite(v);tiles[i].color=Color.white;tiles[i].transform.localScale=Vector3.one;SetText(numbers[i],"{0}",v);numbers[i].color=TileText(v);}
   for(int i=0;i<3;i++) {
    bool active=selection==i,locked=!session.Unlocked;
-   SetText(powerLabels[i],"{0}  {1}",T(((Power)i).ToString()),session.stock[i].available);
-   SetText(powerStatuses[i],active?"SELECTED":locked?"LOCKED":session.CanUse((Power)i)?"READY":"EMPTY");
+   int available=session.stock[i].available;
    powers[i].interactable=!animating && !navigation.Suspended && session.CanUse((Power)i);
-   powers[i].GetComponent<PremiumControl>().State(active,locked);
+   powers[i].GetComponent<PremiumControl>().State(active,locked||available<=0);
+   SetText(powerLabels[i],"{0}",available);powerLabels[i].color=active?Gold:Ink;
+   var badge=powers[i].transform.Find("Count Badge");
+   if(badge!=null){badge.gameObject.SetActive(!locked&&available>0);badge.GetComponent<Image>().color=active?Hex("192327"):Gold;}
+   var iconImg=powers[i].transform.Find("Icon")?.GetComponent<PremiumIcon>();
+   if(iconImg!=null)iconImg.color=active?Hex("192327"):locked||available<=0?PremiumTheme.Muted:White;
+   var toolLabel=powers[i].transform.Find("ToolName")?.GetComponent<Text>();
+   if(toolLabel!=null)toolLabel.color=active?Hex("192327"):White;
+   string st=active?"ACTIVE":locked?"LOCKED":available>0?"READY":"EMPTY";
+   SetText(powerStatuses[i],st);
+   powerStatuses[i].color=active?Hex("192327"):locked?PremiumTheme.Muted:available>0?PremiumTheme.Cyan:PremiumTheme.Muted;
   }
   cancelSelection.SetActive(selection>=0);FitScreen(true);
   if(selection<0)SetText(hint,session.Unlocked?"Hold 128 / 256 / 512 to earn tools":"Tools unlock after {0} more moves",Math.Max(0,2-session.moves));
@@ -320,12 +341,10 @@ public class PremiumGame : MonoBehaviour {
     DialogButton("Home",-308,ShowHome);break;
    case GameDialog.Levels:
     Modal("Choose your board",session!=null?"Starting a board replaces your saved game.":"Three boards. One satisfying challenge.");
-    LevelCard(4,140,"Classic","Short and focused");
-    LevelCard(5,20,"Advanced","Room to build");
-    LevelCard(6,-100,"Expert","Think a few moves ahead");
-    Button("Expedition",modalPanel,new Vector2(-118,-210),new Vector2(210,64),()=>{CloseModal();ShowExpeditionMap();},true);
-    Button("Daily Puzzle",modalPanel,new Vector2(118,-210),new Vector2(210,64),()=>{CloseModal();manager.StartDailyPuzzle();});
-    Button("Back",modalPanel,new Vector2(0,-285),new Vector2(240,56),CloseModal);break;
+    LevelCard(4,136,"Classic","Short and focused");
+    LevelCard(5,-8,"Advanced","Room to build");
+    LevelCard(6,-152,"Expert","Think a few moves ahead");
+    Button("Back",modalPanel,new Vector2(0,-285),new Vector2(240,64),CloseModal);break;
    case GameDialog.Instructions:
     Modal("How to play","Simple moves. Thoughtful choices.");
     BuildInstructions();
@@ -434,7 +453,7 @@ public class PremiumGame : MonoBehaviour {
     Modal("A good run.","No moves remain. Keep your record and try again.");
     ResultCard("FINAL SCORE",session.board.score);
     if(session.CanReward){
-     DialogButton(rewardProvider==null?"Continue: rewind 5 moves":"Watch video to continue",-35,AskReward,true);
+     DialogButton(rewardProvider==null?"Continue: rewind 5 moves":"Watch ad · Rewind 5 moves",-35,AskReward,true);
      DialogButton("Play again",-110,()=>NewGame(session.board.size));
      DialogButton("Home",-185,ShowHome);
     } else {
@@ -451,6 +470,7 @@ public class PremiumGame : MonoBehaviour {
    case GameDialog.RewardVideo:
     Modal("Reward video","Waiting for the ad provider. Reward is granted only after completion.");break;
   }
+  FitDialog(modalPanel);
  }
  void ToggleSound(){manager.ToggleSound();if(sound)Play(spawnTone);}
  void ToggleHaptics(){manager.ToggleHaptics();if(manager.Haptics)PremiumHaptics.Trigger(HapticImpact.Medium);}
@@ -466,8 +486,9 @@ public class PremiumGame : MonoBehaviour {
  IEnumerator PulseBoard() {
   if(grid==null)yield break;
   float elapsed=0;
-  while(elapsed<0.14f){elapsed+=Time.unscaledDeltaTime;float t=Mathf.Clamp01(elapsed/0.14f);grid.localScale=Vector3.one*(1f-0.035f*Mathf.Sin(t*Mathf.PI));yield return null;}
-  grid.localScale=Vector3.one;boardPulseAnimation=null;
+  var restingScale=grid.localScale;
+  while(elapsed<0.14f){elapsed+=Time.unscaledDeltaTime;float t=Mathf.Clamp01(elapsed/0.14f);grid.localScale=restingScale*(1f-0.035f*Mathf.Sin(t*Mathf.PI));yield return null;}
+  grid.localScale=restingScale;boardPulseAnimation=null;
  }
  void ClearSelectionVisuals(){selected=-1;if(cancelSelection!=null)cancelSelection.SetActive(false);if(selectionFrame!=null){selectionFrame.SetActive(false);ReleaseObject(selectionFrame);selectionFrame=null;}}
  void CancelSelection(){manager.CancelSelection();ClearSelectionVisuals();}
@@ -499,7 +520,7 @@ public class PremiumGame : MonoBehaviour {
   try{rewardProvider.Show(success=>manager.CompleteReward(request,success));}
   catch(Exception e){Debug.LogWarning("Reward provider failed: "+e.Message);manager.CompleteReward(request,false);}
  }
- IEnumerator RewardTimeout(int request){yield return new WaitForSecondsRealtime(60);manager.CompleteReward(request,false);}
+ IEnumerator RewardTimeout(int request){yield return new WaitForSecondsRealtime(180);manager.CompleteReward(request,false);}
  void GrantOfflineReward(){if(manager.ContinueOffline()){Play(clickTone);PremiumHaptics.Trigger(HapticImpact.Medium);}}
  IEnumerator AnimatePower(GameChange change) {
   var before=powerBefore;int first=powerFirst,second=powerSecond;
@@ -521,21 +542,26 @@ public class PremiumGame : MonoBehaviour {
   while(elapsed<0.65f) {elapsed+=Time.unscaledDeltaTime;float t=Mathf.Clamp01(elapsed/0.65f);addition.rectTransform.anchoredPosition=new Vector2(0,25+40*t);addition.color=new Color(Gold.r,Gold.g,Gold.b,1-t);yield return null;}
   SetText(addition,"");scoreAnimation=null;
  }
- void Play(AudioClip clip) {if(sound && clip!=null && audioSource!=null)audioSource.PlayOneShot(clip,0.22f);}
+ void Play(AudioClip clip,float volume=0.85f) {if(sound && clip!=null && audioSource!=null)audioSource.PlayOneShot(clip,Mathf.Clamp01(volume));}
  void FitScreen(bool force=false) {
-  if(!force && (safeRoot==null || (lastWidth==Screen.width && lastHeight==Screen.height && lastSafe==Screen.safeArea)))return;
+  if(!force && (safeRoot==null || (lastWidth==Screen.width && lastHeight==Screen.height && lastSafe==Screen.safeArea && lastBannerHeight==AdMobProvider.BannerHeightPixels)))return;
+  lastBannerHeight=AdMobProvider.BannerHeightPixels;
   lastWidth=Screen.width;lastHeight=Screen.height;lastSafe=Screen.safeArea;if(lastWidth==0 || lastHeight==0)return;
   var anchors=PremiumLayout.CalculateSafeAnchors(lastWidth,lastHeight,lastSafe);
   safeRoot.anchorMin=new Vector2(anchors.xMin,anchors.yMin);safeRoot.anchorMax=new Vector2(anchors.xMax,anchors.yMax);safeRoot.offsetMin=safeRoot.offsetMax=Vector2.zero;
   scaler.scaleFactor=PremiumLayout.CalculateScale(lastWidth,lastHeight,lastSafe,new Vector2(540,960));
   float safeH=(lastSafe.height>0?lastSafe.height:lastHeight)/Mathf.Max(0.01f,scaler.scaleFactor);
   safeH=Mathf.Max(960f,safeH);
+  if(root!=null){root.anchoredPosition=Vector2.zero;root.sizeDelta=new Vector2(540,safeH);}
+  if(modalPanel!=null)modalPanel.anchoredPosition=Vector2.zero;
+  var bannerSlot=safeRoot.Find("Banner Ad Slot") as RectTransform;
+  if(bannerSlot!=null){bannerSlot.sizeDelta=new Vector2(540,PremiumLayout.BannerReserve);bannerSlot.anchoredPosition=new Vector2(0,-safeH*.5f+PremiumLayout.BannerReserve*.5f);}
   if(root!=null)root.sizeDelta=new Vector2(540,safeH);
   if(home!=null)home.GetComponent<RectTransform>().sizeDelta=new Vector2(540,safeH);
   if(game!=null)game.GetComponent<RectTransform>().sizeDelta=new Vector2(540,safeH);
   if(expeditionMap!=null)expeditionMap.GetComponent<RectTransform>().sizeDelta=new Vector2(540,safeH);
   if(loading!=null)loading.GetComponent<RectTransform>().sizeDelta=new Vector2(540,safeH);
-  RepositionResponsiveElements(safeH);
+  RepositionResponsiveElements(safeH);FitExpeditionMap();
   if(home!=null)home.GetComponent<PremiumHomeMotion>()?.Rebase();
  }
  void RepositionResponsiveElements(float H) {PositionScreens(home,game,modalPanel,H,session!=null && !session.board.Over,selection>=0,CompactDialog);}
@@ -546,38 +572,94 @@ public class PremiumGame : MonoBehaviour {
   var grid=game!=null?game.transform.Find("Board") as RectTransform:null;
   var hint=game!=null?game.transform.Find("Hint")?.GetComponent<Text>():null;
   var cancelSelection=game!=null?game.transform.Find("Cancel selection")?.gameObject:null;
-  float topY=H*0.5f-54f;float botY=-H*0.5f+45f;
+  float bannerReserve=PremiumLayout.BannerReserve;
+  float topY=H*0.5f-36f;float botY=-H*0.5f+bannerReserve+24f;
   if(home!=null) {
    var hSound=home.transform.Find("Sound: On");if(hSound!=null)hSound.GetComponent<RectTransform>().anchoredPosition=new Vector2(-224,topY);
    var hSettings=home.transform.Find("Settings");if(hSettings!=null)hSettings.GetComponent<RectTransform>().anchoredPosition=new Vector2(224,topY);
-   var hBrand=home.transform.Find("Brand");if(hBrand!=null)hBrand.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-52f);
-   var hEdition=home.transform.Find("Edition");if(hEdition!=null)hEdition.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-110f);
-   var hDesc=home.transform.Find("Description");if(hDesc!=null)hDesc.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-144f);
-   float heroY=topY-268f;
-   var hHero=home.transform.Find("Preview Board");if(hHero!=null)hHero.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,heroY);
-   var hNew=home.transform.Find("New Game");if(hNew!=null)hNew.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+(hasResume?434f:350f));
-   var hResume=home.transform.Find("Resume");if(hResume!=null)hResume.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+182f);
-   var hExp=home.transform.Find("Expedition");if(hExp!=null)hExp.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+(hasResume?350f:266f));
-   var hDaily=home.transform.Find("Daily Puzzle");if(hDaily!=null)hDaily.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+(hasResume?266f:182f));
-   var hStats=home.transform.Find("Stats Summary");if(hStats!=null)hStats.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+110f);
-   var hHow=home.transform.Find("How to Play");if(hHow!=null)hHow.GetComponent<RectTransform>().anchoredPosition=new Vector2(-128,botY+36f);
-   var hHigh=home.transform.Find("High Scores");if(hHigh!=null)hHigh.GetComponent<RectTransform>().anchoredPosition=new Vector2(128,botY+36f);
-   var hFoot=home.transform.Find("Footer");if(hFoot!=null)hFoot.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY-20f);
+   var hBrand=home.transform.Find("Brand");if(hBrand!=null)hBrand.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-58f);
+   var hEdition=home.transform.Find("Edition");if(hEdition!=null)hEdition.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-112f);
+   float homeTop=H*.5f-36f;
+   float statsOffset=hasResume?706f:624f;
+   float footerOffset=statsOffset+148f;
+   float contentSpan=H-36f-(bannerReserve+30f);
+   float stretch=Mathf.Clamp(contentSpan/footerOffset,0.92f,1.25f);
+   Place(home.transform,"Sound: On",-224,homeTop);
+   Place(home.transform,"Settings",224,homeTop);
+   PlaceHome(home.transform,"Brand",0,58,homeTop,stretch);
+   PlaceHome(home.transform,"Edition",0,112,homeTop,stretch);
+   PlaceHome(home.transform,"Preview Board",0,242,homeTop,stretch,200);
+   PlaceHome(home.transform,"New Game",0,394,homeTop,stretch,84);
+   PlaceHome(home.transform,"Expedition",-128,520,homeTop,stretch,132);
+   PlaceHome(home.transform,"Daily Puzzle",128,520,homeTop,stretch,132);
+   var resume=home.transform.Find("Resume");if(resume!=null)resume.gameObject.SetActive(hasResume);
+   PlaceHome(home.transform,"Resume",0,636,homeTop,stretch,72);
+   PlaceHome(home.transform,"Stats Summary",0,statsOffset,homeTop,stretch,56);
+   PlaceHome(home.transform,"How to Play",-128,statsOffset+84,homeTop,stretch,72);
+   PlaceHome(home.transform,"High Scores",128,statsOffset+84,homeTop,stretch,72);
+   PlaceHome(home.transform,"Footer",0,footerOffset,homeTop,stretch);
   }
   if(game!=null) {
    var menu=game.transform.Find("Menu");if(menu!=null)menu.GetComponent<RectTransform>().anchoredPosition=new Vector2(-224,topY);
-   var title=game.transform.Find("Title");if(title!=null)title.GetComponent<RectTransform>().anchoredPosition=new Vector2(-20,topY);
+   var title=game.transform.Find("Title");if(title!=null)title.GetComponent<RectTransform>().anchoredPosition=new Vector2(-20,topY+6);
    var sound=game.transform.Find("Sound: On");if(sound!=null)sound.GetComponent<RectTransform>().anchoredPosition=new Vector2(140,topY);
    var restart=game.transform.Find("Restart");if(restart!=null)restart.GetComponent<RectTransform>().anchoredPosition=new Vector2(224,topY);
-   if(score!=null && score.transform.parent!=null)score.transform.parent.GetComponent<RectTransform>().anchoredPosition=new Vector2(-128,topY-92f);
-   if(best!=null && best.transform.parent!=null)best.transform.parent.GetComponent<RectTransform>().anchoredPosition=new Vector2(128,topY-92f);
-   var lvlPill=game.transform.Find("Level Pill");if(lvlPill!=null)lvlPill.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-168f);
-   if(grid!=null)grid.anchoredPosition=new Vector2(0,(topY+botY-53f)*0.5f);
-   var actionDock=game.transform.Find("Action Bar");if(actionDock!=null)actionDock.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+(selection>=0?128f:95f));
-   if(hint!=null)hint.rectTransform.anchoredPosition=new Vector2(0,botY+(selection>=0?66f:38f));
+   if(score!=null && score.transform.parent!=null)score.transform.parent.GetComponent<RectTransform>().anchoredPosition=new Vector2(-128,topY-106f);
+   if(best!=null && best.transform.parent!=null)best.transform.parent.GetComponent<RectTransform>().anchoredPosition=new Vector2(128,topY-106f);
+   var lvlPill=game.transform.Find("Level Pill");if(lvlPill!=null)lvlPill.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,topY-190f);
+   if(grid!=null){
+    float upper=topY-228,lower=botY+(selection>=0?220:186);
+    float scale=Mathf.Min(1,(upper-lower)/520f);
+    grid.anchoredPosition=new Vector2(0,(upper+lower)*.5f);grid.localScale=Vector3.one*scale;
+   }
+   var actionDock=game.transform.Find("Action Bar");if(actionDock!=null)actionDock.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+(selection>=0?144f:110f));
+   if(hint!=null)hint.rectTransform.anchoredPosition=new Vector2(0,botY+(selection>=0?64f:28f));
    if(cancelSelection!=null)cancelSelection.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,botY+4f);
   }
-  if(modalPanel!=null)modalPanel.sizeDelta=new Vector2(500,Mathf.Min(compactDialog?430f:740f,H-40f));
+  if(modalPanel!=null)FitDialog(modalPanel);
+ }
+ public static void FitDialog(RectTransform panel) {
+  if(panel==null)return;
+  var rows=new List<RectTransform>();
+  foreach(Transform child in panel){
+   if(!child.gameObject.activeSelf || child.name=="Modal Border" || child.name=="Celebration")continue;
+   var rect=child as RectTransform;if(rect==null)continue;
+   var text=child.GetComponent<Text>();
+   if(text!=null && (child.name=="Title" || child.name=="Description")){
+    rect.sizeDelta=new Vector2(452,Mathf.Max(child.name=="Title"?48:44,text.preferredHeight+8));
+   }
+   rows.Add(rect);
+  }
+  rows.Sort((a,b)=>b.anchoredPosition.y.CompareTo(a.anchoredPosition.y));
+  float cursor=28f;
+  for(int i=0;i<rows.Count;){
+   int end=i+1;float originalY=rows[i].anchoredPosition.y;
+   while(end<rows.Count && Mathf.Abs(rows[end].anchoredPosition.y-originalY)<.5f)end++;
+   float height=0;for(int j=i;j<end;j++)height=Mathf.Max(height,rows[j].sizeDelta.y);
+   for(int j=i;j<end;j++)rows[j].anchoredPosition=new Vector2(rows[j].anchoredPosition.x,-cursor-height*.5f);
+   cursor+=height+(rows[i].name=="Title"?8f:rows[i].name=="Description"?24f:12f);
+   i=end;
+  }
+  float total=cursor-12f+28f;
+  panel.sizeDelta=new Vector2(500,total);
+  foreach(var rect in rows)rect.anchoredPosition+=new Vector2(0,total*.5f);
+  var celebration=panel.Find("Celebration") as RectTransform;if(celebration!=null)celebration.sizeDelta=panel.sizeDelta;
+ }
+ static void PlaceHome(Transform parent,string name,float x,float offset,float top,float stretch,float height=0){
+  var rect=parent.Find(name) as RectTransform;if(rect==null)return;
+  rect.anchoredPosition=new Vector2(x,top-offset*stretch);
+  if(height>0)rect.sizeDelta=new Vector2(rect.sizeDelta.x,height*Mathf.Min(stretch,1.4f));
+ }
+ static void Place(Transform parent,string name,float x,float y){var rect=parent.Find(name) as RectTransform;if(rect!=null)rect.anchoredPosition=new Vector2(x,y);}
+ void FitExpeditionMap(){
+  if(expeditionMap==null || root==null)return;
+  float height=root.sizeDelta.y,top=height*.5f-36;
+  Place(expeditionMap.transform,"Back",-224,top);Place(expeditionMap.transform,"Map Title",-20,top);
+  Place(expeditionMap.transform,"Sound: On",140,top);Place(expeditionMap.transform,"Settings",224,top);
+  var resume=expeditionMap.transform.Find("Resume expedition");bool hasResume=resume!=null;
+  Place(expeditionMap.transform,"Resume expedition",0,top-92);
+  var viewport=expeditionMap.transform.Find("Map Viewport") as RectTransform;
+  if(viewport!=null){float upper=top-(hasResume?148:58),lower=-height*.5f+PremiumLayout.BannerReserve+16f;viewport.sizeDelta=new Vector2(500,upper-lower);viewport.anchoredPosition=new Vector2(0,(upper+lower)*.5f);}
  }
  static Color Hex(string value) {
   switch(value){case "192327":return PremiumTheme.Background;case "223035":return PremiumTheme.Surface;case "2B3A3F":return PremiumTheme.SurfaceElevated;case "3A4B50":return PremiumTheme.Border;case "253236":return PremiumTheme.Border;case "314247":return PremiumTheme.Color("203040");case "182428":case "121A1D":return PremiumTheme.Background;case "E5BB7A":return PremiumTheme.Accent;case "B1BEBA":return PremiumTheme.Muted;}
@@ -630,6 +712,7 @@ public class PremiumGame : MonoBehaviour {
  }
  void AddIcon(Transform parent,Vector2 position,float size,IconKind kind,Color color) {
   var rt=Rect("Icon",parent,position,Vector2.one*size);var icon=rt.gameObject.AddComponent<PremiumIcon>();icon.Kind=kind;icon.color=color;icon.raycastTarget=false;
+  if(kind==IconKind.Settings)rt.gameObject.AddComponent<PremiumIconRotation>();
  }
  static Sprite RoundedSprite() {
   var texture=new Texture2D(32,32,TextureFormat.RGBA32,false);texture.wrapMode=TextureWrapMode.Clamp;texture.filterMode=FilterMode.Bilinear;
@@ -637,10 +720,19 @@ public class PremiumGame : MonoBehaviour {
   texture.Apply();return Sprite.Create(texture,new Rect(0,0,32,32),new Vector2(0.5f,0.5f),100,0,SpriteMeshType.FullRect,new Vector4(8,8,8,8));
  }
  void BuildShell() {
+  // Destroy any external canvases (not under this GameObject)
   foreach(var c in FindObjectsByType<Canvas>(FindObjectsSortMode.None)) {
    if(c.gameObject != gameObject && !c.transform.IsChildOf(transform)) {
     c.gameObject.SetActive(false);
     Destroy(c.gameObject);
+   }
+  }
+  // Also destroy any static scene canvases that are children of THIS transform (e.g. Canvas_Premium)
+  for(int i=transform.childCount-1;i>=0;i--) {
+   var child=transform.GetChild(i);
+   if(child.GetComponent<Canvas>()!=null) {
+    child.gameObject.SetActive(false);
+    Destroy(child.gameObject);
    }
   }
   if(FindFirstObjectByType<EventSystem>()==null)new GameObject("EventSystem",typeof(EventSystem),typeof(StandaloneInputModule));
@@ -649,6 +741,7 @@ public class PremiumGame : MonoBehaviour {
   scaler=canvas.GetComponent<CanvasScaler>();scaler.uiScaleMode=CanvasScaler.ScaleMode.ConstantPixelSize;
   var bg=Panel("Background",canvas.transform,Vector2.zero,Vector2.zero,Color.white);bg.rectTransform.anchorMin=Vector2.zero;bg.rectTransform.anchorMax=Vector2.one;bg.rectTransform.offsetMin=bg.rectTransform.offsetMax=Vector2.zero;bg.sprite=GradientSprite();bg.type=Image.Type.Simple;
   safeRoot=Rect("Safe Area",canvas.transform,Vector2.zero,Vector2.zero);root=Rect("Content",safeRoot,Vector2.zero,new Vector2(600,960));
+  var bannerSlot=Panel("Banner Ad Slot",safeRoot,Vector2.zero,new Vector2(540,PremiumLayout.BannerReserve),new Color(0,0,0,0));
   home=Rect("Home",root,Vector2.zero,new Vector2(600,960)).gameObject;
   game=Rect("Game",root,Vector2.zero,new Vector2(600,960)).gameObject;
   expeditionMap=Rect("ExpeditionMap",root,Vector2.zero,new Vector2(600,960)).gameObject;
@@ -657,8 +750,11 @@ public class PremiumGame : MonoBehaviour {
   Label("Subtitle",loading.transform,"A moment of focus",new Vector2(0,-12),new Vector2(500,48),22).color=PremiumTheme.Muted;
   Panel("Track",loading.transform,new Vector2(0,-100),new Vector2(380,12),Hex("314247"));loadFill=Panel("Progress",loading.transform,new Vector2(0,-100),new Vector2(380,12),Gold);loadFill.type=Image.Type.Filled;loadFill.fillMethod=Image.FillMethod.Horizontal;
   loadText=Label("Status",loading.transform,"",new Vector2(0,-160),new Vector2(500,70),19);
-  modal=Panel("Modal Overlay",safeRoot,Vector2.zero,Vector2.zero,new Color(0.025f,0.035f,0.04f,0.78f),true).gameObject;
+  modal=Panel("Modal Overlay",safeRoot,Vector2.zero,Vector2.zero,Color.clear,true).gameObject;
   var overlay=modal.GetComponent<RectTransform>();overlay.anchorMin=Vector2.zero;overlay.anchorMax=Vector2.one;overlay.offsetMin=overlay.offsetMax=Vector2.zero;
+  var backdrop=Panel("Full Screen Backdrop",modal.transform,Vector2.zero,Vector2.zero,new Color(0.02f,0.03f,0.04f,0.92f),true);
+  backdrop.sprite=null;
+  backdrop.gameObject.AddComponent<PremiumFullScreenBackdrop>().Fit();
   modalPanel=Panel("Dialog",modal.transform,Vector2.zero,new Vector2(500,740),Hex("223035"),true).rectTransform;
   home.SetActive(false);game.SetActive(false);expeditionMap.SetActive(false);loading.SetActive(false);modal.SetActive(false);FitScreen();
  }
@@ -673,65 +769,79 @@ public class PremiumGame : MonoBehaviour {
   texture.Apply();return Sprite.Create(texture,new Rect(0,0,width,height),new Vector2(.5f,.5f));
  }
  void BuildHome() {
+  // Top bar
   var mute=IconButton("Sound: On",home.transform,new Vector2(-224,420),ToggleSound,sound?IconKind.Sound:IconKind.Mute);soundLabel=mute.GetComponentInChildren<Text>(true);
   IconButton("Settings",home.transform,new Vector2(224,420),ShowSettings,IconKind.Settings);
+  // Brand block
   Brand(home.transform,new Vector2(0,360),1.0f);
-  Label("Edition",home.transform,"A GAME OF SMALL MOVES",new Vector2(0,305),new Vector2(500,24),14).color=Gold;
-  Label("Description",home.transform,"Make room for your next best move.",new Vector2(0,275),new Vector2(500,30),18).color=PremiumTheme.Muted;
-
-  var heroCard=Panel("Preview Board",home.transform,new Vector2(0,150),new Vector2(500,190),Hex("223035"));
-  var previewBox=Panel("Hero Preview",heroCard.transform,new Vector2(-150,0),new Vector2(140,140),Hex("192327"));
-  int[] defaultValues={2,4,8,16,32,64,128,256,512,1024,2048,0,0,0,0,0};
+  Label("Edition",home.transform,"A GAME OF SMALL MOVES",new Vector2(0,305),new Vector2(500,24),13).color=Gold;
+  // Hero card (compact 140 h)
+  bool hasActiveSession=session!=null && !session.board.Over;
+  var heroCard=Panel("Preview Board",home.transform,new Vector2(0,195),new Vector2(500,200),PremiumTheme.Surface);
   int dimension=session!=null?session.board.size:4;
-  int[] previewValues=session!=null?session.board.cells:defaultValues;float previewStep=128f/dimension;
+  int[] previewValues=session!=null?session.board.cells:new int[]{2,4,8,16,32,64,128,256,512,1024,2048,0,0,0,0,0};
+  float previewStep=156f/dimension;
+  var previewBox=Panel("Hero Preview",heroCard.transform,new Vector2(-150,0),new Vector2(156,156),Hex("111E22"));
   for(int i=0;i<dimension*dimension;i++){
    int v=(i<previewValues.Length)?previewValues[i]:0;
-   var cell=Panel("Preview "+i,previewBox.transform,new Vector2(-64+previewStep*.5f+(i%dimension)*previewStep,64-previewStep*.5f-(i/dimension)*previewStep),Vector2.one*(previewStep-3),v>0?Color.white:PremiumTheme.Color("314247"));
-   if(v>0){cell.sprite=TileSprite(v);cell.type=Image.Type.Simple;var value=Label("Value",cell.transform,"{0}",Vector2.zero,Vector2.one*(previewStep-4),v>=1024?9:dimension==4?13:10,v);Emphasis(value);value.color=TileText(v);}
+   var cell=Panel("Preview "+i,previewBox.transform,new Vector2(-78+previewStep*.5f+(i%dimension)*previewStep,78-previewStep*.5f-(i/dimension)*previewStep),Vector2.one*(previewStep-2),v>0?Color.white:PremiumTheme.Color("253236"));
+   if(v>0){cell.sprite=TileSprite(v);cell.type=Image.Type.Simple;var value=Label("Value",cell.transform,"{0}",Vector2.zero,Vector2.one*(previewStep-3),v>=1024?12:17,v);Emphasis(value);value.color=TileText(v);}
   }
-  bool hasActiveSession=session!=null && !session.board.Over;
-  Panel("Hero accent",heroCard.transform,new Vector2(-244,0),new Vector2(3,138),Gold);
-  var heroTitle=Label("Hero Title",heroCard.transform,hasActiveSession?"YOUR BOARD":"CLASSIC 4 × 4",new Vector2(90,40),new Vector2(230,30),19);Emphasis(heroTitle);heroTitle.color=Gold;heroTitle.alignment=TextAnchor.MiddleLeft;
-  var heroSubtitle=Label("Preview caption",heroCard.transform,hasActiveSession?"Resume your current board":"One swipe can change everything",new Vector2(90,4),new Vector2(230,44),16);heroSubtitle.color=PremiumTheme.Muted;heroSubtitle.alignment=TextAnchor.MiddleLeft;
-  var heroStats=Label("Hero Stats",heroCard.transform,"{0} × {0}  ·  Best {1}",new Vector2(90,-40),new Vector2(230,30),15,hasActiveSession?session.board.size:4,stats.best[hasActiveSession?session.board.size-4:0]);heroStats.color=Hex("E5BB7A");heroStats.alignment=TextAnchor.MiddleLeft;
-
-  // 1. Classic Mode (New Game)
-  var classic=Button("New Game",home.transform,new Vector2(0,15),new Vector2(500,72),ShowLevels,true);SetText(classic.GetComponentInChildren<Text>(),"PLAY CLASSIC");AddIcon(classic.transform,new Vector2(207,0),24,IconKind.Play,Ink);
-
-  // 2. Expedition Journey Mode
+  var heroRim=Rect("Hero frame",heroCard.transform,Vector2.zero,new Vector2(498,198)).gameObject.AddComponent<PremiumSelectionFrame>();heroRim.color=PremiumTheme.Border;heroRim.raycastTarget=false;heroRim.rectTransform.anchorMin=Vector2.zero;heroRim.rectTransform.anchorMax=Vector2.one;heroRim.rectTransform.sizeDelta=new Vector2(-2,-2);
+  var heroTitle=Label("Hero Title",heroCard.transform,hasActiveSession?"YOUR BOARD":"CLASSIC MODE",new Vector2(66,46),new Vector2(252,30),21);
+  Emphasis(heroTitle);heroTitle.color=Gold;heroTitle.alignment=TextAnchor.MiddleLeft;
+  var heroSubtitle=Label("Preview caption",heroCard.transform,hasActiveSession?"Resume where you left off":"One swipe at a time",new Vector2(66,6),new Vector2(252,52),17);
+  heroSubtitle.color=PremiumTheme.Muted;heroSubtitle.alignment=TextAnchor.MiddleLeft;
+  var heroStats=Label("Hero Stats",heroCard.transform,"{0}x{0}  Best {1}",new Vector2(66,-46),new Vector2(252,28),16,hasActiveSession?session.board.size:4,stats.best[hasActiveSession?session.board.size-4:0]);
+  heroStats.color=Hex("E5BB7A");heroStats.alignment=TextAnchor.MiddleLeft;
+  AddIcon(heroCard.transform,new Vector2(216,-46),20,IconKind.Play,hasActiveSession?Gold:PremiumTheme.Muted);
+  var heroBtn=heroCard.gameObject.AddComponent<Button>();heroBtn.targetGraphic=heroCard;
+  heroBtn.navigation=new Navigation{mode=Navigation.Mode.None};
+  var heroColors=heroBtn.colors;heroColors.highlightedColor=Color.white;heroColors.pressedColor=new Color(.85f,.85f,.85f);heroBtn.colors=heroColors;
+  heroCard.gameObject.AddComponent<PremiumButtonMotion>();
+  heroBtn.onClick.AddListener(()=>{Play(clickTone);if(hasActiveSession)ShowGame();else ShowLevels();});
+  // Primary: PLAY CLASSIC
+  var classic=Button("New Game",home.transform,new Vector2(0,70),new Vector2(500,84),ShowLevels,true);
+  SetText(classic.GetComponentInChildren<Text>(),"PLAY CLASSIC");Size(classic.GetComponentInChildren<Text>(),24);
+  AddIcon(classic.transform,new Vector2(207,0),22,IconKind.Play,Ink);
+  // Expedition Journey
   int totalStars=0;if(manager!=null&&manager.Campaign!=null){foreach(var m in manager.Campaign.missions)if(m!=null)totalStars+=m.stars;}
-  var expBtn=Button("Expedition",home.transform,new Vector2(0,-55),new Vector2(500,72),ShowExpeditionMap);
-  var expTxt=expBtn.GetComponentInChildren<Text>();expTxt.rectTransform.anchoredPosition=new Vector2(-8,10);expTxt.rectTransform.sizeDelta=new Vector2(320,26);expTxt.alignment=TextAnchor.MiddleLeft;Size(expTxt,20);
-  SetText(expTxt,"EXPEDITION JOURNEY");
-  var expSub=Label("Expedition Sub",expBtn.transform,"10 Missions  ·  {0}/30 ★",new Vector2(-8,-16),new Vector2(320,22),14,totalStars);expSub.alignment=TextAnchor.MiddleLeft;expSub.color=Gold;
-  var expBadge=Panel("Journey emblem",expBtn.transform,new Vector2(-204,0),new Vector2(46,46),PremiumTheme.Background);AddIcon(expBadge.transform,Vector2.zero,28,IconKind.Map,Gold);Label("Chevron",expBtn.transform,"›",new Vector2(210,0),new Vector2(24,40),32).color=Gold;
-
-  // 3. Daily Puzzle
+  HomeModeCard("Expedition", "Expedition", "10 missions", "{0}/30 stars",totalStars, -128, ShowExpeditionMap,IconKind.Map,Gold);
   string todayKey=DailyPuzzleService.GetTodayKey();
   bool dailyDone=manager!=null&&manager.Daily!=null&&manager.Daily.IsCompleted(todayKey);
-  var dailyBtn=Button("Daily Puzzle",home.transform,new Vector2(0,-125),new Vector2(500,72),()=>manager.StartDailyPuzzle());
-  var dailyTxt=dailyBtn.GetComponentInChildren<Text>();dailyTxt.rectTransform.anchoredPosition=new Vector2(-8,10);dailyTxt.rectTransform.sizeDelta=new Vector2(320,26);dailyTxt.alignment=TextAnchor.MiddleLeft;Size(dailyTxt,20);
-  SetText(dailyTxt,"DAILY PUZZLE");
   int streak=manager!=null&&manager.Daily!=null?manager.Daily.currentStreak:0;
-  var dailySub=Label("Daily Sub",dailyBtn.transform,dailyDone?"Today Completed!  ·  Streak {0} 🔥":"New Daily Ready  ·  Streak {0} 🔥",new Vector2(-8,-16),new Vector2(320,22),14,streak);
-  dailySub.alignment=TextAnchor.MiddleLeft;dailySub.color=dailyDone?Gold:PremiumTheme.Muted;
-  var dailyBadge=Panel("Daily emblem",dailyBtn.transform,new Vector2(-204,0),new Vector2(46,46),PremiumTheme.Background);AddIcon(dailyBadge.transform,Vector2.zero,26,IconKind.Star,PremiumTheme.Cyan);Label("Chevron",dailyBtn.transform,"›",new Vector2(210,0),new Vector2(24,40),32).color=PremiumTheme.Cyan;
-
-  // 4. Resume Classic (if available)
-  var resume=Button("Resume",home.transform,new Vector2(0,-195),new Vector2(500,72),ShowGame);
-  var title=resume.GetComponentInChildren<Text>();title.rectTransform.anchoredPosition=new Vector2(-70,8);title.rectTransform.sizeDelta=new Vector2(290,26);title.alignment=TextAnchor.MiddleLeft;Size(title,18);
-  resumeDetails=Label("Resume detail",resume.transform,"",new Vector2(-70,-14),new Vector2(290,22),13);resumeDetails.alignment=TextAnchor.MiddleLeft;resumeDetails.color=PremiumTheme.Muted;
-  AddIcon(resume.transform,new Vector2(194,0),24,IconKind.Play,White);
-
-  // 5. Stats Summary Pill
-  var statsPill=Panel("Stats Summary",home.transform,new Vector2(0,-265),new Vector2(500,44),Hex("223035"));
-  int totalPlayed=stats.played;int totalWon=stats.won;int winRate=totalPlayed==0?0:Mathf.RoundToInt(100f*totalWon/totalPlayed);
-  var statsLabel=Label("Stats Summary Label",statsPill.transform,"Played {0}  ·  Won {1}  ·  Win rate {2}%",Vector2.zero,new Vector2(480,36),14,totalPlayed,totalWon,winRate);statsLabel.color=PremiumTheme.Muted;
-
-  // 6. Navigation Buttons (How to Play & High Scores)
-  Button("How to Play",home.transform,new Vector2(-128,-325),new Vector2(244,72),ShowInstructions);
-  Button("High Scores",home.transform,new Vector2(128,-325),new Vector2(244,72),ShowScores);
-  Label("Footer",home.transform,"OFFLINE. ALWAYS YOURS.",new Vector2(0,-375),new Vector2(500,24),13).color=PremiumTheme.Muted;
+  HomeModeCard("Daily Puzzle", "Daily Puzzle",dailyDone?"Completed today":"A fresh challenge", "Streak {0}",streak,128,()=>manager.StartDailyPuzzle(),IconKind.Star,PremiumTheme.Cyan);
+  // Resume Classic
+  var resume=Button("Resume",home.transform,new Vector2(0,0),new Vector2(500,76),ShowGame);
+  var resumeTitle=resume.GetComponentInChildren<Text>();
+  resumeTitle.rectTransform.anchoredPosition=new Vector2(14,10);resumeTitle.rectTransform.sizeDelta=new Vector2(310,24);resumeTitle.alignment=TextAnchor.MiddleLeft;Size(resumeTitle,17);
+  SetText(resumeTitle,"RESUME GAME");
+  resumeDetails=Label("Resume detail",resume.transform,"",new Vector2(14,-14),new Vector2(310,20),13);
+  resumeDetails.alignment=TextAnchor.MiddleLeft;resumeDetails.color=PremiumTheme.Muted;
+  AddIcon(resume.transform,new Vector2(-210,0),20,IconKind.Play,Gold);
+  AddIcon(resume.transform,new Vector2(216,0),20,IconKind.Play,White);
+  // Stats bar
+  var statsPill=Rect("Stats Summary",home.transform,Vector2.zero,new Vector2(500,56));
+  int winRate=stats.played==0?0:Mathf.RoundToInt(100f*stats.won/stats.played);
+  string[] captions={"PLAYED","VICTORIES","WIN RATE"};string[] values={stats.played.ToString(),stats.won.ToString(),winRate+"%"};
+  for(int i=0;i<3;i++){
+   float x=(i-1)*166;
+   var value=Label("Stat value "+i,statsPill,values[i],new Vector2(x,12),new Vector2(150,30),22);Emphasis(value);value.color=White;
+   Label("Stat caption "+i,statsPill,captions[i],new Vector2(x,-17),new Vector2(150,20),12).color=PremiumTheme.Muted;
+   if(i<2)Panel("Stat divider "+i,statsPill,new Vector2(x+83,0),new Vector2(1,36),PremiumTheme.Border);
+  }
+  // Bottom nav
+  Button("How to Play",home.transform,new Vector2(-128,0),new Vector2(236,72),ShowInstructions);
+  Button("High Scores",home.transform,new Vector2(128,0),new Vector2(236,72),ShowScores);
+  Label("Footer",home.transform,"OFFLINE. ALWAYS YOURS.",new Vector2(0,0),new Vector2(500,22),12).color=PremiumTheme.Muted;
+ }
+ void HomeModeCard(string name,string title,string detail,string progress,int value,float x,Action action,IconKind icon,Color accent){
+  var button=Button(name,home.transform,new Vector2(x,0),new Vector2(244,132),action);
+  var label=button.GetComponentInChildren<Text>();SetText(label,title);Size(label,20);
+  label.rectTransform.anchoredPosition=new Vector2(0,-4);label.rectTransform.sizeDelta=new Vector2(208,30);label.alignment=TextAnchor.MiddleLeft;
+  var emblem=Panel("Mode emblem",button.transform,new Vector2(-84,42),new Vector2(40,40),PremiumTheme.Background);AddIcon(emblem.transform,Vector2.zero,24,icon,accent);
+  var tag=Label("Progress",button.transform,progress,new Vector2(30,42),new Vector2(142,24),13,value);tag.color=accent;tag.alignment=TextAnchor.MiddleRight;
+  var subtitle=Label("Detail",button.transform,detail,new Vector2(0,-38),new Vector2(208,30),14);subtitle.alignment=TextAnchor.MiddleLeft;subtitle.color=PremiumTheme.Muted;
  }
  void BuildExpeditionMap() {
   if(expeditionMap==null)return;
@@ -802,47 +912,59 @@ public class PremiumGame : MonoBehaviour {
  void RefreshExpeditionMap(){BuildExpeditionMap();}
  void BuildGame() {
   IconButton("Menu",game.transform,new Vector2(-230,420),ShowMenu,IconKind.Menu);
-  var wordmark=Label("Title",game.transform,"2048",new Vector2(-35,420),new Vector2(180,64),50);wordmark.color=Gold;Emphasis(wordmark);
+  var wordmark=Label("Title",game.transform,"2048",new Vector2(-20,426),new Vector2(220,64),52);wordmark.color=Gold;Emphasis(wordmark);
   var mute=IconButton("Sound: On",game.transform,new Vector2(140,420),ToggleSound,sound?IconKind.Sound:IconKind.Mute);soundLabel=mute.GetComponentInChildren<Text>(true);
   IconButton("Restart",game.transform,new Vector2(230,420),ConfirmRestart,IconKind.Restart);
   score=ScoreCard("SCORE",new Vector2(-128,330),Hex("223035"),Hex("3A4B50"));best=ScoreCard("BEST",new Vector2(128,330),Hex("223035"),Hex("3A4B50"));addition=Label("Score addition",score.transform.parent,"",new Vector2(0,25),new Vector2(220,60),28);
-  var levelPill=Panel("Level Pill",game.transform,new Vector2(0,252),new Vector2(496,40),Hex("223035"));
+  var levelPill=Panel("Level Pill",game.transform,new Vector2(0,252),new Vector2(496,44),PremiumTheme.Surface);
 
   level=Label("Level",levelPill.transform,"",Vector2.zero,new Vector2(480,36),17);level.color=Gold;Emphasis(level);
   grid=Panel("Board",game.transform,new Vector2(0,-25),new Vector2(520,520),PremiumTheme.Background).rectTransform;
   var boardRim=Rect("Board Border",grid,Vector2.zero,new Vector2(518,518)).gameObject.AddComponent<PremiumSelectionFrame>();boardRim.color=PremiumTheme.Border;boardRim.raycastTarget=false;
 
-  var actionDock=Panel("Action Bar",game.transform,new Vector2(0,-328),new Vector2(520,80),Hex("223035"));
-
+  // Action Bar — premium redesign: centered icon, tool name, count badge, status
+  var actionDock=Panel("Action Bar",game.transform,new Vector2(0,-328),new Vector2(520,112),PremiumTheme.Background);
+  string[] toolNames={"UNDO","SWAP","DELETE"};
   for(int i=0;i<3;i++) {
-   int action=i;powers[i]=Button(((Power)i).ToString(),actionDock.transform,new Vector2(-168+i*168,0),new Vector2(156,76),()=>UsePower((Power)action));
-   powerLabels[i]=powers[i].GetComponentInChildren<Text>();Size(powerLabels[i],16);
-   powerLabels[i].alignment=TextAnchor.MiddleLeft;
-   powerLabels[i].rectTransform.anchoredPosition=new Vector2(22,11);powerLabels[i].rectTransform.sizeDelta=new Vector2(95,26);
-   AddIcon(powers[i].transform,new Vector2(-42,0),30,(IconKind)((int)IconKind.Undo+i),White);
-   powerStatuses[i]=Label("Availability",powers[i].transform,"LOCKED",new Vector2(22,-14),new Vector2(95,20),12);
-   powerStatuses[i].alignment=TextAnchor.MiddleLeft;
+   int action=i;powers[i]=Button(((Power)i).ToString(),actionDock.transform,new Vector2(-168+i*168,0),new Vector2(160,104),()=>UsePower((Power)action));
+   var defLabel=powers[i].GetComponentInChildren<Text>();if(defLabel!=null){SetText(defLabel,"");defLabel.gameObject.SetActive(false);}
+   AddIcon(powers[i].transform,new Vector2(0,23),34,(IconKind)((int)IconKind.Undo+i),White);
+   var badge=Panel("Count Badge",powers[i].transform,new Vector2(58,30),new Vector2(28,28),Gold);
+   badge.rectTransform.anchorMin=badge.rectTransform.anchorMax=new Vector2(0.5f,0.5f);
+   var badgeNum=Label("Count",badge.rectTransform,"0",Vector2.zero,new Vector2(26,26),14);
+   Emphasis(badgeNum);badgeNum.color=Hex("192327");badgeNum.alignment=TextAnchor.MiddleCenter;
+   powerLabels[i]=badgeNum;
+   var toolName=Label("ToolName",powers[i].transform,toolNames[i],new Vector2(0,-10),new Vector2(150,24),16);
+   Emphasis(toolName);toolName.alignment=TextAnchor.MiddleCenter;toolName.color=White;
+   powerStatuses[i]=Label("Availability",powers[i].transform,"LOCKED",new Vector2(0,-34),new Vector2(150,18),11);
+   powerStatuses[i].alignment=TextAnchor.MiddleCenter;powerStatuses[i].color=PremiumTheme.Muted;
   }
-  hint=Label("Hint",game.transform,"",new Vector2(0,-386),new Vector2(520,32),15);hint.color=PremiumTheme.Muted;
-  cancelSelection=Button("Cancel selection",game.transform,new Vector2(0,-428),new Vector2(230,72),()=>{CancelSelection();Refresh();}).gameObject;Size(cancelSelection.GetComponentInChildren<Text>(),15);cancelSelection.SetActive(false);
+  hint=Label("Hint",game.transform,"",new Vector2(0,-388),new Vector2(500,32),16);hint.color=PremiumTheme.Muted;
+  cancelSelection=Button("Cancel selection",game.transform,new Vector2(0,-432),new Vector2(230,72),()=>{CancelSelection();Refresh();}).gameObject;Size(cancelSelection.GetComponentInChildren<Text>(),15);cancelSelection.SetActive(false);
  }
  Text ScoreCard(string title,Vector2 position,Color cardBg,Color borderColor) {
-  var card=Panel(title,game.transform,position,new Vector2(240,86),cardBg);
-
-  var caption=Label("Caption",card.transform,title,new Vector2(0,23),new Vector2(220,24),13);caption.color=PremiumTheme.Muted;Emphasis(caption);
-  var number=Label("Number",card.transform,"0",new Vector2(0,-13),new Vector2(220,44),38);Emphasis(number);number.resizeTextForBestFit=true;number.resizeTextMinSize=18;number.resizeTextMaxSize=38;return number;
+  var card=Panel(title,game.transform,position,new Vector2(240,100),cardBg);
+  var rim=Rect("Card frame",card.transform,Vector2.zero,new Vector2(238,98)).gameObject.AddComponent<PremiumSelectionFrame>();rim.color=borderColor;rim.raycastTarget=false;
+  var caption=Label("Caption",card.transform,title,new Vector2(0,28),new Vector2(204,22),14);caption.color=PremiumTheme.Muted;caption.alignment=TextAnchor.MiddleLeft;Emphasis(caption);
+  AddIcon(card.transform,new Vector2(90,28),22,title=="BEST"?IconKind.Trophy:IconKind.Star,title=="BEST"?Gold:PremiumTheme.Cyan);
+  var number=Label("Number",card.transform,"0",new Vector2(0,-14),new Vector2(204,52),44);Emphasis(number);number.alignment=TextAnchor.MiddleLeft;number.resizeTextForBestFit=true;number.resizeTextMinSize=18;number.resizeTextMaxSize=44;return number;
  }
+
  RectTransform CreateTile(Transform parent,int index,int value) {
   var image=Panel("Tile "+index,parent,CellPosition(index),Vector2.one*CellSize,Color.white);image.sprite=TileSprite(value);image.type=Image.Type.Simple;var number=Label("Value",image.transform,value.ToString(),Vector2.zero,Vector2.one*(CellSize-8),BoardDimension==4?39:BoardDimension==5?31:26);Emphasis(number);number.resizeTextForBestFit=true;number.resizeTextMinSize=16;number.resizeTextMaxSize=number.fontSize;number.color=TileText(value);return image.rectTransform;
  }
  void BuildBoard() {
   mergeFeedback?.Stop();
   if(manager.ActiveSession==null)return;
+  int expected=manager.Mode==GameMode.Expedition?16:session.board.cells.Length;
+  bool expeditionBoard=manager.Mode==GameMode.Expedition;
+  if(tiles!=null && tiles.Length==expected && boardWasExpedition==expeditionBoard)return;
+  boardWasExpedition=expeditionBoard;
   for(int i=grid.childCount-1;i>=0;i--){var child=grid.GetChild(i);if(child.name=="Board Border" || child.name=="Merge Feedback" || ghostPool.Contains(child as RectTransform))continue;child.gameObject.SetActive(false);ReleaseObject(child.gameObject);}
   int count=manager.Mode==GameMode.Expedition?16:session.board.cells.Length;tiles=new Image[count];numbers=new Text[count];
   for(int i=0;i<count;i++)Panel("Empty "+i,grid,CellPosition(i),Vector2.one*CellSize,TileColor(0));
   int[] currentValues=manager.Mode==GameMode.Expedition?manager.Expedition.tiles:session.board.cells;
-  for(int i=0;i<count;i++) {var tile=CreateTile(grid,i,(i<currentValues.Length)?currentValues[i]:0);tiles[i]=tile.GetComponent<Image>();numbers[i]=tile.GetComponentInChildren<Text>();if(manager.Mode==GameMode.Expedition && manager.Expedition.terrain[i]>0){AddIcon(tile,new Vector2(0,20),36,IconKind.Lock,Gold);tile.Find("Icon").name="Terrain lock";}}
+  for(int i=0;i<count;i++) {var tile=CreateTile(grid,i,(i<currentValues.Length)?currentValues[i]:0);tiles[i]=tile.GetComponent<Image>();numbers[i]=tile.GetComponentInChildren<Text>();if(manager.Mode==GameMode.Expedition){AddIcon(tile,new Vector2(0,20),36,IconKind.Lock,Gold);tile.Find("Icon").name="Terrain lock";}}
   ghostPool.RemoveAll(tile=>tile==null);
   for(int i=ghostPool.Count;i<count;i++){var ghost=CreateTile(grid,0,2);ghost.gameObject.SetActive(false);ghostPool.Add(ghost);}
  }
@@ -853,8 +975,8 @@ public class PremiumGame : MonoBehaviour {
   var motion=modalPanel.GetComponent<PremiumPanelMotion>();if(motion==null)motion=modalPanel.gameObject.AddComponent<PremiumPanelMotion>();motion.Reveal();
   for(int i=modalPanel.childCount-1;i>=0;i--){var child=modalPanel.GetChild(i);if(child.name=="Modal Border")continue;child.gameObject.SetActive(false);ReleaseObject(child.gameObject);}
   modalPanel.sizeDelta=new Vector2(500,CompactDialog?430:740);
-  var heading=Label("Title",modalPanel,title,new Vector2(0,CompactDialog?130:296),new Vector2(456,72),32);Emphasis(heading);heading.color=Gold;
-  Label("Description",modalPanel,description,new Vector2(0,CompactDialog?52:225),new Vector2(456,78),19).color=PremiumTheme.Muted;
+  var heading=Label("Title",modalPanel,title,new Vector2(0,CompactDialog?136:296),new Vector2(456,48),30);Emphasis(heading);heading.color=Gold;
+  Label("Description",modalPanel,description,new Vector2(0,CompactDialog?68:240),new Vector2(456,44),17).color=PremiumTheme.Muted;
  }
  void DialogButton(string title,float y,Action action,bool primary=false,bool destructive=false){Button(title,modalPanel,new Vector2(0,CompactDialog?y-60:y),new Vector2(456,72),action,primary,destructive);}
  string T(string english,params object[] arguments){return GameLocalization.Translate(manager.Language,english,arguments);}
@@ -879,21 +1001,21 @@ public class PremiumGame : MonoBehaviour {
  }
  void LevelCard(int size,float y,string title,string description) {
   int levelIndex=size-3;
-  var button=Button("Level "+levelIndex,modalPanel,new Vector2(0,y),new Vector2(456,134),()=>StartLevel(size));SetText(button.GetComponentInChildren<Text>(),"");
+  var button=Button("Level "+levelIndex,modalPanel,new Vector2(0,y),new Vector2(456,126),()=>StartLevel(size));SetText(button.GetComponentInChildren<Text>(),"");
   bool current=session!=null && session.board.size==size && !session.board.Over;
-  if(current){var border=Rect("Current board frame",button.transform,Vector2.zero,new Vector2(450,128)).gameObject.AddComponent<PremiumSelectionFrame>();border.color=Gold;border.raycastTarget=false;}
-  var preview=Panel("Difficulty preview",button.transform,new Vector2(-158,0),new Vector2(104,104),Hex("192327"));
-  float cell=90f/size;int targetVal=size==4?2048:size==5?4096:8192;
+  if(current){var border=Rect("Current board frame",button.transform,Vector2.zero,new Vector2(450,120)).gameObject.AddComponent<PremiumSelectionFrame>();border.color=Gold;border.raycastTarget=false;}
+  var preview=Panel("Difficulty preview",button.transform,new Vector2(-158,0),new Vector2(96,96),Hex("192327"));
+  float cell=84f/size;int targetVal=size==4?2048:size==5?4096:8192;
   for(int i=0;i<size*size;i++){
-   int row=i/size,col=i%size;Vector2 pos=new Vector2(-45f+cell*0.5f+col*cell,45f-cell*0.5f-row*cell);
+   int row=i/size,col=i%size;Vector2 pos=new Vector2(-42f+cell*0.5f+col*cell,42f-cell*0.5f-row*cell);
    bool isAccent=(row==size-1 && col==size-1);bool isSub=(row==0 && col==0);
    var c=Panel("Cell "+i,preview.transform,pos,Vector2.one*(cell-2.5f),isAccent?Gold:isSub?Hex("E5BB7A"):Hex("314247"));
    if(isAccent){c.sprite=TileSprite(targetVal);c.type=Image.Type.Simple;}
   }
-  var levelTag=Label("Level tag",button.transform,"LEVEL "+levelIndex,new Vector2(38,36),new Vector2(280,22),13);levelTag.color=Gold;levelTag.alignment=TextAnchor.MiddleLeft;Emphasis(levelTag);
-  var heading=Label("Difficulty",button.transform,title.ToUpper()+"  "+size+"×"+size,new Vector2(38,12),new Vector2(280,30),22);Emphasis(heading);heading.alignment=TextAnchor.MiddleLeft;heading.color=current?Gold:White;
-  var detail=Label("Goal",button.transform,"Target {0}  ·  Best {1}",new Vector2(38,-14),new Vector2(280,24),15,targetVal,stats.best[size-4]);detail.alignment=TextAnchor.MiddleLeft;detail.color=Hex("E5BB7A");
-  var badge=Label("Difficulty note",button.transform,current?"CURRENT ACTIVE BOARD":description,new Vector2(38,-36),new Vector2(280,22),13);badge.alignment=TextAnchor.MiddleLeft;badge.color=current?Gold:PremiumTheme.Muted;
+  var levelTag=Label("Level tag",button.transform,"LEVEL "+levelIndex,new Vector2(38,34),new Vector2(280,20),13);levelTag.color=Gold;levelTag.alignment=TextAnchor.MiddleLeft;Emphasis(levelTag);
+  var heading=Label("Difficulty",button.transform,title.ToUpper()+"  "+size+"×"+size,new Vector2(38,11),new Vector2(280,26),21);Emphasis(heading);heading.alignment=TextAnchor.MiddleLeft;heading.color=current?Gold:White;
+  var detail=Label("Goal",button.transform,"Target {0}  ·  Best {1}",new Vector2(38,-13),new Vector2(280,22),14,targetVal,stats.best[size-4]);detail.alignment=TextAnchor.MiddleLeft;detail.color=Hex("E5BB7A");
+  var badge=Label("Difficulty note",button.transform,current?"CURRENT ACTIVE BOARD":description,new Vector2(38,-34),new Vector2(280,20),12);badge.alignment=TextAnchor.MiddleLeft;badge.color=current?Gold:PremiumTheme.Muted;
   AddIcon(button.transform,new Vector2(196,0),24,IconKind.Play,current?Gold:Hex("B1BEBA"));
  }
  void SettingRow(string title,float y,bool enabled,Action action) {
@@ -938,14 +1060,16 @@ public class PremiumGame : MonoBehaviour {
  }
  void CloseModal(){navigation.Back();}
 #if UNITY_EDITOR
- public void BuildEditorPreview(GameDialog dialog, bool gameplay) {
+ public void BuildEditorPreview(GameDialog dialog, bool gameplay, bool savedHome=false) {
   manager=gameObject.AddComponent<GameManager>();controller=gameObject.AddComponent<GameController>();
-  manager.Initialize("Premium2048.EditorPreview",new PreviewStore());
-  manager.StartGame(4);
+  rewardProvider=gameObject.AddComponent<AdMobProvider>();
+  manager.Initialize(savedHome?"Premium2048":"Premium2048.EditorPreview",new PreviewStore(savedHome?new NativeSaveStore():null));
+  if(!savedHome){manager.StartGame(4);
   var b=session.board;b.cells=new[]{2,4,8,16,4,8,16,32,8,16,32,64,0,2,64,128};b.score=2684;session.moves=24;
   session.history.Add(b.Copy());stats.best=new long[]{12480,18640,28672};stats.played=18;stats.won=3;
   if(dialog==GameDialog.Win){b.cells[15]=2048;b.won=true;}
   if(dialog==GameDialog.Loss || dialog==GameDialog.Continue){for(int i=0;i<16;i++)b.cells[i]=(i%4+i/4)%2==0?2:4;}
+  }
   font=Resources.Load<Font>("Fonts/NotoSans-Regular");rounded=RoundedSprite();
   BuildShell();BuildHome();BuildGame();BuildExpeditionMap();
   manager.Changed+=OnGameChanged;navigation.Changed+=OnNavigationChanged;ready=true;
@@ -969,8 +1093,10 @@ public class PremiumGame : MonoBehaviour {
  }
  sealed class PreviewStore : IPreferenceStore {
   readonly Dictionary<string,string> values=new Dictionary<string,string>();
-  public string Read(string key,string fallback=""){return values.TryGetValue(key,out var value)?value:fallback;}
-  public int ReadInt(string key,int fallback){return int.TryParse(Read(key),out var value)?value:fallback;}
+  readonly IPreferenceStore source;
+  public PreviewStore(IPreferenceStore source=null){this.source=source;}
+  public string Read(string key,string fallback=""){return values.TryGetValue(key,out var value)?value:source!=null?source.Read(key,fallback):fallback;}
+  public int ReadInt(string key,int fallback){return int.TryParse(Read(key),out var value)?value:source!=null?source.ReadInt(key,fallback):fallback;}
   public void Write(string key,string value){values[key]=value;}public void Delete(string key){values.Remove(key);}public void Flush(){}
  }
 #endif

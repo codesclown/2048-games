@@ -116,13 +116,16 @@ public static class PhaseFourVerification {
   var finish = game.GetType().GetMethod("FinishAnimation", Flags);
   var grid = (RectTransform)game.GetType().GetField("grid", Flags).GetValue(game);
 
+  // Responsive layout can shrink the board to keep selection controls clear.
+  game.GetType().GetMethod("FitScreen", Flags).Invoke(game,new object[]{true});
+  var restingScale=grid.localScale;
   // Simulate interrupted state
   grid.localScale = Vector3.one * 0.9f;
   finish.Invoke(game, null);
 
   bool animating = (bool)game.GetType().GetField("animating", Flags).GetValue(game);
   Check(!animating, "FinishAnimation clears animating flag");
-  Check(grid.localScale == Vector3.one, "FinishAnimation restores grid scale to 1.0");
+  Check(Vector3.Distance(grid.localScale,restingScale)<.001f, "FinishAnimation restores responsive board scale");
 
   var active = (List<RectTransform>)game.GetType().GetField("activeGhosts", Flags).GetValue(game);
   Check(active.Count == 0, "FinishAnimation clears all active ghost tiles");

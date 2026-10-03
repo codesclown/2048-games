@@ -607,6 +607,58 @@
     {
       "en": "PLAY CLASSIC",
       "es": "JUGAR CLÁSICO"
+    },
+    {
+      "en": "UNDO",
+      "es": "DESHACER"
+    },
+    {
+      "en": "SWAP",
+      "es": "CAMBIAR"
+    },
+    {
+      "en": "DELETE",
+      "es": "ELIMINAR"
+    },
+    {
+      "en": "ACTIVE",
+      "es": "ACTIVO"
+    },
+    {
+      "en": "EXPEDITION JOURNEY",
+      "es": "VIAJE DE EXPEDICIÓN"
+    },
+    {
+      "en": "DAILY PUZZLE",
+      "es": "ROMPECABEZAS DIARIO"
+    },
+    {
+      "en": "RESUME GAME",
+      "es": "CONTINUAR PARTIDA"
+    },
+    {
+      "en": "10 missions",
+      "es": "10 misiones"
+    },
+    {
+      "en": "{0}/30 stars",
+      "es": "{0}/30 estrellas"
+    },
+    {
+      "en": "Completed today",
+      "es": "Completado hoy"
+    },
+    {
+      "en": "A fresh challenge",
+      "es": "Un nuevo desafío"
+    },
+    {
+      "en": "Streak {0}",
+      "es": "Racha {0}"
+    },
+    {
+      "en": "Watch ad · Rewind 5 moves",
+      "es": "Ver anuncio · Deshacer 5 movimientos"
     }
   ]
 }

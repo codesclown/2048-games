@@ -21,20 +21,36 @@ public static class UIBaker {
  }
  static void Bake(string name,GameDialog dialog,bool gameplay,bool master) {
   var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
-  var view=new GameObject("Preview source").AddComponent<PremiumGame>();view.BuildEditorPreview(dialog,gameplay);
+  var canvasGo=BuildPreviewCanvas(name,dialog,gameplay);var canvas=canvasGo.GetComponent<Canvas>();
+  var safe=canvasGo.transform.Find("Safe Area");
+  // Prefabs contain the visible native view, including its real controls and vector icons.
+  Transform screen=dialog==GameDialog.None?safe.Find("Content/"+(gameplay?"Game":"Home")):safe.Find("Modal Overlay/Dialog");
+  if(screen!=null){string prefab=dialog==GameDialog.None?(gameplay?"GameScreen":"HomeScreen"):dialog==GameDialog.Scores?"HighScoresDialog":dialog==GameDialog.Instructions?"HowToPlayDialog":dialog==GameDialog.Loss?"GameOverDialog":dialog==GameDialog.Win?"VictoryDialog":dialog+"Dialog";PrefabUtility.SaveAsPrefabAsset(screen.gameObject,"Assets/Prefabs/"+(dialog==GameDialog.None?"Screens/":"Dialogs/")+prefab+".prefab");}
+  if(master)new GameObject("2048 Premium Controller").AddComponent<PremiumGame>();
+  EditorSceneManager.SaveScene(scene,"Assets/Scenes/"+name+".unity");
+ }
+ public static GameObject BuildPreviewCanvas(string name,GameDialog dialog,bool gameplay,bool savedHome=false){
+  var view=new GameObject("Preview source").AddComponent<PremiumGame>();view.BuildEditorPreview(dialog,gameplay,savedHome);
   var canvas=view.GetComponentInChildren<Canvas>();var canvasGo=canvas.gameObject;canvasGo.transform.SetParent(null,false);canvasGo.name="Canvas_"+name;canvasGo.tag="EditorOnly";
   PersistSprites(canvasGo);
   var scaler=canvas.GetComponent<CanvasScaler>();scaler.enabled=true;scaler.uiScaleMode=CanvasScaler.ScaleMode.ScaleWithScreenSize;scaler.referenceResolution=new Vector2(540,960);scaler.matchWidthOrHeight=0f;
   canvasGo.AddComponent<PremiumPreviewCanvas>();
-  var safe=canvasGo.transform.Find("Safe Area");safe.gameObject.AddComponent<PremiumSafeArea>().padding=new Vector2(10,12);
+  var safe=canvasGo.transform.Find("Safe Area");safe.gameObject.AddComponent<PremiumSafeArea>().padding=Vector2.zero;
   var layout=canvasGo.AddComponent<PremiumPreviewLayout>();layout.compactDialog=dialog==GameDialog.Restart || dialog==GameDialog.ClearScores || dialog==GameDialog.ReplaceBoard || dialog==GameDialog.Continue || dialog==GameDialog.VideoUnavailable;
   Canvas.ForceUpdateCanvases();layout.Fit();
-  // Prefabs contain the visible native view, including its real controls and vector icons.
-  Transform screen=dialog==GameDialog.None?safe.Find("Content/"+(gameplay?"Game":"Home")):safe.Find("Modal Overlay/Dialog");
-  if(screen!=null){string prefab=dialog==GameDialog.None?(gameplay?"GameScreen":"HomeScreen"):dialog==GameDialog.Scores?"HighScoresDialog":dialog==GameDialog.Instructions?"HowToPlayDialog":dialog==GameDialog.Loss?"GameOverDialog":dialog==GameDialog.Win?"VictoryDialog":dialog+"Dialog";PrefabUtility.SaveAsPrefabAsset(screen.gameObject,"Assets/Prefabs/"+(dialog==GameDialog.None?"Screens/":"Dialogs/")+prefab+".prefab");}
   UnityEngine.Object.DestroyImmediate(view.gameObject);
-  if(master)new GameObject("2048 Premium Controller").AddComponent<PremiumGame>();
-  EditorSceneManager.SaveScene(scene,"Assets/Scenes/"+name+".unity");
+  return canvasGo;
+ }
+ public static bool RefreshOpenPreview(){
+  var scene=EditorSceneManager.GetActiveScene();int index=Array.IndexOf(Names,scene.name);
+  bool master=scene.name=="Premium";if(!master && index<0)return false;
+  // Only replace the derived canvas; retain the scene controller and other objects.
+  var old=Array.Find(scene.GetRootGameObjects(),go=>go.name=="Canvas_"+scene.name);
+  if(old==null || old.GetComponent<PremiumPreviewCanvas>()==null)return false;
+  UnityEngine.Object.DestroyImmediate(old);
+  BuildPreviewCanvas(scene.name,master?GameDialog.None:Dialogs[index],!master && index==1,master);
+  Canvas.ForceUpdateCanvases();UnityEditor.SceneView.RepaintAll();
+  return true;
  }
  static void PersistSprites(GameObject canvas) {
   const string folder="Assets/Art/BakedUI";Directory.CreateDirectory(folder);

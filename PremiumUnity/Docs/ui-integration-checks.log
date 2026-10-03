@@ -1,0 +1,97 @@
+QA PASS: tiny gesture does not move or persist
+QA PASS: gesture starting outside board is ignored
+QA PASS: cancelled gesture cannot apply later
+QA PASS: real controller swipe reaches manager and animation
+QA PASS: pause mid-animation resolves visuals and overlapping focus loss stays suspended
+QA PASS: background gesture cannot alter saved board
+QA PASS: foreground retains pause menu
+QA PASS: button enabled: Resume
+QA PASS: explicit resume preserves score after interrupted animation
+QA PASS: lifecycle boundary persisted committed swipe
+QA PASS: exactly one game manager and controller
+QA PASS: home initializes
+QA PASS: button enabled: Settings
+QA PASS: settings modal opened
+QA PASS: button enabled: About
+QA PASS: about screen opens from settings
+QA PASS: button enabled: Back
+QA PASS: about returns to the settings screen
+QA PASS: button enabled: Haptic feedback
+QA PASS: haptic feedback toggled off
+QA PASS: button enabled: Haptic feedback
+QA PASS: haptic feedback toggled on
+QA PASS: button enabled: Large text
+QA PASS: large text toggled on
+QA PASS: button enabled: Large text
+QA PASS: large text toggled off
+QA PASS: button enabled: High contrast
+QA PASS: high contrast toggled on
+QA PASS: button enabled: High contrast
+QA PASS: high contrast toggled off
+QA PASS: button enabled: Language
+QA PASS: language toggled to Spanish
+QA PASS: button enabled: Language
+QA PASS: language toggled back to English
+QA PASS: button enabled: Close
+QA PASS: button enabled: New Game
+QA PASS: levels modal opened
+QA PASS: button enabled: Level 1
+QA PASS: changing boards requires confirmation and preserves the saved board
+QA PASS: button enabled: Keep current board
+QA PASS: cancel new board returns to levels without losing progress
+QA PASS: button enabled: Level 1
+QA PASS: button enabled: Start new board
+QA PASS: 4x4 UI and board
+QA PASS: input to animated move and score
+QA PASS: powers unlocked by actual moves
+QA PASS: button enabled: Undo
+QA PASS: Undo UI consumes stock
+QA PASS: button enabled: Swap
+QA PASS: swap animates with board input gated
+QA PASS: Swap selection UI
+QA PASS: button enabled: Delete
+QA PASS: delete animates with board input gated
+QA PASS: Delete selection UI
+QA PASS: button enabled: Menu
+QA PASS: pause menu
+QA PASS: button enabled: Resume
+QA PASS: 5x5 UI and board
+QA PASS: 6x6 UI and board
+QA PASS: 8192 win dialog
+QA PASS: button enabled: Keep going
+QA PASS: keep going UI
+QA PASS: loss dialog
+QA PASS: button enabled: Continue: rewind 5 moves
+QA PASS: button enabled: Continue
+QA PASS: offline continuation UI
+QA PASS: button enabled: Menu
+QA PASS: button enabled: How to Play
+QA PASS: instructions fit dialog
+QA PASS: button enabled: Close
+QA PASS: high score dialog
+QA PASS: button enabled: Close
+QA PASS: level one completes on its 2048 tile
+QA PASS: button enabled: Next level
+QA PASS: next level starts the 4096-target board
+QA PASS: level two completes on its 4096 tile
+QA PASS: button enabled: Next level
+QA PASS: next level starts the 8192-target board
+QA PASS: home navigation
+QA PASS: button enabled: Resume
+QA PASS: saved game resume
+QA PASS: rapid second swipe is buffered without mutating the animated board
+QA PASS: buffered swipe executes once after the first animation resolves
+QA PASS: backgrounding discards buffered input and resolves visual tiles
+QA PASS: button enabled: Resume
+QA PASS: button enabled: Expedition
+QA PASS: Expedition map opens from home
+QA PASS: first mission Play button is inside the visible map viewport
+QA PASS: button enabled: Play 0
+QA PASS: Expedition mission 1 active
+QA PASS: Expedition gameplay view visible
+QA PASS: mission HUD labels actions correctly
+QA PASS: Expedition slides all source tiles using pooled visuals
+QA PASS: Expedition win dialog
+QA PASS: button enabled: Daily Puzzle
+QA PASS: Daily button starts playable puzzle
+PREMIUM_SMOKE_SUCCESS

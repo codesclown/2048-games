@@ -57,6 +57,19 @@ public sealed class PremiumMotionVerification : MonoBehaviour {
   if(stage==5){Check(!Get<GameObject>("home").GetComponent<PremiumHomeMotion>().IsRevealing,"reduced motion disables home entrance");
    Call("NewGame",4);manager.Session.board=new Board(4);manager.Session.board.cells[0]=manager.Session.board.cells[1]=2;Call("Refresh",true);Call("Move",Direction.Right);
    Check(!Get<bool>("animating") && manager.Session.board.cells[3]==4,"reduced motion still merges correctly without waiting for animation");
+   manager.ToggleReducedMotion();Call("ShowExpeditionMap");stage++;return;}
+  if(stage==6){
+   var map=Get<GameObject>("expeditionMap");var group=map.GetComponent<CanvasGroup>();
+   Check(map.activeSelf && map.GetComponent<PremiumPanelMotion>()!=null && group!=null,"Expedition map plays a page entrance");
+   if(group.alpha<.999f)return;
+   Call("ShowInstructions");stage++;return;
+  }
+  if(stage==7){
+   var panel=Get<RectTransform>("modalPanel");var group=panel.GetComponent<CanvasGroup>();
+   Check(Get<GameObject>("modal").activeSelf && panel.GetComponent<PremiumPanelMotion>()!=null,"instructions plays a dialog entrance");
+   if(group.alpha<.999f)return;
+   manager.ToggleReducedMotion();Call("ShowSettings");
+   Check(panel.GetComponent<CanvasGroup>().alpha==1 && panel.localScale==Vector3.one,"reduced motion opens dialogs fully visible in the first frame");
    Debug.Log("PREMIUM_MOTION_SUCCESS");Finish(0);stage++;}
  }catch(Exception e){Debug.LogError("PREMIUM_MOTION_FAILED: "+e);Finish(1);enabled=false;}}
  static void Finish(int code){

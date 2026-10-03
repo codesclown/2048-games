@@ -8,6 +8,7 @@ public static class PremiumLayout {
  public const float MinTouchTarget = 72f;
  public const float ReferenceWidth = 540f;
  public const float ReferenceHeight = 960f;
+ public const float BannerReserve = 90f;
 
  public static DeviceProfile GetProfile(float width, float height, Rect safeArea) {
   float safeW = safeArea.width > 0 ? safeArea.width : (width > 0 ? width : ReferenceWidth);

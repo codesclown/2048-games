@@ -20,7 +20,12 @@ public sealed class PremiumText : MonoBehaviour {
  object[] arguments;Text label;GameManager manager;bool emphasized;
  static Font regular,bold;
  public void Initialize(GameManager manager,string source,int size,params object[] arguments){this.manager=manager;label=GetComponent<Text>();BaseSize=size;Set(source,arguments);}
- public void Set(string source,params object[] arguments){Source=source;this.arguments=arguments;Apply();}
+ public void Set(string source,params object[] arguments){
+  bool same=Source==source && (this.arguments?.Length??0)==(arguments?.Length??0);
+  if(same && arguments!=null)for(int i=0;i<arguments.Length;i++)if(!Equals(this.arguments[i],arguments[i])){same=false;break;}
+  if(same)return;
+  Source=source;this.arguments=arguments;Apply();
+ }
  public void Size(int size){BaseSize=size;Apply();}
  public void Emphasis(){emphasized=true;Apply();}
  public void Apply() {

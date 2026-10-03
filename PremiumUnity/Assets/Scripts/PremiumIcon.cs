@@ -87,9 +87,11 @@ public sealed class PremiumIcon : Image {
     break;
 
    case IconKind.Restart:
-    d = Mathf.Min(d, Arc(p, Vector2.zero, 0.62f, -60f, 220f));
-    d = Mathf.Min(d, Seg(p, new Vector2(-0.45f, 0.42f), new Vector2(-0.45f, 0.88f)));
-    d = Mathf.Min(d, Seg(p, new Vector2(-0.45f, 0.42f), new Vector2(-0.02f, 0.42f)));
+    // Join the arrowhead to the circle's endpoint, along its tangent.
+    d = Mathf.Min(d, Arc(p, Vector2.zero, 0.65f, -135f, 135f));
+    var restartTip = new Vector2(-0.4596194f, 0.4596194f);
+    d = Mathf.Min(d, Seg(p, restartTip, restartTip + new Vector2(0f, 0.36f)));
+    d = Mathf.Min(d, Seg(p, restartTip, restartTip + new Vector2(0.36f, 0f)));
     break;
 
    case IconKind.Undo:
