@@ -4,9 +4,9 @@ Native Android/iOS Unity 2048 game. The parent web prototype is reference materi
 
 ## Included
 
-- Navy/slate and champagne visual theme, coherent tile gradients, native vector toolbar icons, rounded touch controls, home preview board, loading progress, home and gameplay screens.
-- Level selector: 4×4 / 2048, 5×5 / 4096, 6×6 / 8192; level preparation screen, restart confirmation, pause/menu, home navigation and saved-game resume.
-- Separate score/best cards, floating score gains, slide/spawn/merge animations, win and game-over dialogs, keep going, play again and home actions.
+- Ink, parchment and muted amber UI kit, coherent tile progression, native procedural toolbar icons, rounded touch controls and a live home preview for all board sizes.
+- Level selector: 4×4 / 2048, 5×5 / 4096, 6×6 / 8192; new-board replacement confirmation, restart confirmation, pause/menu, home navigation and saved-game resume.
+- Separate score/best cards, floating score gains, short slide/spawn/merge, Swap/Delete and screen animations with one queued swipe, win and game-over dialogs, keep going, play again and home actions.
 - Arrows, WASD and HJKL; single-finger swipe or mouse drag on the board. Modifier shortcuts are ignored; R opens restart confirmation; Escape opens menu or cancels selection/dialogs. Multitouch cancels the swipe.
 - Sound toggle with native generated slide, merge, click and win tones; mute preference persists.
 - Power-ups unlock after **2 valid moves**, matching the active unified configuration in the web source. Starting Undo/Swap/Delete: **2/1/1**, **2/2/2**, **3/3/3** by level. Each type has a lifetime cap of **4/5/6**.
@@ -27,7 +27,7 @@ Without a configured SDK, the game honestly offers **Continue: rewind 5 moves**,
 From this folder:
 
 ```sh
-mcs -out:/tmp/premium-rules.exe Assets/Scripts/Board.cs Assets/Scripts/Session.cs Tests/RulesTests.cs
+mcs -out:/tmp/premium-rules.exe Assets/Scripts/Board.cs Assets/Scripts/Session.cs Assets/Scripts/BoardMovement.cs Assets/Scripts/IGameSession.cs Assets/Scripts/ExpeditionSession.cs Tests/RulesTests.cs
 mono /tmp/premium-rules.exe
 ```
 
@@ -35,7 +35,7 @@ Tests cover all grid sizes and movement directions, merge precedence, score/targ
 
 ## Play the included macOS app
 
-Open `Builds/2048Premium.app` on this Mac. This is an unsigned local macOS build. The full Unity source is included for editing and building for other platforms.
+Use `BuildVerifier.BuildMac` to generate `/tmp/2048Premium.app` on this Mac. This is an unsigned local macOS build. The full Unity source is included for editing and building for other platforms.
 
 ## Build
 
@@ -62,10 +62,23 @@ The original HTML/CSS/JS files stay in the parent folder for reference. The nati
 
 ## Mobile premium delivery plan
 
-Phase 1 foundations are complete. See [PHASES.md](PHASES.md) for completed changes, pending work and phase exit checks. Android/iOS builds, physical device responsiveness, launcher assets and store signing are still pending.
+The offline gameplay loop, fourteen screens, UI kit and phase 1–4 foundations are implemented and desktop integration verified. See [PHASES.md](PHASES.md) for completed changes, pending work and phase exit checks. See `Docs/GAME_DESIGN.md` for this design revision. Physical device responsiveness, iOS export/signing and store release remain pending. Matching launcher assets and the Android ARM64 development build command are included.
 
 ## Save format and Phase 1 checks
 
 Schema-v2 saves alternate two checksum-protected files in `Application.persistentDataPath/Saves`. Each commit contains session, undo history, inventory, statistics and sound preference; temporary files are flushed and atomically replaced. Legacy `.session.v1`, `.stats.v1` and integer `.sound` PlayerPrefs migrate automatically. A corrupt newest slot falls back to the prior valid slot. Reset removes backup and legacy progress. Rendering never commits a save; unchanged lifecycle saves are deduplicated.
 
 The development-only `PhaseOneVerification` checks native file recovery, v1 migration, invalid/interrupted saves, future-schema protection, state gates, all board dimensions, tools, reward idempotency and persistence. `PremiumSmokeRunner` also checks actual controller gestures and overlapping focus/pause notifications. These run with `-premiumSmoke`, use separate QA storage, and are excluded from the release player.
+
+## Rebuild native screen previews
+
+`2048 Premium → Bake All Screens & Prefabs` generates all fourteen scenes and their prefabs from `PremiumGame`. `PremiumPreviewLayout` uses the runtime positioning function, so simulator previews adapt to compact/tall phones and tablets. `SceneChecker.RebuildAndVerify` rebuilds and captures the complete screen set in `Docs/Previews/AllScreens`. Editor previews use isolated in-memory demo data and hide during Play.
+
+`BuildVerifier.BuildAndroidDevelopment` builds an IL2CPP ARM64 APK into `Builds/Android/2048-Premium-dev.apk` with a development signing key. It preserves custom release-signing preferences and SDK/backend settings. It does not publish to a store.
+
+`BuildVerifier.BuildAndroidPreview` builds the non-development, debug-signed phone-testing APK at `Builds/Android/2048-Premium-preview.apk`. Android ARM64 builds and 623 native smoke checks passed for this revision. Store signing and physical-device performance validation remain pending.
+
+`-premiumMotionSmoke` on a development player verifies real slide/merge frames across all board sizes/directions, pooled tile draw order, home entrance and reduced motion. See `Docs/motion-checks.log` for the restored-animation regression evidence.
+
+## Expedition roadmap
+See [Docs/EXPEDITION_PHASES.md](Docs/EXPEDITION_PHASES.md) for the planned E1–E10 mission/locked-cell mode. This is a design and implementation plan; Expedition features are not implemented yet.

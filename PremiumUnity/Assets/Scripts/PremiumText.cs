@@ -17,16 +17,16 @@ public sealed class PremiumText : MonoBehaviour {
  public string Source {get;private set;}
  public int BaseSize {get;private set;}
  public bool Scales=true;
- object[] arguments;Text label;GameManager manager;
+ object[] arguments;Text label;GameManager manager;bool emphasized;
  static Font regular,bold;
  public void Initialize(GameManager manager,string source,int size,params object[] arguments){this.manager=manager;label=GetComponent<Text>();BaseSize=size;Set(source,arguments);}
  public void Set(string source,params object[] arguments){Source=source;this.arguments=arguments;Apply();}
  public void Size(int size){BaseSize=size;Apply();}
- public void Emphasis(){label.fontStyle=FontStyle.Bold;Apply();}
+ public void Emphasis(){emphasized=true;Apply();}
  public void Apply() {
   if(label==null || manager==null)return;
   if(regular==null)regular=Resources.Load<Font>("Fonts/NotoSans-Regular");if(bold==null)bold=Resources.Load<Font>("Fonts/NotoSans-Bold");
-  if(label.fontStyle==FontStyle.Bold && bold!=null){label.font=bold;label.fontStyle=FontStyle.Normal;}else if(regular!=null){label.font=regular;}
+  if(emphasized && bold!=null){label.font=bold;label.fontStyle=FontStyle.Normal;}else if(regular!=null){label.font=regular;}
   if(label.font==null)label.font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
   if(label.font==null)label.font=Font.CreateDynamicFontFromOSFont(new[]{"Arial","Helvetica","sans-serif"},label.fontSize);
   label.text=GameLocalization.Translate(manager.Language,Source??"",arguments);

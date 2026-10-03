@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Premium2048 {
-public enum IconKind {Menu,Sound,Mute,Restart,Undo,Swap,Delete,Settings,Play,Check,Lock,Trophy}
+public enum IconKind {Menu,Sound,Mute,Restart,Undo,Swap,Delete,Settings,Play,Check,Lock,Trophy,Star,Map}
 
 public sealed class PremiumIcon : Image {
  static readonly Dictionary<IconKind,Sprite> cache = new Dictionary<IconKind,Sprite>();
@@ -155,6 +155,32 @@ public sealed class PremiumIcon : Image {
     d = Mathf.Min(d, Seg(p, new Vector2(0.38f, -0.10f), new Vector2(0.60f, 0.68f)));
     d = Mathf.Min(d, Seg(p, new Vector2(0f, -0.10f), new Vector2(0f, -0.68f)));
     d = Mathf.Min(d, Seg(p, new Vector2(-0.40f, -0.68f), new Vector2(0.40f, -0.68f)));
+    break;
+
+   case IconKind.Star:
+    // 5-pointed star segments
+    Vector2[] pts = new Vector2[10];
+    for(int i=0; i<10; i++) {
+     float a = i * Mathf.PI / 5f - Mathf.PI / 2f;
+     float r = (i % 2 == 0) ? 0.75f : 0.35f;
+     pts[i] = new Vector2(Mathf.Cos(a) * r, -Mathf.Sin(a) * r);
+    }
+    for(int i=0; i<10; i++) {
+     d = Mathf.Min(d, Seg(p, pts[i], pts[(i + 1) % 10]));
+    }
+    break;
+
+   case IconKind.Map:
+    d = Mathf.Min(d, Seg(p, new Vector2(-0.65f, -0.55f), new Vector2(-0.65f, 0.65f)));
+    d = Mathf.Min(d, Seg(p, new Vector2(-0.65f, 0.65f), new Vector2(-0.20f, 0.45f)));
+    d = Mathf.Min(d, Seg(p, new Vector2(-0.20f, 0.45f), new Vector2(-0.20f, -0.75f)));
+    d = Mathf.Min(d, Seg(p, new Vector2(-0.20f, -0.75f), new Vector2(-0.65f, -0.55f)));
+    d = Mathf.Min(d, Seg(p, new Vector2(-0.20f, 0.45f), new Vector2(0.20f, 0.65f)));
+    d = Mathf.Min(d, Seg(p, new Vector2(0.20f, 0.65f), new Vector2(0.20f, -0.55f)));
+    d = Mathf.Min(d, Seg(p, new Vector2(0.20f, -0.55f), new Vector2(-0.20f, -0.75f)));
+    d = Mathf.Min(d, Seg(p, new Vector2(0.20f, 0.65f), new Vector2(0.65f, 0.45f)));
+    d = Mathf.Min(d, Seg(p, new Vector2(0.65f, 0.45f), new Vector2(0.65f, -0.75f)));
+    d = Mathf.Min(d, Seg(p, new Vector2(0.65f, -0.75f), new Vector2(0.20f, -0.55f)));
     break;
   }
   return d;

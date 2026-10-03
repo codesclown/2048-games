@@ -23,23 +23,10 @@ public struct TileMotion {
  public bool Slide(Direction direction) {
   motions=new List<TileMotion>(); merges=new List<int>(); spawned=-1;
   if (Blocked) return false;
-  bool changed = false;
-  for (int line=0; line<size; line++) {
-   var values = new List<int>(); var sources=new List<int>();
-   for(int i=0;i<size;i++) { int v=cells[Index(direction,line,i)]; if(v!=0) { values.Add(v); sources.Add(Index(direction,line,i)); } }
-   var output = new List<int>();
-   for(int i=0;i<values.Count;i++) {
-    int v=values[i], destination=Index(direction,line,output.Count);
-    motions.Add(new TileMotion(sources[i],destination,v));
-    if(i+1<values.Count && values[i+1]==v && v<=int.MaxValue/2) { motions.Add(new TileMotion(sources[i+1],destination,v)); merges.Add(destination); v*=2; i++; score+=v; if(v>=target) won=true; }
-    output.Add(v);
-   }
-   for(int i=0;i<size;i++) { int index=Index(direction,line,i), value=i<output.Count?output[i]:0; changed |= cells[index]!=value; cells[index]=value; }
-  }
-  return changed;
- }
- int Index(Direction d,int line,int offset) {
-  switch(d) { case Direction.Left:return line*size+offset; case Direction.Right:return line*size+size-1-offset; case Direction.Up:return offset*size+line; default:return (size-1-offset)*size+line; }
+  var turn=BoardMovement.Slide(cells,size,direction,null);
+  motions=turn.motions;merges=turn.merges;score+=turn.scoreGain;
+  foreach(int index in merges)if(cells[index]>=target)won=true;
+  return turn.changed;
  }
  public bool Spawn(Random random) {
   var empty=new List<int>(); for(int i=0;i<cells.Length;i++) if(cells[i]==0) empty.Add(i);

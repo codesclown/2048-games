@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 namespace Premium2048.EditorTools {
 public static class SceneChecker {
+    public static void RebuildAndVerify() { Premium2048.Editor.UIBaker.BakeAll(); VerifyAll(); }
+
     [MenuItem("2048 Premium/Verify All Scenes")]
     public static void VerifyAll() {
         string[] scenes = {
@@ -18,14 +20,18 @@ public static class SceneChecker {
             "07_Dialog_Pause",
             "08_Dialog_GameOver",
             "09_Dialog_Victory",
-            "10_Dialog_Restart"
+            "10_Dialog_Restart",
+            "11_Dialog_ClearProgress",
+            "12_Dialog_Continue",
+            "13_Dialog_NewBoard",
+            "14_Dialog_About"
         };
 
-        string outDir = "/Users/chandanvishwakarma/.gemini/antigravity-ide/brain/fb08918b-7d1a-4f64-b389-488e4927443e";
+        string outDir = Path.GetFullPath("Docs/Previews/AllScreens");
         if (!Directory.Exists(outDir)) Directory.CreateDirectory(outDir);
 
         int width = 1080;
-        int height = 1920;
+        int height = 2340;
 
         foreach (var sceneName in scenes) {
             string path = "Assets/Scenes/" + sceneName + ".unity";
@@ -42,18 +48,28 @@ public static class SceneChecker {
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.06f, 0.06f, 0.14f, 1f);
             cam.orthographic = true;
-            cam.orthographicSize = 5f;
+            cam.orthographicSize = height * .5f;
+            cam.aspect = (float)width / height;
             cam.transform.position = new Vector3(0, 0, -10);
 
             var canvas = Object.FindFirstObjectByType<Canvas>();
             if (canvas != null) {
-                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.renderMode = RenderMode.WorldSpace;
+                canvas.GetComponent<CanvasScaler>().enabled=false;
+                var root=(RectTransform)canvas.transform;
+                root.sizeDelta=new Vector2(width,height);
+                root.position=Vector3.zero;root.localScale=Vector3.one;
+                var safe=canvas.GetComponentInChildren<Premium2048.PremiumSafeArea>();
+                if(safe!=null){safe.enabled=false;var area=(RectTransform)safe.transform;area.anchorMin=Vector2.zero;area.anchorMax=Vector2.one;area.offsetMin=new Vector2(20,50);area.offsetMax=new Vector2(-20,-50);}
                 canvas.worldCamera = cam;
                 canvas.planeDistance = 5f;
             }
 
             var rt = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
             cam.targetTexture = rt;
+            Canvas.ForceUpdateCanvases();
+            canvas.GetComponent<Premium2048.PremiumPreviewLayout>()?.Fit();Canvas.ForceUpdateCanvases();
+            foreach(var text in Object.FindObjectsByType<Text>(FindObjectsSortMode.None)){if(text.font==null)throw new System.Exception("Missing font in "+sceneName+": "+text.name);}
             cam.Render();
 
             RenderTexture.active = rt;
@@ -74,6 +90,7 @@ public static class SceneChecker {
             Debug.Log("[SceneChecker] Verified and captured: " + outPath);
         }
 
+        EditorSceneManager.OpenScene("Assets/Scenes/Premium.unity",OpenSceneMode.Single);
         Debug.Log("<color=green><b>[SceneChecker]</b> All scenes successfully verified and captured!</color>");
     }
 }

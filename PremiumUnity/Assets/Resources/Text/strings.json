@@ -395,6 +395,214 @@
     {
       "en": "Menu",
       "es": "Menú"
+    },
+    {
+      "en": "A GAME OF SMALL MOVES",
+      "es": "UN JUEGO DE PEQUEÑOS MOVIMIENTOS"
+    },
+    {
+      "en": "Make room for your next best move.",
+      "es": "Haz espacio para tu próximo gran movimiento."
+    },
+    {
+      "en": "OFFLINE. ALWAYS YOURS.",
+      "es": "SIN CONEXIÓN. SIEMPRE TUYO."
+    },
+    {
+      "en": "YOUR BOARD",
+      "es": "TU TABLERO"
+    },
+    {
+      "en": "CLASSIC 4 × 4",
+      "es": "CLÁSICO 4 × 4"
+    },
+    {
+      "en": "Choose your board",
+      "es": "Elige tu tablero"
+    },
+    {
+      "en": "How to play",
+      "es": "Cómo jugar"
+    },
+    {
+      "en": "Your records",
+      "es": "Tus récords"
+    },
+    {
+      "en": "Every personal best, saved on this device.",
+      "es": "Todos tus récords, guardados en este dispositivo."
+    },
+    {
+      "en": "Beautifully played.",
+      "es": "Muy bien jugado."
+    },
+    {
+      "en": "You reached your target. There is more to build.",
+      "es": "Alcanzaste tu objetivo. Aún queda más por construir."
+    },
+    {
+      "en": "A good run.",
+      "es": "Una buena partida."
+    },
+    {
+      "en": "No moves remain. Keep your record and try again.",
+      "es": "No quedan movimientos. Conserva tu récord e inténtalo de nuevo."
+    },
+    {
+      "en": "Start a new board?",
+      "es": "¿Empezar un tablero nuevo?"
+    },
+    {
+      "en": "Your current board will be replaced. Your records stay saved.",
+      "es": "Tu tablero actual será reemplazado. Tus récords seguirán guardados."
+    },
+    {
+      "en": "Start new board",
+      "es": "Empezar tablero nuevo"
+    },
+    {
+      "en": "Keep current board",
+      "es": "Conservar tablero actual"
+    },
+    {
+      "en": "{0} moves  ·  Best tile {1}",
+      "es": "{0} movimientos  ·  Mejor ficha {1}"
+    },
+    {
+      "en": "About",
+      "es": "Acerca del juego"
+    },
+    {
+      "en": "A quieter kind of play.",
+      "es": "Una forma más tranquila de jugar."
+    },
+    {
+      "en": "YOUR SCORE",
+      "es": "TU PUNTUACIÓN"
+    },
+    {
+      "en": "PERSONAL BEST",
+      "es": "RÉCORD PERSONAL"
+    },
+    {
+      "en": "An offline puzzle by GSV Infotech.\nVersion {0}\n\nTypography: Noto Sans\nSIL Open Font License 1.1\n\nYour progress stays on this device.",
+      "es": "Un juego sin conexión de GSV Infotech.\nVersión {0}\n\nTipografía: Noto Sans\nSIL Open Font License 1.1\n\nTu progreso permanece en este dispositivo."
+    },
+    {
+      "en": "Level complete",
+      "es": "Nivel completado"
+    },
+    {
+      "en": "Target tile reached: {0}",
+      "es": "Ficha objetivo alcanzada: {0}"
+    },
+    {
+      "en": "Next level",
+      "es": "Siguiente nivel"
+    },
+    {
+      "en": "Expedition",
+      "es": "Expedición"
+    },
+    {
+      "en": "Daily Puzzle",
+      "es": "Desafío Diario"
+    },
+    {
+      "en": "Journey",
+      "es": "Viaje"
+    },
+    {
+      "en": "Chapter 1: Discover",
+      "es": "Capítulo 1: Descubrir"
+    },
+    {
+      "en": "Chapter 2: Explore",
+      "es": "Capítulo 2: Explorar"
+    },
+    {
+      "en": "Chapter 3: Master",
+      "es": "Capítulo 3: Dominar"
+    },
+    {
+      "en": "First opening",
+      "es": "Primera apertura"
+    },
+    {
+      "en": "Make room",
+      "es": "Hacer espacio"
+    },
+    {
+      "en": "Twin tiles",
+      "es": "Fichas gemelas"
+    },
+    {
+      "en": "Corner key",
+      "es": "Llave de esquina"
+    },
+    {
+      "en": "Crossroads",
+      "es": "Encrucijada"
+    },
+    {
+      "en": "Open the path",
+      "es": "Abrir el camino"
+    },
+    {
+      "en": "A careful swap",
+      "es": "Un intercambio prudente"
+    },
+    {
+      "en": "Small spaces",
+      "es": "Espacios reducidos"
+    },
+    {
+      "en": "Two goals",
+      "es": "Dos objetivos"
+    },
+    {
+      "en": "Expedition finale",
+      "es": "Final de la expedición"
+    },
+    {
+      "en": "Actions: {0} / {1}",
+      "es": "Acciones: {0} / {1}"
+    },
+    {
+      "en": "Goal: {0}",
+      "es": "Objetivo: {0}"
+    },
+    {
+      "en": "Daily Streak: {0}",
+      "es": "Racha Diaria: {0}"
+    },
+    {
+      "en": "Share Result",
+      "es": "Compartir Resultado"
+    },
+    {
+      "en": "Copied to clipboard!",
+      "es": "¡Copiado al portapapeles!"
+    },
+    {
+      "en": "Mission Completed!",
+      "es": "¡Misión Completada!"
+    },
+    {
+      "en": "Mission Failed",
+      "es": "Misión Fallida"
+    },
+    {
+      "en": "Replay",
+      "es": "Repetir"
+    },
+    {
+      "en": "Next Mission",
+      "es": "Siguiente Misión"
+    },
+    {
+      "en": "Map",
+      "es": "Mapa"
     }
   ]
 }

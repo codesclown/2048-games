@@ -11,12 +11,12 @@ public sealed class PremiumControl : MonoBehaviour {
  public void State(bool selected=false,bool locked=false){this.selected=selected;this.locked=locked;Apply();}
  public void Apply() {
   if(manager==null || surface==null)return;
-  var background=Tone==ControlTone.Primary?PremiumTheme.Accent:Tone==ControlTone.Destructive?PremiumTheme.Color("713A48"):PremiumTheme.Color("263952");
-  if(manager.HighContrast && Tone==ControlTone.Secondary)background=PremiumTheme.Color("101D30");
-  if(locked || !button.interactable)background=PremiumTheme.Color("1C2C43");
+  var background=Tone==ControlTone.Primary?PremiumTheme.Accent:Tone==ControlTone.Destructive?PremiumTheme.Color("713A48"):PremiumTheme.SurfaceElevated;
+  if(manager.HighContrast && Tone==ControlTone.Secondary)background=PremiumTheme.Background;
+  if(locked)background=PremiumTheme.Color("1C2C43");
   if(selected)background=PremiumTheme.Accent;
   surface.color=background;
-  var foreground=(Tone==ControlTone.Primary && button.interactable || selected)?PremiumTheme.Ink:PremiumTheme.Text;
+  var foreground=(Tone==ControlTone.Primary || selected)?PremiumTheme.Ink:PremiumTheme.Text;
   foreach(var label in GetComponentsInChildren<Text>())label.color=foreground;
   foreach(var icon in GetComponentsInChildren<PremiumIcon>())icon.color=foreground;
  }

@@ -1,0 +1,4 @@
+TILE COLOURS PASS: all 30 positive powers of two, 2 through 1073741824, have unique RGB colours.
+TEXT CONTRAST PASS: minimum 4.54:1; high-contrast preserves per-value backgrounds.
+UNITY SCENES PASS: rebuilt and verified all 14 scenes.
+ANDROID BUILD PASS: updated non-development IL2CPP ARM64 APK (15242868 bytes).

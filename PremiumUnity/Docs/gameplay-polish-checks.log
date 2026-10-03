@@ -1,0 +1,458 @@
+MOTION QA CASE: 4x4 Up
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 4x4 Right
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 4x4 Down
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 4x4 Left
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 5x5 Up
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 5x5 Right
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 5x5 Down
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 5x5 Left
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 6x6 Up
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 6x6 Right
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 6x6 Down
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA CASE: 6x6 Left
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: home plays a staggered entrance when returning from gameplay
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: reduced motion disables home entrance
+MOTION QA PASS: reduced motion still merges correctly without waiting for animation
+PREMIUM_MOTION_SUCCESS
+FULL GAMEPLAY SMOKE PASS: 623 checks, PREMIUM_SMOKE_SUCCESS
+APK BUILD: not requested; not performed

@@ -17,10 +17,25 @@ using Premium2048;
   PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.iOS,"com.gsvinfotech.twozerofoureight");
   var icon=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Resources/Brand/AppIcon.png");
   if(icon!=null){
-   PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Unknown,new[]{icon});
-   PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Android,new[]{icon});
-   PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.iOS,new[]{icon});
-   PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Standalone,new[]{icon});
+   foreach(var group in new[]{BuildTargetGroup.Unknown,BuildTargetGroup.Android,BuildTargetGroup.iOS,BuildTargetGroup.Standalone}) {
+    var named=UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(group);
+    int count=PlayerSettings.GetIconSizes(named,UnityEditor.IconKind.Any).Length;
+    if(count==0)continue;
+    var icons=new Texture2D[count];for(int i=0;i<count;i++)icons[i]=icon;
+    PlayerSettings.SetIcons(named,icons,UnityEditor.IconKind.Any);
+   }
+  }
+  foreach(var platform in new[]{UnityEditor.Build.NamedBuildTarget.Android,UnityEditor.Build.NamedBuildTarget.iOS}) {
+   foreach(var kind in PlayerSettings.GetSupportedIconKinds(platform)) {
+    var slots=PlayerSettings.GetPlatformIcons(platform,kind);
+    string label=kind.ToString().ToLowerInvariant();
+    foreach(var slot in slots) {
+     if(platform==UnityEditor.Build.NamedBuildTarget.Android && label.Contains("adaptive")) {
+      slot.SetTextures(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Platform/Android/AdaptiveBackground.png"),AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Platform/Android/AdaptiveForeground.png"));
+     } else {slot.SetTexture(platform==UnityEditor.Build.NamedBuildTarget.Android && label.Contains("monochrome")?AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Platform/Android/Monochrome.png"):icon);}
+    }
+    PlayerSettings.SetPlatformIcons(platform,kind,slots);
+   }
   }
   var settings=new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/ProjectSettings.asset")[0]);var input=settings.FindProperty("activeInputHandler");if(input!=null){input.intValue=0;settings.ApplyModifiedProperties();}AssetDatabase.SaveAssets();
  }

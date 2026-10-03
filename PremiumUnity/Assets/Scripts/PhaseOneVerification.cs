@@ -88,6 +88,9 @@ public static class PhaseOneVerification {
    Check(manager.BeginSelection(Power.Delete) && manager.Delete(2) && session.board.cells[2]==0,"manager owns delete: "+size);
    manager.BeginSelection(Power.Swap);manager.CancelSelection();Check(manager.Navigation.State==GameState.Playing,"cancel selection returns to playing: "+size);
    manager.Home();Check(!manager.Move(Direction.Left,4),"home rejects moves: "+size);manager.Resume();
+   session.board=new Board(size);session.board.cells[0]=session.board.cells[1]=session.board.target/4;session.board.score=999999;
+   Check(manager.Move(Direction.Left,4.5),"below-target merge commits despite high total score: "+size);manager.ResolveAnimation();
+   Check(!session.board.won && manager.Navigation.Dialog==GameDialog.None,"score and below-target tile cannot complete the level: "+size);
    session.board=new Board(size);session.board.cells[0]=session.board.cells[1]=session.board.target/2;
    Check(manager.Move(Direction.Left,5),"target merge commits: "+size);manager.ResolveAnimation();Check(manager.Navigation.Dialog==GameDialog.Win && session.winRecorded,"win is recorded once and opens result: "+size);
    int wins=manager.Statistics.won;Check(manager.KeepGoing() && session.board.continued,"keep going is a manager action: "+size);manager.Save();Check(manager.Statistics.won==wins,"repeated save cannot count win twice: "+size);
@@ -102,6 +105,12 @@ public static class PhaseOneVerification {
    request=manager.BeginReward();Check(manager.CompleteReward(request,true) && !manager.CompleteReward(request,true),"reward callback is granted exactly once: "+size);
    manager.Save();int commits=manager.Persistence.Commits;manager.Save();Check(manager.Persistence.Commits==commits,"repeated lifecycle save is deduplicated: "+size);
    var reloaded=new GamePersistence("manager-test",memory).Load();Check(reloaded.session.Valid() && reloaded.session.rewardUsed && reloaded.stats.won==manager.Statistics.won,"board/history/inventory/stats resume together: "+size);
+  }
+  foreach(int size in new[]{4,5,6}){
+   manager.StartGame(size);var blocked=manager.Session.board;
+   for(int i=0;i<blocked.cells.Length;i++)blocked.cells[i]=(i%size+i/size)%2==0?2:4;
+   blocked.cells[0]=blocked.target;blocked.won=true;manager.ShowResult();
+   Check(blocked.Over && manager.Navigation.Dialog==GameDialog.Win,"target achievement takes priority over a blocked board: "+size);
   }
   memory.failNext=true;manager.ToggleSound();Check(manager.HasUnsavedChanges,"failed commit retains the live state and signals a pending retry");
   manager.Save();Check(!manager.HasUnsavedChanges,"next lifecycle boundary retries the pending save");

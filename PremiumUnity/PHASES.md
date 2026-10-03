@@ -79,7 +79,7 @@ Status vocabulary: **Complete** means implementation and verification passed; **
 
 ## Phase 5 — Native platform builds and integrations
 
-**Pending — mobile platform modules absent on this machine**
+**In progress — Android module, SDK/NDK and OpenJDK are installed, and development plus non-development IL2CPP ARM64 APK builds passed; iOS module and physical-device release checks remain pending.**
 - Install Android/iOS Unity platform modules and required SDK/toolchains.
 - Android: IL2CPP ARM64 release build, store-required target/min SDK, AAB, signing keystore, adaptive icons and manifest checks.
 - iOS: IL2CPP device build, Xcode export, bundle identifier ownership, signing/provisioning, icons, deployment target and archive.
@@ -114,3 +114,23 @@ Status vocabulary: **Complete** means implementation and verification passed; **
 ## Priority order
 
 Phases 1, 2, 3, and 4 are complete. Next prioritize Phase 5 (native Android/iOS platform builds and mobile SDK toolchains) when platform modules are available, followed by Phase 6 comprehensive device QA and Phase 7 store release.
+
+## 2026-10-03 — Design and completeness revision
+
+- Replaced mixed neon/gradient styling with the ink/parchment/amber kit and matching launcher artwork.
+- Rebuilt all fourteen scenes and prefabs from the real runtime view; shared responsive preview positioning replaces the separate scene design.
+- Added saved-board replacement confirmation, clear-progress/continuation preview scenes and About/version/font credits. Pause includes Restart.
+- Live home preview supports every grid size; sound icons stay synchronized; results show score, moves and best tile.
+- Added Swap/Delete transitions, prewarmed ghost pooling, lightweight victory celebration and one-swipe buffering with lifecycle cancellation.
+- Enlarged controls to 72 virtual units at the 540-unit phone reference width; device QA is still required.
+- Verification and current Android build outcome are recorded in `Docs/GAME_DESIGN.md` and `Docs/game-design-checks.log`.
+
+The older phase entries record their historical evidence. Current haptics use Unity's vibration fallback; fine-grained iOS/Android impact behaviour needs a platform bridge/device review. Mobile frame time, signed iOS export and store publication are not established by desktop smoke tests.
+
+### Animation regression correction
+Restored visible smooth slides after board rebuild/restart by correcting pooled tile draw order. Source-frame jumps removed; 160ms slide and 160ms merge/spawn settle. Home staggered entrance and restrained brand motion added. All 12 dimension/direction combinations, home and reduced motion verified by the native `-premiumMotionSmoke` runner.
+
+Slide timing tuned on request: 120ms movement + 100ms merge/spawn settle, retaining smoothstep interpolation and source-frame/render-order fixes.
+
+## Expedition feature roadmap
+The separate [2048 Expedition phase plan](Docs/EXPEDITION_PHASES.md) defines E1–E10 for the mission/locked-cell mode, ten authored missions, journey progression, daily puzzles, native UI and release QA. All Expedition phases are currently **Pending**; existing Classic phase completion does not imply Expedition is implemented. Start with E1 architecture and mode separation. No automatic APK builds.

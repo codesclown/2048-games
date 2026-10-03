@@ -24,14 +24,15 @@ public sealed class PlayerPreferenceStore : IPreferenceStore {
 public sealed class NativeSaveStore : IPreferenceStore {
  readonly string directory;readonly PlayerPreferenceStore legacy=new PlayerPreferenceStore();bool legacyDirty;
  public NativeSaveStore(string directory=null){this.directory=directory??Path.Combine(Application.persistentDataPath,"Saves");}
+ static bool NativeKey(string key){return key.Contains(".save.v2.") || key.Contains(".expedition.save.v1.");}
  string PathFor(string key){using(var hash=SHA256.Create())return Path.Combine(directory,BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(key))).Replace("-","")+".json");}
  public string Read(string key,string fallback="") {
-  if(!key.Contains(".save.v2."))return legacy.Read(key,fallback);
+  if(!NativeKey(key))return legacy.Read(key,fallback);
   var path=PathFor(key);return File.Exists(path)?File.ReadAllText(path):legacy.Read(key,fallback);
  }
  public int ReadInt(string key,int fallback){return legacy.ReadInt(key,fallback);}
  public void Write(string key,string value) {
-  if(!key.Contains(".save.v2.")){legacy.Write(key,value);legacyDirty=true;return;}
+  if(!NativeKey(key)){legacy.Write(key,value);legacyDirty=true;return;}
   Directory.CreateDirectory(directory);string path=PathFor(key),temporary=path+".tmp";
   byte[] bytes=Encoding.UTF8.GetBytes(value);
   using(var stream=new FileStream(temporary,FileMode.Create,FileAccess.Write,FileShare.None)){stream.Write(bytes,0,bytes.Length);stream.Flush(true);}
@@ -39,7 +40,7 @@ public sealed class NativeSaveStore : IPreferenceStore {
   File.Move(temporary,path);
  }
  public void Delete(string key) {
-  if(key.Contains(".save.v2.")){var path=PathFor(key);if(File.Exists(path))File.Delete(path);if(File.Exists(path+".tmp"))File.Delete(path+".tmp");}
+  if(NativeKey(key)){var path=PathFor(key);if(File.Exists(path))File.Delete(path);if(File.Exists(path+".tmp"))File.Delete(path+".tmp");}
   legacy.Delete(key);legacyDirty=true;
  }
  public void Flush(){if(!legacyDirty)return;legacy.Flush();legacyDirty=false;}

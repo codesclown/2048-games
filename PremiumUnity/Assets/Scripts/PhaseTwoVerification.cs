@@ -80,7 +80,7 @@ public static class PhaseTwoVerification {
    Check(Mathf.Min(contrast1, contrast2) >= 4.5f, "WCAG AA contrast (>= 4.5) met for tile " + val + " (contrast: " + Mathf.Min(contrast1, contrast2).ToString("F2") + ")");
 
    Color highContrastText = PremiumTheme.TileText(val, true);
-   Check(highContrastText == PremiumTheme.Ink, "high contrast tile text returns Ink");
+   Check(Mathf.Min(PremiumTheme.Contrast(highContrastText,c1),PremiumTheme.Contrast(highContrastText,c2)) >= 4.5f, "high contrast label stays readable on the distinct colour for tile " + val);
   }
 
   Check(PremiumTheme.Contrast(PremiumTheme.Text, PremiumTheme.Ink) >= 7.0f, "ink to text contrast exceeds WCAG AAA (>= 7.0)");

@@ -119,6 +119,7 @@ public class PremiumSmokeRunner : MonoBehaviour {
 
    switch (stage++) {
     case 0:
+     ExpeditionVerification.Run();
      PhaseOneVerification.Run(manager);
      PhaseTwoVerification.Run(manager);
      PhaseThreeVerification.Run(game);
@@ -131,6 +132,8 @@ public class PremiumSmokeRunner : MonoBehaviour {
      Click("Settings");
      Check(Get<GameObject>("modal").activeSelf, "settings modal opened");
      ScreenCapture.CaptureScreenshot("/tmp/premium-settings.png");
+     Click("About");Check(manager.Navigation.Dialog==GameDialog.About,"about screen opens from settings");
+     Click("Back");Check(manager.Navigation.Dialog==GameDialog.Settings,"about returns to the settings screen");
      Click("Haptic feedback");
      Check(!manager.Haptics, "haptic feedback toggled off");
      Click("Haptic feedback");
@@ -152,7 +155,12 @@ public class PremiumSmokeRunner : MonoBehaviour {
      Click("New Game");
      Check(Get<GameObject>("modal").activeSelf, "levels modal opened");
      ScreenCapture.CaptureScreenshot("/tmp/premium-levels.png");
+     var existing=manager.Session;
      Click("Level 1");
+     Check(manager.Navigation.Dialog==GameDialog.ReplaceBoard && manager.Session==existing,"changing boards requires confirmation and preserves the saved board");
+     Click("Keep current board");
+     Check(manager.Navigation.Dialog==GameDialog.Levels && manager.Session==existing,"cancel new board returns to levels without losing progress");
+     Click("Level 1");Click("Start new board");
      stage = 1;
      break;
 
@@ -191,12 +199,14 @@ public class PremiumSmokeRunner : MonoBehaviour {
      Click("Swap");
      Select(0);
      Select(1);
+     Check(Get<bool>("animating") && !Get<bool>("Playing"),"swap animates with board input gated");
      break;
 
     case 5:
      Check(session.board.cells[0] == 4 && session.board.cells[1] == 2, "Swap selection UI");
      Click("Delete");
      Select(2);
+     Check(Get<bool>("animating") && !Get<bool>("Playing"),"delete animates with board input gated");
      break;
 
     case 6:
@@ -259,15 +269,39 @@ public class PremiumSmokeRunner : MonoBehaviour {
      Check(Get<GameObject>("modal").activeSelf, "high score dialog");
      ScreenCapture.CaptureScreenshot("/tmp/premium-scores.png");
      Click("Close");
-     Call("ShowHome");
+     Call("ShowHome");stage=17;
      break;
 
-    case 13:
+    case 17:
+     Call("NewGame",4);session=manager.Session;session.board=new Board(4);
+     session.board.cells[0]=session.board.cells[1]=1024;Call("Refresh",true);Call("Move",Direction.Left);
+     break;
+    case 18:
+     Check(manager.Navigation.Dialog==GameDialog.Win && session.board.cells[0]==2048,"level one completes on its 2048 tile");
+     Click("Next level");session=manager.Session;
+     Check(session.board.size==5 && session.board.target==4096,"next level starts the 4096-target board");
+     session.board=new Board(5);session.board.cells[0]=session.board.cells[1]=2048;Call("Refresh",true);Call("Move",Direction.Left);
+     break;
+    case 19:
+     Check(manager.Navigation.Dialog==GameDialog.Win && session.board.cells[0]==4096,"level two completes on its 4096 tile");
+     Click("Next level");session=manager.Session;
+     Check(session.board.size==6 && session.board.target==8192,"next level starts the 8192-target board");
+     Call("ShowHome");
      Check(Get<GameObject>("home").activeSelf, "home navigation");
      Click("Resume");
      Check(Get<GameObject>("game").activeSelf, "saved game resume");
-     Debug.Log("PREMIUM_SMOKE_SUCCESS");
-     Finish(0);
+     Call("NewGame",4);session=manager.Session;
+     session.board=new Board(4);session.board.cells[0]=session.board.cells[1]=2;Call("Refresh",true);
+     Call("Move",Direction.Right);Call("QueueMove",Direction.Down);
+     Check(session.moves==1 && Get<Direction?>("queuedMove")==Direction.Down,"rapid second swipe is buffered without mutating the animated board");
+     break;
+    case 20:
+     Check(session.moves==2,"buffered swipe executes once after the first animation resolves");
+     session.board=new Board(4);session.board.cells[0]=session.board.cells[1]=2;Call("Refresh",true);
+     Call("Move",Direction.Right);Call("QueueMove",Direction.Down);Call("OnApplicationPause",true);
+     Check(!Get<Direction?>("queuedMove").HasValue && !Get<bool>("animating"),"backgrounding discards buffered input and resolves visual tiles");
+     Call("OnApplicationPause",false);Click("Resume");Call("ShowHome");
+     Debug.Log("PREMIUM_SMOKE_SUCCESS");Finish(0);
      break;
    }
   } catch (Exception e) {

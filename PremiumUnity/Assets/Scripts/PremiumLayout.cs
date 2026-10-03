@@ -5,8 +5,8 @@ namespace Premium2048 {
 public enum DeviceProfile { CompactPhone, TallPhone, Tablet }
 
 public static class PremiumLayout {
- public const float MinTouchTarget = 48f;
- public const float ReferenceWidth = 600f;
+ public const float MinTouchTarget = 72f;
+ public const float ReferenceWidth = 540f;
  public const float ReferenceHeight = 960f;
 
  public static DeviceProfile GetProfile(float width, float height, Rect safeArea) {

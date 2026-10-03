@@ -6,7 +6,11 @@ public enum Power { Undo, Swap, Delete }
  public int available, used;
  public double lastEarn=-1;
 }
-[Serializable] public class Session {
+[Serializable] public class Session : IGameSession {
+ public GameMode Mode {get{return GameMode.Classic;}}
+ public int Size {get{return board.size;}}
+ public int[] Cells {get{return board.cells;}}
+ public long Score {get{return board.score;}}
  public Board board;
  public List<Board> history=new List<Board>();
  public Stock[] stock={new Stock(),new Stock(),new Stock()};
