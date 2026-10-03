@@ -73,6 +73,7 @@ public class PremiumGame : MonoBehaviour {
    else if(selection>=0){CancelSelection();Refresh();}
    else if(navigation.Screen==GameScreen.Game||navigation.Screen==GameScreen.Expedition)ShowMenu();
    else if(navigation.Screen==GameScreen.ExpeditionMap)ShowHome();
+   else if(navigation.Screen==GameScreen.Home)Application.Quit();
    return;
   }
   if(animating && navigation.State==GameState.Animating && !navigation.Suspended){controller.Poll(grid,false,QueueMove,_=>{},ConfirmRestart);return;}
@@ -390,7 +391,7 @@ public class PremiumGame : MonoBehaviour {
     Button("Close",modalPanel,new Vector2(-118,-320),new Vector2(210,72),CloseModal,true);
     Button("About",modalPanel,new Vector2(118,-320),new Vector2(210,72),()=>navigation.Open(GameDialog.About));break;
    case GameDialog.About:
-    Modal("2048 Premium","A quieter kind of play.");
+    Modal("2048 Saga","Tile Adventures — A strategic puzzle journey.");
     Brand(modalPanel,new Vector2(0,100),.9f);
     Label("Credits",modalPanel,"An offline puzzle by GSV Infotech.\nVersion {0}\n\nTypography: Noto Sans\nSIL Open Font License 1.1\n\nYour progress stays on this device.",new Vector2(0,-80),new Vector2(436,260),20,Application.version).color=PremiumTheme.TextSecondary;
     Button("Back",modalPanel,new Vector2(0,-295),new Vector2(240,72),CloseModal,true);break;
@@ -601,7 +602,7 @@ public class PremiumGame : MonoBehaviour {
   }
   if(game!=null) {
    var menu=game.transform.Find("Menu");if(menu!=null)menu.GetComponent<RectTransform>().anchoredPosition=new Vector2(-224,topY);
-   var title=game.transform.Find("Title");if(title!=null)title.GetComponent<RectTransform>().anchoredPosition=new Vector2(-20,topY+6);
+   var title=game.transform.Find("Title");if(title!=null)title.GetComponent<RectTransform>().anchoredPosition=new Vector2(-20,topY);
    var sound=game.transform.Find("Sound: On");if(sound!=null)sound.GetComponent<RectTransform>().anchoredPosition=new Vector2(140,topY);
    var restart=game.transform.Find("Restart");if(restart!=null)restart.GetComponent<RectTransform>().anchoredPosition=new Vector2(224,topY);
    if(score!=null && score.transform.parent!=null)score.transform.parent.GetComponent<RectTransform>().anchoredPosition=new Vector2(-128,topY-106f);
@@ -653,13 +654,15 @@ public class PremiumGame : MonoBehaviour {
  static void Place(Transform parent,string name,float x,float y){var rect=parent.Find(name) as RectTransform;if(rect!=null)rect.anchoredPosition=new Vector2(x,y);}
  void FitExpeditionMap(){
   if(expeditionMap==null || root==null)return;
-  float height=root.sizeDelta.y,top=height*.5f-36;
-  Place(expeditionMap.transform,"Back",-224,top);Place(expeditionMap.transform,"Map Title",-20,top);
-  Place(expeditionMap.transform,"Sound: On",140,top);Place(expeditionMap.transform,"Settings",224,top);
+  float height=root.sizeDelta.y,top=height*.5f-36f;
+  Place(expeditionMap.transform,"Back",-224,top);
+  Place(expeditionMap.transform,"Map Title",-20,top);
+  Place(expeditionMap.transform,"Sound: On",140,top);
+  Place(expeditionMap.transform,"Settings",224,top);
   var resume=expeditionMap.transform.Find("Resume expedition");bool hasResume=resume!=null;
-  Place(expeditionMap.transform,"Resume expedition",0,top-92);
+  Place(expeditionMap.transform,"Resume expedition",0,top-92f);
   var viewport=expeditionMap.transform.Find("Map Viewport") as RectTransform;
-  if(viewport!=null){float upper=top-(hasResume?148:58),lower=-height*.5f+PremiumLayout.BannerReserve+16f;viewport.sizeDelta=new Vector2(500,upper-lower);viewport.anchoredPosition=new Vector2(0,(upper+lower)*.5f);}
+  if(viewport!=null){float upper=top-(hasResume?148f:58f),lower=-height*.5f+PremiumLayout.BannerReserve+16f;viewport.sizeDelta=new Vector2(500,upper-lower);viewport.anchoredPosition=new Vector2(0,(upper+lower)*.5f);}
  }
  static Color Hex(string value) {
   switch(value){case "192327":return PremiumTheme.Background;case "223035":return PremiumTheme.Surface;case "2B3A3F":return PremiumTheme.SurfaceElevated;case "3A4B50":return PremiumTheme.Border;case "253236":return PremiumTheme.Border;case "314247":return PremiumTheme.Color("203040");case "182428":case "121A1D":return PremiumTheme.Background;case "E5BB7A":return PremiumTheme.Accent;case "B1BEBA":return PremiumTheme.Muted;}
@@ -747,7 +750,7 @@ public class PremiumGame : MonoBehaviour {
   expeditionMap=Rect("ExpeditionMap",root,Vector2.zero,new Vector2(600,960)).gameObject;
   loading=Rect("Loading",root,Vector2.zero,new Vector2(600,960)).gameObject;
   Brand(loading.transform,new Vector2(0,90),1.1f);
-  Label("Subtitle",loading.transform,"A moment of focus",new Vector2(0,-12),new Vector2(500,48),22).color=PremiumTheme.Muted;
+  Label("Subtitle",loading.transform,"Tile Adventures",new Vector2(0,-12),new Vector2(500,48),22).color=PremiumTheme.Muted;
   Panel("Track",loading.transform,new Vector2(0,-100),new Vector2(380,12),Hex("314247"));loadFill=Panel("Progress",loading.transform,new Vector2(0,-100),new Vector2(380,12),Gold);loadFill.type=Image.Type.Filled;loadFill.fillMethod=Image.FillMethod.Horizontal;
   loadText=Label("Status",loading.transform,"",new Vector2(0,-160),new Vector2(500,70),19);
   modal=Panel("Modal Overlay",safeRoot,Vector2.zero,Vector2.zero,Color.clear,true).gameObject;
@@ -770,11 +773,12 @@ public class PremiumGame : MonoBehaviour {
  }
  void BuildHome() {
   // Top bar
-  var mute=IconButton("Sound: On",home.transform,new Vector2(-224,420),ToggleSound,sound?IconKind.Sound:IconKind.Mute);soundLabel=mute.GetComponentInChildren<Text>(true);
-  IconButton("Settings",home.transform,new Vector2(224,420),ShowSettings,IconKind.Settings);
+  float homeTopY=root!=null?root.sizeDelta.y*.5f-36f:444f;
+  var mute=IconButton("Sound: On",home.transform,new Vector2(-224,homeTopY),ToggleSound,sound?IconKind.Sound:IconKind.Mute);soundLabel=mute.GetComponentInChildren<Text>(true);
+  IconButton("Settings",home.transform,new Vector2(224,homeTopY),ShowSettings,IconKind.Settings);
   // Brand block
   Brand(home.transform,new Vector2(0,360),1.0f);
-  Label("Edition",home.transform,"A GAME OF SMALL MOVES",new Vector2(0,305),new Vector2(500,24),13).color=Gold;
+  Label("Edition",home.transform,"TILE ADVENTURES",new Vector2(0,305),new Vector2(500,24),13).color=Gold;
   // Hero card (compact 140 h)
   bool hasActiveSession=session!=null && !session.board.Over;
   var heroCard=Panel("Preview Board",home.transform,new Vector2(0,195),new Vector2(500,200),PremiumTheme.Surface);
@@ -846,10 +850,11 @@ public class PremiumGame : MonoBehaviour {
  void BuildExpeditionMap() {
   if(expeditionMap==null)return;
   for(int i=expeditionMap.transform.childCount-1;i>=0;i--){var child=expeditionMap.transform.GetChild(i);child.gameObject.SetActive(false);ReleaseObject(child.gameObject);}
-  IconButton("Back",expeditionMap.transform,new Vector2(-224,420),ShowHome,IconKind.Menu);
-  var title=Label("Map Title",expeditionMap.transform,"EXPEDITION",new Vector2(-20,420),new Vector2(240,64),32);title.color=Gold;Emphasis(title);
-  var mute=IconButton("Sound: On",expeditionMap.transform,new Vector2(140,420),ToggleSound,sound?IconKind.Sound:IconKind.Mute);
-  IconButton("Settings",expeditionMap.transform,new Vector2(224,420),ShowSettings,IconKind.Settings);
+  float expTopY=root!=null?root.sizeDelta.y*.5f-36f:444f;
+  IconButton("Back",expeditionMap.transform,new Vector2(-224,expTopY),ShowHome,IconKind.Menu);
+  var title=Label("Map Title",expeditionMap.transform,"EXPEDITION",new Vector2(-20,expTopY),new Vector2(240,64),32);title.color=Gold;Emphasis(title);
+  var mute=IconButton("Sound: On",expeditionMap.transform,new Vector2(140,expTopY),ToggleSound,sound?IconKind.Sound:IconKind.Mute);
+  IconButton("Settings",expeditionMap.transform,new Vector2(224,expTopY),ShowSettings,IconKind.Settings);
 
   bool hasMissionResume=manager.CanResumeExpedition && !manager.Expedition.completed && !manager.Expedition.failed;
   if(hasMissionResume)Button("Resume expedition",expeditionMap.transform,new Vector2(0,330),new Vector2(500,72),()=>manager.Resume(GameMode.Expedition),true);
@@ -908,13 +913,15 @@ public class PremiumGame : MonoBehaviour {
   foreach(RectTransform row in content){var position=row.anchoredPosition;row.anchorMin=row.anchorMax=new Vector2(.5f,1);row.anchoredPosition=position;}
   content.sizeDelta=new Vector2(480,-y+40f);
   content.anchoredPosition=Vector2.zero;scroll.verticalNormalizedPosition=1f;
+  FitExpeditionMap();
  }
  void RefreshExpeditionMap(){BuildExpeditionMap();}
  void BuildGame() {
-  IconButton("Menu",game.transform,new Vector2(-230,420),ShowMenu,IconKind.Menu);
-  var wordmark=Label("Title",game.transform,"2048",new Vector2(-20,426),new Vector2(220,64),52);wordmark.color=Gold;Emphasis(wordmark);
-  var mute=IconButton("Sound: On",game.transform,new Vector2(140,420),ToggleSound,sound?IconKind.Sound:IconKind.Mute);soundLabel=mute.GetComponentInChildren<Text>(true);
-  IconButton("Restart",game.transform,new Vector2(230,420),ConfirmRestart,IconKind.Restart);
+  float gameTopY=root!=null?root.sizeDelta.y*.5f-36f:444f;
+  IconButton("Menu",game.transform,new Vector2(-224,gameTopY),ShowMenu,IconKind.Menu);
+  var wordmark=Label("Title",game.transform,"2048",new Vector2(-20,gameTopY),new Vector2(220,64),52);wordmark.color=Gold;Emphasis(wordmark);
+  var mute=IconButton("Sound: On",game.transform,new Vector2(140,gameTopY),ToggleSound,sound?IconKind.Sound:IconKind.Mute);soundLabel=mute.GetComponentInChildren<Text>(true);
+  IconButton("Restart",game.transform,new Vector2(224,gameTopY),ConfirmRestart,IconKind.Restart);
   score=ScoreCard("SCORE",new Vector2(-128,330),Hex("223035"),Hex("3A4B50"));best=ScoreCard("BEST",new Vector2(128,330),Hex("223035"),Hex("3A4B50"));addition=Label("Score addition",score.transform.parent,"",new Vector2(0,25),new Vector2(220,60),28);
   var levelPill=Panel("Level Pill",game.transform,new Vector2(0,252),new Vector2(496,44),PremiumTheme.Surface);
 
@@ -997,7 +1004,7 @@ public class PremiumGame : MonoBehaviour {
   var mark=Rect("Tile monogram",group,new Vector2(-124,0),new Vector2(70,70));
   int[] digits={2,0,4,8};
   for(int i=0;i<4;i++){var cell=Panel("Mark cell "+i,mark,new Vector2(i%2==0?-18:18,i<2?18:-18),new Vector2(32,32),i==3?Gold:PremiumTheme.SurfaceElevated);var digit=Label("Digit",cell.transform,digits[i].ToString(),Vector2.zero,new Vector2(32,32),20);Emphasis(digit);digit.color=i==3?Ink:White;}
-  var wordmark=Label("Wordmark",group,"2048",new Vector2(35,2),new Vector2(245,86),66);wordmark.GetComponent<PremiumText>().Scales=false;Emphasis(wordmark);wordmark.color=Gold;
+  var wordmark=Label("Wordmark",group,"2048 SAGA",new Vector2(35,2),new Vector2(245,86),48);wordmark.GetComponent<PremiumText>().Scales=false;Emphasis(wordmark);wordmark.color=Gold;
  }
  void LevelCard(int size,float y,string title,string description) {
   int levelIndex=size-3;
@@ -1080,14 +1087,14 @@ public class PremiumGame : MonoBehaviour {
   scaler.enabled=false;canvas.renderMode=RenderMode.ScreenSpaceOverlay;scaler.scaleFactor=2;
   safeRoot.anchorMin=Vector2.zero;safeRoot.anchorMax=Vector2.one;safeRoot.offsetMin=safeRoot.offsetMax=Vector2.zero;
   root.anchorMin=root.anchorMax=new Vector2(.5f,.5f);root.sizeDelta=new Vector2(540,1100);
-  home.GetComponent<RectTransform>().sizeDelta=game.GetComponent<RectTransform>().sizeDelta=new Vector2(540,1100);
-  RepositionResponsiveElements(1100);
+  home.GetComponent<RectTransform>().sizeDelta=game.GetComponent<RectTransform>().sizeDelta=expeditionMap.GetComponent<RectTransform>().sizeDelta=new Vector2(540,1100);
+  RepositionResponsiveElements(1100);FitExpeditionMap();
   root.localScale=Vector3.one*2;modalPanel.localScale=Vector3.one*2;
   var group=modalPanel.GetComponent<CanvasGroup>();if(group!=null)group.alpha=1;
   foreach(var groupItem in GetComponentsInChildren<CanvasGroup>(true)){groupItem.alpha=1;groupItem.transform.localScale=Vector3.one;}
   root.localScale=Vector3.one*2;modalPanel.localScale=Vector3.one*2;
   foreach(var motion in GetComponentsInChildren<PremiumHomeMotion>(true)){motion.StopAndRestore();DestroyImmediate(motion);}
-  RepositionResponsiveElements(1100);
+  RepositionResponsiveElements(1100);FitExpeditionMap();
   foreach(var motion in GetComponentsInChildren<PremiumPanelMotion>(true))DestroyImmediate(motion);
   foreach(var celebration in GetComponentsInChildren<PremiumCelebration>(true))DestroyImmediate(celebration);
  }

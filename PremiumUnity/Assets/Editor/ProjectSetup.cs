@@ -10,7 +10,7 @@ using Premium2048;
   SessionState.SetBool("Premium2048.configured",true);
   if(!System.IO.File.Exists("Assets/Scenes/Premium.unity")) CreateScene();
   EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene("Assets/Scenes/Premium.unity",true)};
-  PlayerSettings.productName="2048 Premium";PlayerSettings.companyName="GSV Infotech";
+  PlayerSettings.productName="2048 Saga: Tile Adventures";PlayerSettings.companyName="GSV Infotech";
   PlayerSettings.defaultScreenWidth=600;PlayerSettings.defaultScreenHeight=960;PlayerSettings.defaultInterfaceOrientation=UIOrientation.Portrait;
   PlayerSettings.allowedAutorotateToPortrait=true;PlayerSettings.allowedAutorotateToPortraitUpsideDown=false;PlayerSettings.allowedAutorotateToLandscapeLeft=false;PlayerSettings.allowedAutorotateToLandscapeRight=false;
   PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Android,"com.gsvinfotech.twozerofoureight");

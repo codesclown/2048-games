@@ -29,8 +29,17 @@ public static class PremiumUiVerification {
     for(int i=0;i<4;i++)Check(Vector3.Distance(viewportCorners[i],backdropCorners[i])<.1f,"dialog backdrop fills viewport with safe-area inset "+inset);
    }
    safe.offsetMin=safe.offsetMax=Vector2.zero;
+   var expMap=(GameObject)typeof(PremiumGame).GetField("expeditionMap",Fields).GetValue(view);
    foreach(float height in new[]{960f,1000f,1170f,1280f})foreach(bool resume in new[]{false,true}){
     PremiumGame.PositionScreens(home,game,panel,height,resume,false,false);
+    var rootRt=safe.Find("Content") as RectTransform;if(rootRt!=null)rootRt.sizeDelta=new Vector2(540,height);
+    typeof(PremiumGame).GetMethod("FitExpeditionMap",Fields).Invoke(view,null);
+    var expBack=Find(expMap,"Back");var expVp=Find(expMap,"Map Viewport");
+    if(expBack!=null)Check(Mathf.Abs(expBack.anchoredPosition.y-(height*.5f-36f))<.1f,"expedition back aligned at top at "+height);
+    if(expVp!=null){
+     Check(Bottom(expVp)>-height*.5f+PremiumLayout.BannerReserve,"expedition viewport clears bottom banner at "+height);
+     Check(Top(expVp)<=height*.5f-36f-20f,"expedition viewport clears top header at "+height);
+    }
     string[] names=resume?new[]{"Preview Board","New Game","Expedition","Resume","Stats Summary","How to Play","Footer"}:new[]{"Preview Board","New Game","Expedition","Stats Summary","How to Play","Footer"};
     for(int i=1;i<names.Length;i++)Check(Bottom(Find(home,names[i-1]))>=Top(Find(home,names[i]))+4,"home overlap: "+names[i]+" at "+height);
     Check(Mathf.Abs(Find(home,"Expedition").anchoredPosition.y-Find(home,"Daily Puzzle").anchoredPosition.y)<.01f,"mode cards share a row");

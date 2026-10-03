@@ -68,7 +68,7 @@ public static class PremiumHaptics {
     }
    }
   } catch (System.Exception) {}
-  Handheld.Vibrate();
+  try { Handheld.Vibrate(); } catch (System.Exception) {}
 #elif UNITY_IOS || UNITY_ANDROID
   try {
    Handheld.Vibrate();
