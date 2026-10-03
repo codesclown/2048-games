@@ -1,0 +1,1191 @@
+EXPEDITION PASS: mission selects its own route
+EXPEDITION PASS: active session interface preserves Classic reference
+EXPEDITION PASS: mission cannot spend Classic tools or continuation
+EXPEDITION PASS: manager routes movement into mission
+EXPEDITION PASS: independent resume entries available
+EXPEDITION PASS: mission movement preserves entire Classic run
+EXPEDITION PASS: both modes reload independently
+EXPEDITION PASS: mission resume survives manager reinitialization
+EXPEDITION PASS: Classic resume selects Classic route
+EXPEDITION PASS: background gates both modes
+EXPEDITION PASS: damaged mission save falls back to preceding slot
+EXPEDITION PASS: mission save uses native file backend
+EXPEDITION PASS: start E2 lock mission
+EXPEDITION PASS: swipe left triggers merge at cell 0 and damages lock 4
+EXPEDITION PASS: adjacent lock 4 opened upon damage
+EXPEDITION PASS: LockOpened event emitted in live session
+EXPEDITION PASS: newly opened lock 4 was excluded from spawn this turn
+EXPEDITION PASS: E2 opened terrain state persists accurately
+EXPEDITION PASS: start E3 goal mission
+EXPEDITION PASS: Expedition Swap tool selectable
+EXPEDITION PASS: merge 2+2 -> 4 completes ReachTile goal on action 1
+EXPEDITION PASS: Expedition completed in GameManager
+EXPEDITION PASS: campaign progress and 3-star rating committed
+EXPEDITION PASS: catalog contains all 10 campaign missions
+EXPEDITION PASS: catalog mission 1 valid
+EXPEDITION PASS: manager can start mission 1
+EXPEDITION PASS: catalog mission 2 valid
+EXPEDITION PASS: manager can start mission 2
+EXPEDITION PASS: catalog mission 3 valid
+EXPEDITION PASS: manager can start mission 3
+EXPEDITION PASS: catalog mission 4 valid
+EXPEDITION PASS: manager can start mission 4
+EXPEDITION PASS: catalog mission 5 valid
+EXPEDITION PASS: manager can start mission 5
+EXPEDITION PASS: catalog mission 6 valid
+EXPEDITION PASS: manager can start mission 6
+EXPEDITION PASS: catalog mission 7 valid
+EXPEDITION PASS: manager can start mission 7
+EXPEDITION PASS: catalog mission 8 valid
+EXPEDITION PASS: manager can start mission 8
+EXPEDITION PASS: catalog mission 9 valid
+EXPEDITION PASS: manager can start mission 9
+EXPEDITION PASS: catalog mission 10 valid
+EXPEDITION PASS: manager can start mission 10
+EXPEDITION PASS: start catalog mission 1
+EXPEDITION PASS: M1 move 1 Left opens lock
+EXPEDITION PASS: M1 move 2 Left reaches 16
+EXPEDITION PASS: M1 won with 3 stars
+EXPEDITION PASS: start Chapter 2 mission 5
+EXPEDITION PASS: M5 move 1 Left
+EXPEDITION PASS: M5 move 2 Down reaches 128
+EXPEDITION PASS: M5 won with 3 stars
+EXPEDITION PASS: campaign progress records persisted accurately
+EXPEDITION PASS: ExpeditionMap navigation selects ExpeditionMap screen
+EXPEDITION PASS: start M1 for E6 dialog flow
+EXPEDITION PASS: playing screen active
+EXPEDITION PASS: RetryMission resets mission state cleanly
+EXPEDITION PASS: M1 first winning slide
+EXPEDITION PASS: M1 second winning slide
+EXPEDITION PASS: winning mission opens GameDialog.Win
+EXPEDITION PASS: start daily puzzle for 2026-10-03
+EXPEDITION PASS: daily puzzle id matches UTC date
+EXPEDITION PASS: daily share text formatted correctly
+EXPEDITION PASS: daily completion and streak recorded
+EXPEDITION PASS: daily progress persisted safely
+EXPEDITION PASS: return to Home after daily puzzle
+EXPEDITION_INTEGRATION_SUCCESS: 66 checks
+PHASE1 PASS: native atomic replacement reloads newest slot
+PHASE1 PASS: separate native slot recovers from corruption and leftover temp file
+PHASE1 PASS: failed migration remains playable and preserves legacy data
+PHASE1 PASS: legacy session/stats/integer sound migrate together
+PHASE1 PASS: unchanged refresh/save does not flush
+PHASE1 PASS: migrated save reloads
+PHASE1 PASS: newest complete transaction reloads
+PHASE1 PASS: corrupt newest slot falls back to previous commit
+PHASE1 PASS: checksum rejects changed payload
+PHASE1 PASS: interrupted write preserves previous session and stats
+PHASE1 PASS: invalid save cannot replace a committed record
+PHASE1 PASS: future schema is preserved by an older app
+PHASE1 PASS: reset cannot resurrect legacy or backup session
+PHASE1 PASS: loading blocks input
+PHASE1 PASS: home blocks board input
+PHASE1 PASS: animation gates selection and board input
+PHASE1 PASS: selection accepts targeting
+PHASE1 PASS: background cancels selection into pause
+PHASE1 PASS: foreground does not auto-resume gameplay
+PHASE1 PASS: instructions return to pause menu
+PHASE1 PASS: reset cancellation returns to scores
+PHASE1 PASS: nested scores cancellation preserves its pause parent
+PHASE1 PASS: continuation cancellation returns to loss
+PHASE1 PASS: reward cannot be dismissed into active play
+PHASE1 PASS: reward completion in background returns to pause
+PHASE1 PASS: invalid move spends/writes nothing: 4
+PHASE1 PASS: valid move enters animation: 4
+PHASE1 PASS: concurrent gameplay actions rejected: 4
+PHASE1 PASS: pause mid-animation preserves committed move: 4
+PHASE1 PASS: resume accepts next valid move: 4
+PHASE1 PASS: manager owns undo: 4
+PHASE1 PASS: tools require the matching selection state: 4
+PHASE1 PASS: invalid swap does not consume/save: 4
+PHASE1 PASS: valid swap commits and exits selection: 4
+PHASE1 PASS: manager owns delete: 4
+PHASE1 PASS: cancel selection returns to playing: 4
+PHASE1 PASS: home rejects moves: 4
+PHASE1 PASS: below-target merge commits despite high total score: 4
+PHASE1 PASS: score and below-target tile cannot complete the level: 4
+PHASE1 PASS: target merge commits: 4
+PHASE1 PASS: win is recorded once and opens result: 4
+PHASE1 PASS: keep going is a manager action: 4
+PHASE1 PASS: repeated save cannot count win twice: 4
+PHASE1 PASS: loss opens result: 4
+PHASE1 PASS: offline continuation preserves score and commits: 4
+PHASE1 PASS: continuation cannot be granted twice: 4
+PHASE1 PASS: pending reward blocks input: 4
+PHASE1 PASS: failed reward grants nothing: 4
+PHASE1 PASS: reward callback is granted exactly once: 4
+PHASE1 PASS: repeated lifecycle save is deduplicated: 4
+PHASE1 PASS: board/history/inventory/stats resume together: 4
+PHASE1 PASS: invalid move spends/writes nothing: 5
+PHASE1 PASS: valid move enters animation: 5
+PHASE1 PASS: concurrent gameplay actions rejected: 5
+PHASE1 PASS: pause mid-animation preserves committed move: 5
+PHASE1 PASS: resume accepts next valid move: 5
+PHASE1 PASS: manager owns undo: 5
+PHASE1 PASS: tools require the matching selection state: 5
+PHASE1 PASS: invalid swap does not consume/save: 5
+PHASE1 PASS: valid swap commits and exits selection: 5
+PHASE1 PASS: manager owns delete: 5
+PHASE1 PASS: cancel selection returns to playing: 5
+PHASE1 PASS: home rejects moves: 5
+PHASE1 PASS: below-target merge commits despite high total score: 5
+PHASE1 PASS: score and below-target tile cannot complete the level: 5
+PHASE1 PASS: target merge commits: 5
+PHASE1 PASS: win is recorded once and opens result: 5
+PHASE1 PASS: keep going is a manager action: 5
+PHASE1 PASS: repeated save cannot count win twice: 5
+PHASE1 PASS: loss opens result: 5
+PHASE1 PASS: offline continuation preserves score and commits: 5
+PHASE1 PASS: continuation cannot be granted twice: 5
+PHASE1 PASS: pending reward blocks input: 5
+PHASE1 PASS: failed reward grants nothing: 5
+PHASE1 PASS: reward callback is granted exactly once: 5
+PHASE1 PASS: repeated lifecycle save is deduplicated: 5
+PHASE1 PASS: board/history/inventory/stats resume together: 5
+PHASE1 PASS: invalid move spends/writes nothing: 6
+PHASE1 PASS: valid move enters animation: 6
+PHASE1 PASS: concurrent gameplay actions rejected: 6
+PHASE1 PASS: pause mid-animation preserves committed move: 6
+PHASE1 PASS: resume accepts next valid move: 6
+PHASE1 PASS: manager owns undo: 6
+PHASE1 PASS: tools require the matching selection state: 6
+PHASE1 PASS: invalid swap does not consume/save: 6
+PHASE1 PASS: valid swap commits and exits selection: 6
+PHASE1 PASS: manager owns delete: 6
+PHASE1 PASS: cancel selection returns to playing: 6
+PHASE1 PASS: home rejects moves: 6
+PHASE1 PASS: below-target merge commits despite high total score: 6
+PHASE1 PASS: score and below-target tile cannot complete the level: 6
+PHASE1 PASS: target merge commits: 6
+PHASE1 PASS: win is recorded once and opens result: 6
+PHASE1 PASS: keep going is a manager action: 6
+PHASE1 PASS: repeated save cannot count win twice: 6
+PHASE1 PASS: loss opens result: 6
+PHASE1 PASS: offline continuation preserves score and commits: 6
+PHASE1 PASS: continuation cannot be granted twice: 6
+PHASE1 PASS: pending reward blocks input: 6
+PHASE1 PASS: failed reward grants nothing: 6
+PHASE1 PASS: reward callback is granted exactly once: 6
+PHASE1 PASS: repeated lifecycle save is deduplicated: 6
+PHASE1 PASS: board/history/inventory/stats resume together: 6
+PHASE1 PASS: target achievement takes priority over a blocked board: 4
+PHASE1 PASS: target achievement takes priority over a blocked board: 5
+PHASE1 PASS: target achievement takes priority over a blocked board: 6
+PHASE1 PASS: failed commit retains the live state and signals a pending retry
+PHASE1 PASS: next lifecycle boundary retries the pending save
+PHASE1 PASS: committed actions publish view events
+PHASE1_SERVICE_SUCCESS: 109 checks
+PHASE2 PASS: localization catalog contains key: Preparing premium interface
+PHASE2 PASS: spanish translation exists and is distinct: Preparing premium interface
+PHASE2 PASS: localization catalog contains key: Loading scores and saved game
+PHASE2 PASS: spanish translation exists and is distinct: Loading scores and saved game
+PHASE2 PASS: localization catalog contains key: Preparing controls and audio
+PHASE2 PASS: spanish translation exists and is distinct: Preparing controls and audio
+PHASE2 PASS: localization catalog contains key: Ready
+PHASE2 PASS: spanish translation exists and is distinct: Ready
+PHASE2 PASS: localization catalog contains key: THE NUMBER COLLECTION
+PHASE2 PASS: spanish translation exists and is distinct: THE NUMBER COLLECTION
+PHASE2 PASS: localization catalog contains key: A little focus. A better move.
+PHASE2 PASS: spanish translation exists and is distinct: A little focus. A better move.
+PHASE2 PASS: localization catalog contains key: One swipe can change everything
+PHASE2 PASS: spanish translation exists and is distinct: One swipe can change everything
+PHASE2 PASS: localization catalog contains key: New Game
+PHASE2 PASS: spanish translation exists and is distinct: New Game
+PHASE2 PASS: localization catalog contains key: Resume
+PHASE2 PASS: spanish translation exists and is distinct: Resume
+PHASE2 PASS: localization catalog contains key: How to Play
+PHASE2 PASS: spanish translation exists and is distinct: How to Play
+PHASE2 PASS: localization catalog contains key: High Scores
+PHASE2 PASS: spanish translation exists and is distinct: High Scores
+PHASE2 PASS: localization catalog contains key: Settings
+PHASE2 PASS: spanish translation exists and is distinct: Settings
+PHASE2 PASS: localization catalog contains key: SWIPE · MERGE · MASTER
+PHASE2 PASS: spanish translation exists and is distinct: SWIPE · MERGE · MASTER
+PHASE2 PASS: localization catalog contains key: SCORE
+PHASE2 PASS: spanish translation exists and is distinct: SCORE
+PHASE2 PASS: localization catalog contains key: BEST
+PHASE2 PASS: spanish translation exists and is distinct: BEST
+PHASE2 PASS: localization catalog contains key: Undo
+PHASE2 PASS: spanish translation exists and is distinct: Undo
+PHASE2 PASS: localization catalog contains key: Swap
+PHASE2 PASS: spanish translation exists and is distinct: Swap
+PHASE2 PASS: localization catalog contains key: Delete
+PHASE2 PASS: spanish translation exists and is distinct: Delete
+PHASE2 PASS: localization catalog contains key: SELECTED
+PHASE2 PASS: spanish translation exists and is distinct: SELECTED
+PHASE2 PASS: localization catalog contains key: LOCKED
+PHASE2 PASS: spanish translation exists and is distinct: LOCKED
+PHASE2 PASS: localization catalog contains key: READY
+PHASE2 PASS: spanish translation exists and is distinct: READY
+PHASE2 PASS: localization catalog contains key: EMPTY
+PHASE2 PASS: spanish translation exists and is distinct: EMPTY
+PHASE2 PASS: localization catalog contains key: Hold 128 / 256 / 512 to earn tools
+PHASE2 PASS: spanish translation exists and is distinct: Hold 128 / 256 / 512 to earn tools
+PHASE2 PASS: localization catalog contains key: Tools unlock after {0} more moves
+PHASE2 PASS: spanish translation exists and is distinct: Tools unlock after {0} more moves
+PHASE2 PASS: localization catalog contains key: Tap two different adjacent tiles
+PHASE2 PASS: spanish translation exists and is distinct: Tap two different adjacent tiles
+PHASE2 PASS: localization catalog contains key: Tap the tile to remove · Cancel to exit
+PHASE2 PASS: spanish translation exists and is distinct: Tap the tile to remove · Cancel to exit
+PHASE2 PASS: localization catalog contains key: Tile 1 selected · Tap an adjacent tile
+PHASE2 PASS: spanish translation exists and is distinct: Tile 1 selected · Tap an adjacent tile
+PHASE2 PASS: localization catalog contains key: Choose a different tile next to tile 1
+PHASE2 PASS: spanish translation exists and is distinct: Choose a different tile next to tile 1
+PHASE2 PASS: localization catalog contains key: Cancel selection
+PHASE2 PASS: spanish translation exists and is distinct: Cancel selection
+PHASE2 PASS: localization catalog contains key: Paused
+PHASE2 PASS: spanish translation exists and is distinct: Paused
+PHASE2 PASS: localization catalog contains key: Take a breath. Your board is saved.
+PHASE2 PASS: spanish translation exists and is distinct: Take a breath. Your board is saved.
+PHASE2 PASS: localization catalog contains key: Change level
+PHASE2 PASS: spanish translation exists and is distinct: Change level
+PHASE2 PASS: localization catalog contains key: Home
+PHASE2 PASS: spanish translation exists and is distinct: Home
+PHASE2 PASS: localization catalog contains key: Choose your pace
+PHASE2 PASS: spanish translation exists and is distinct: Choose your pace
+PHASE2 PASS: localization catalog contains key: Classic
+PHASE2 PASS: spanish translation exists and is distinct: Classic
+PHASE2 PASS: localization catalog contains key: Short and focused
+PHASE2 PASS: spanish translation exists and is distinct: Short and focused
+PHASE2 PASS: localization catalog contains key: Advanced
+PHASE2 PASS: spanish translation exists and is distinct: Advanced
+PHASE2 PASS: localization catalog contains key: Room to build
+PHASE2 PASS: spanish translation exists and is distinct: Room to build
+PHASE2 PASS: localization catalog contains key: Expert
+PHASE2 PASS: spanish translation exists and is distinct: Expert
+PHASE2 PASS: localization catalog contains key: Think a few moves ahead
+PHASE2 PASS: spanish translation exists and is distinct: Think a few moves ahead
+PHASE2 PASS: localization catalog contains key: CURRENT BOARD
+PHASE2 PASS: spanish translation exists and is distinct: CURRENT BOARD
+PHASE2 PASS: localization catalog contains key: Simple moves. Thoughtful choices.
+PHASE2 PASS: spanish translation exists and is distinct: Simple moves. Thoughtful choices.
+PHASE2 PASS: localization catalog contains key: Your personal bests, saved on this device
+PHASE2 PASS: spanish translation exists and is distinct: Your personal bests, saved on this device
+PHASE2 PASS: localization catalog contains key: Played {0}  ·  Won {1}  ·  Win rate {2}%
+PHASE2 PASS: spanish translation exists and is distinct: Played {0}  ·  Won {1}  ·  Win rate {2}%
+PHASE2 PASS: localization catalog contains key: Clear scores
+PHASE2 PASS: spanish translation exists and is distinct: Clear scores
+PHASE2 PASS: localization catalog contains key: Clear saved scores?
+PHASE2 PASS: spanish translation exists and is distinct: Clear saved scores?
+PHASE2 PASS: localization catalog contains key: Clear
+PHASE2 PASS: spanish translation exists and is distinct: Clear
+PHASE2 PASS: localization catalog contains key: Cancel
+PHASE2 PASS: spanish translation exists and is distinct: Cancel
+PHASE2 PASS: localization catalog contains key: Restart level?
+PHASE2 PASS: spanish translation exists and is distinct: Restart level?
+PHASE2 PASS: localization catalog contains key: Restart
+PHASE2 PASS: spanish translation exists and is distinct: Restart
+PHASE2 PASS: localization catalog contains key: You win!
+PHASE2 PASS: spanish translation exists and is distinct: You win!
+PHASE2 PASS: localization catalog contains key: A new milestone. Keep building.
+PHASE2 PASS: spanish translation exists and is distinct: A new milestone. Keep building.
+PHASE2 PASS: localization catalog contains key: TARGET REACHED
+PHASE2 PASS: spanish translation exists and is distinct: TARGET REACHED
+PHASE2 PASS: localization catalog contains key: Keep going
+PHASE2 PASS: spanish translation exists and is distinct: Keep going
+PHASE2 PASS: localization catalog contains key: Play again
+PHASE2 PASS: spanish translation exists and is distinct: Play again
+PHASE2 PASS: localization catalog contains key: Game over
+PHASE2 PASS: spanish translation exists and is distinct: Game over
+PHASE2 PASS: localization catalog contains key: No moves remain. A fresh challenge awaits.
+PHASE2 PASS: spanish translation exists and is distinct: No moves remain. A fresh challenge awaits.
+PHASE2 PASS: localization catalog contains key: FINAL SCORE
+PHASE2 PASS: spanish translation exists and is distinct: FINAL SCORE
+PHASE2 PASS: localization catalog contains key: Continue: rewind 5 moves
+PHASE2 PASS: spanish translation exists and is distinct: Continue: rewind 5 moves
+PHASE2 PASS: localization catalog contains key: Continue playing?
+PHASE2 PASS: spanish translation exists and is distinct: Continue playing?
+PHASE2 PASS: localization catalog contains key: Continue
+PHASE2 PASS: spanish translation exists and is distinct: Continue
+PHASE2 PASS: localization catalog contains key: No thanks
+PHASE2 PASS: spanish translation exists and is distinct: No thanks
+PHASE2 PASS: localization catalog contains key: Close
+PHASE2 PASS: spanish translation exists and is distinct: Close
+PHASE2 PASS: localization catalog contains key: Sound
+PHASE2 PASS: spanish translation exists and is distinct: Sound
+PHASE2 PASS: localization catalog contains key: Reduced motion
+PHASE2 PASS: spanish translation exists and is distinct: Reduced motion
+PHASE2 PASS: localization catalog contains key: Large text
+PHASE2 PASS: spanish translation exists and is distinct: Large text
+PHASE2 PASS: localization catalog contains key: High contrast
+PHASE2 PASS: spanish translation exists and is distinct: High contrast
+PHASE2 PASS: localization catalog contains key: ON
+PHASE2 PASS: spanish translation exists and is distinct: ON
+PHASE2 PASS: localization catalog contains key: OFF
+PHASE2 PASS: spanish translation exists and is distinct: OFF
+PHASE2 PASS: localized string formats arguments correctly
+PHASE2 PASS: missing localization falls back to english key
+PHASE2 PASS: NotoSans-Regular font bundled in Resources/Fonts
+PHASE2 PASS: NotoSans-Bold font bundled in Resources/Fonts
+PHASE2 PASS: brand mark sprite/texture bundled in Resources/Brand
+PHASE2 PASS: brand app icon bundled in Resources/Brand (>= 512px)
+PHASE2 PASS: launch portrait art bundled in Resources/Brand
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 0 (contrast: 9.23)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 0
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 2 (contrast: 15.02)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 2
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 4 (contrast: 11.95)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 4
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 8 (contrast: 9.77)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 8
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 16 (contrast: 9.75)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 16
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 32 (contrast: 7.68)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 32
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 64 (contrast: 5.16)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 64
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 128 (contrast: 4.54)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 128
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 256 (contrast: 5.39)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 256
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 512 (contrast: 4.81)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 512
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 1024 (contrast: 4.89)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 1024
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 2048 (contrast: 10.20)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 2048
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 4096 (contrast: 7.02)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 4096
+PHASE2 PASS: WCAG AA contrast (>= 4.5) met for tile 8192 (contrast: 7.84)
+PHASE2 PASS: high contrast label stays readable on the distinct colour for tile 8192
+PHASE2 PASS: ink to text contrast exceeds WCAG AAA (>= 7.0)
+PHASE2 PASS: accent to ink contrast meets WCAG AA
+PHASE2 PASS: vector icon renders mesh vertices: Menu (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Sound (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Mute (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Restart (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Undo (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Swap (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Delete (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Settings (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Play (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Check (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Lock (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Trophy (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Star (4 verts)
+PHASE2 PASS: vector icon renders mesh vertices: Map (4 verts)
+PHASE2 PASS: rounded selection outline stays within the tile boundary
+PHASE2 PASS: selection outline renders a thin border without filling the tile
+PHASE2 PASS: primary control applies accent background
+PHASE2 PASS: destructive control applies destructive tone
+PHASE2 PASS: selected state applies accent background
+PHASE2 PASS: locked state applies muted tone
+PHASE2 PASS: toggle large text modifies manager state
+PHASE2 PASS: toggle reduced motion modifies manager state
+PHASE2 PASS: toggle high contrast modifies manager state
+PHASE2 PASS: toggle language switches between en and es
+PHASE2 PASS: Android adaptive background asset exists
+PHASE2 PASS: Android adaptive foreground asset exists
+PHASE2 PASS: Android monochrome icon asset exists
+PHASE2 PASS: iOS 1024x1024 app store icon asset exists
+PHASE2 PASS: iOS AppIcon.appiconset catalog exists
+PHASE2 PASS: iOS icon asset present: icon-20.png
+PHASE2 PASS: iOS icon asset present: icon-29.png
+PHASE2 PASS: iOS icon asset present: icon-40.png
+PHASE2 PASS: iOS icon asset present: icon-58.png
+PHASE2 PASS: iOS icon asset present: icon-60.png
+PHASE2 PASS: iOS icon asset present: icon-76.png
+PHASE2 PASS: iOS icon asset present: icon-80.png
+PHASE2 PASS: iOS icon asset present: icon-87.png
+PHASE2 PASS: iOS icon asset present: icon-120.png
+PHASE2 PASS: iOS icon asset present: icon-152.png
+PHASE2 PASS: iOS icon asset present: icon-167.png
+PHASE2 PASS: iOS icon asset present: icon-180.png
+PHASE2 PASS: iOS icon asset present: icon-1024.png
+PHASE2_SERVICE_SUCCESS: 217 checks
+PHASE3 PASS: iPad 4:3 classified as Tablet
+PHASE3 PASS: Tablet 16:10 classified as Tablet
+PHASE3 PASS: Tablet 3:2 classified as Tablet
+PHASE3 PASS: Compact 16:9 (1080x1920) classified as CompactPhone
+PHASE3 PASS: Compact 16:9 (720x1280) classified as CompactPhone
+PHASE3 PASS: 18:10 classified as CompactPhone
+PHASE3 PASS: iPhone 15 Pro 19.5:9 classified as TallPhone
+PHASE3 PASS: Android 20:9 (1080x2400) classified as TallPhone
+PHASE3 PASS: Sony Xperia 21:9 classified as TallPhone
+PHASE3 PASS: safe anchor xMin is 0
+PHASE3 PASS: safe anchor xMax is 1
+PHASE3 PASS: safe anchor yMin isolates bottom home bar: 0.0399061
+PHASE3 PASS: safe anchor yMax isolates top notch: 0.9483568
+PHASE3 PASS: scale factor respects safe area width bound
+PHASE3 PASS: scale factor respects safe area height bound
+PHASE3 PASS: zero dimension fallback returns full rect
+PHASE3 PASS: interactive buttons exist in scene (117 buttons)
+PHASE3 PASS: touch target >= 72x72 for button 'Sound: On' (72x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Settings' (72x72)
+PHASE3 PASS: touch target >= 72x72 for button 'New Game' (500x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Expedition' (500x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Daily Puzzle' (500x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Resume' (500x72)
+PHASE3 PASS: touch target >= 72x72 for button 'How to Play' (244x72)
+PHASE3 PASS: touch target >= 72x72 for button 'High Scores' (244x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Menu' (72x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Sound: On' (72x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Restart' (72x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Undo' (156x76)
+PHASE3 PASS: touch target >= 72x72 for button 'Swap' (156x76)
+PHASE3 PASS: touch target >= 72x72 for button 'Delete' (156x76)
+PHASE3 PASS: touch target >= 72x72 for button 'Cancel selection' (230x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Back' (72x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Sound: On' (72x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Settings' (72x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Resume expedition' (500x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play 0' (72x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play 1' (72x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Resume' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Change level' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Restart' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'How to Play' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'High Scores' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Settings' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Resume' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Change level' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Restart' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'How to Play' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'High Scores' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Settings' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Next level' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Keep going' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue: rewind 5 moves' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'No thanks' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue: rewind 5 moves' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue: rewind 5 moves' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Resume' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Change level' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Restart' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'How to Play' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'High Scores' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Settings' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Resume' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Change level' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Restart' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'How to Play' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'High Scores' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Settings' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Next level' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Keep going' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue: rewind 5 moves' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'No thanks' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue: rewind 5 moves' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue: rewind 5 moves' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Resume' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Change level' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Restart' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'How to Play' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'High Scores' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Settings' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Resume' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Change level' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Restart' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'How to Play' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'High Scores' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Settings' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Keep going' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue: rewind 5 moves' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'No thanks' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue: rewind 5 moves' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Continue: rewind 5 moves' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Next level' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Next level' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Play again' (456x72)
+PHASE3 PASS: touch target >= 72x72 for button 'Home' (456x72)
+PHASE3 PASS: calculated valid positive cell size for 4x4: 116.5
+PHASE3 PASS: board cells + spacing sum exactly to 496 for 4x4
+PHASE3 PASS: cell 0 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 1 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 2 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 3 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 4 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 5 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 6 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 7 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 8 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 9 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 10 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 11 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 12 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 13 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 14 strictly contained within board bounds for 4x4
+PHASE3 PASS: cell 15 strictly contained within board bounds for 4x4
+PHASE3 PASS: calculated valid positive cell size for 5x5: 91.2
+PHASE3 PASS: board cells + spacing sum exactly to 496 for 5x5
+PHASE3 PASS: cell 0 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 1 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 2 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 3 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 4 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 5 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 6 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 7 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 8 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 9 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 10 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 11 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 12 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 13 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 14 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 15 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 16 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 17 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 18 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 19 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 20 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 21 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 22 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 23 strictly contained within board bounds for 5x5
+PHASE3 PASS: cell 24 strictly contained within board bounds for 5x5
+PHASE3 PASS: calculated valid positive cell size for 6x6: 74.33334
+PHASE3 PASS: board cells + spacing sum exactly to 496 for 6x6
+PHASE3 PASS: cell 0 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 1 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 2 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 3 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 4 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 5 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 6 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 7 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 8 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 9 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 10 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 11 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 12 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 13 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 14 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 15 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 16 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 17 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 18 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 19 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 20 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 21 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 22 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 23 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 24 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 25 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 26 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 27 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 28 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 29 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 30 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 31 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 32 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 33 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 34 strictly contained within board bounds for 6x6
+PHASE3 PASS: cell 35 strictly contained within board bounds for 6x6
+PHASE3 PASS: Compact Phone 16:9: rendered width 1080 <= safe width 1080
+PHASE3 PASS: Compact Phone 16:9: rendered height 1728 <= safe height 1920
+PHASE3 PASS: Tall Phone iPhone 15 Pro: rendered width 1179 <= safe width 1179
+PHASE3 PASS: Tall Phone iPhone 15 Pro: rendered height 1886.4 <= safe height 2322
+PHASE3 PASS: Tall Phone Android 20:9: rendered width 1080 <= safe width 1080
+PHASE3 PASS: Tall Phone Android 20:9: rendered height 1728 <= safe height 2240
+PHASE3 PASS: Tablet iPad 4:3: rendered width 1230 <= safe width 1536
+PHASE3 PASS: Tablet iPad 4:3: rendered height 1968 <= safe height 1968
+PHASE3 PASS: Tablet Android 16:10: rendered width 1125 <= safe width 1200
+PHASE3 PASS: Tablet Android 16:10: rendered height 1800 <= safe height 1800
+PHASE3_SERVICE_SUCCESS: 227 checks
+PHASE4 PASS: toggle haptics alters manager state
+PHASE4 PASS: haptic preference persisted in GameSave schema v2 as false
+PHASE4 PASS: haptic preference persisted in GameSave schema v2 as true
+PHASE4 PASS: PremiumHaptics.Trigger runs cleanly for Light
+PHASE4 PASS: PremiumHaptics.Trigger runs cleanly for Medium
+PHASE4 PASS: PremiumHaptics.Trigger runs cleanly for Heavy
+PHASE4 PASS: PremiumHaptics.Trigger runs cleanly for Success
+PHASE4 PASS: PremiumHaptics.Trigger runs cleanly for Warning
+PHASE4 PASS: PremiumHaptics.Trigger runs cleanly for Error
+PHASE4 PASS: strings catalog contains 'Haptic feedback'
+PHASE4 PASS: spanish translation for 'Haptic feedback' matches
+PHASE4 PASS: 4 active ghosts registered
+PHASE4 PASS: acquired ghosts are active in hierarchy
+PHASE4 PASS: active ghosts list cleared after recycle
+PHASE4 PASS: 4 ghosts returned to pool
+PHASE4 PASS: pooled ghosts deactivated in hierarchy
+PHASE4 PASS: pooled ghost reused LIFO without reallocating
+PHASE4 PASS: reused ghost reactivated
+PHASE4 PASS: FinishAnimation clears animating flag
+PHASE4 PASS: FinishAnimation restores grid scale to 1.0
+PHASE4 PASS: FinishAnimation clears all active ghost tiles
+PHASE4 PASS: move succeeds under reduced motion
+PHASE4 PASS: reduced motion executes move without lingering animation state
+PHASE4_SERVICE_SUCCESS: 23 checks
+QA PASS: tiny gesture does not move or persist
+QA PASS: gesture starting outside board is ignored
+QA PASS: cancelled gesture cannot apply later
+QA PASS: real controller swipe reaches manager and animation
+QA PASS: pause mid-animation resolves visuals and overlapping focus loss stays suspended
+QA PASS: background gesture cannot alter saved board
+QA PASS: foreground retains pause menu
+QA PASS: button enabled: Resume
+QA PASS: explicit resume preserves score after interrupted animation
+QA PASS: lifecycle boundary persisted committed swipe
+QA PASS: exactly one game manager and controller
+QA PASS: home initializes
+QA PASS: button enabled: Settings
+QA PASS: settings modal opened
+QA PASS: button enabled: About
+QA PASS: about screen opens from settings
+QA PASS: button enabled: Back
+QA PASS: about returns to the settings screen
+QA PASS: button enabled: Haptic feedback
+QA PASS: haptic feedback toggled off
+QA PASS: button enabled: Haptic feedback
+QA PASS: haptic feedback toggled on
+QA PASS: button enabled: Large text
+QA PASS: large text toggled on
+QA PASS: button enabled: Large text
+QA PASS: large text toggled off
+QA PASS: button enabled: High contrast
+QA PASS: high contrast toggled on
+QA PASS: button enabled: High contrast
+QA PASS: high contrast toggled off
+QA PASS: button enabled: Language
+QA PASS: language toggled to Spanish
+QA PASS: button enabled: Language
+QA PASS: language toggled back to English
+QA PASS: button enabled: Close
+QA PASS: button enabled: New Game
+QA PASS: levels modal opened
+QA PASS: button enabled: Level 1
+QA PASS: changing boards requires confirmation and preserves the saved board
+QA PASS: button enabled: Keep current board
+QA PASS: cancel new board returns to levels without losing progress
+QA PASS: button enabled: Level 1
+QA PASS: button enabled: Start new board
+QA PASS: 4x4 UI and board
+QA PASS: input to animated move and score
+QA PASS: powers unlocked by actual moves
+QA PASS: button enabled: Undo
+QA PASS: Undo UI consumes stock
+QA PASS: button enabled: Swap
+QA PASS: swap animates with board input gated
+QA PASS: Swap selection UI
+QA PASS: button enabled: Delete
+QA PASS: delete animates with board input gated
+QA PASS: Delete selection UI
+QA PASS: button enabled: Menu
+QA PASS: pause menu
+QA PASS: button enabled: Resume
+QA PASS: 5x5 UI and board
+QA PASS: 6x6 UI and board
+QA PASS: 8192 win dialog
+QA PASS: button enabled: Keep going
+QA PASS: keep going UI
+QA PASS: loss dialog
+QA PASS: button enabled: Continue: rewind 5 moves
+QA PASS: button enabled: Continue
+QA PASS: offline continuation UI
+QA PASS: button enabled: Menu
+QA PASS: button enabled: How to Play
+QA PASS: instructions fit dialog
+QA PASS: button enabled: Close
+QA PASS: high score dialog
+QA PASS: button enabled: Close
+QA PASS: level one completes on its 2048 tile
+QA PASS: button enabled: Next level
+QA PASS: next level starts the 4096-target board
+QA PASS: level two completes on its 4096 tile
+QA PASS: button enabled: Next level
+QA PASS: next level starts the 8192-target board
+QA PASS: home navigation
+QA PASS: button enabled: Resume
+QA PASS: saved game resume
+QA PASS: rapid second swipe is buffered without mutating the animated board
+QA PASS: buffered swipe executes once after the first animation resolves
+QA PASS: backgrounding discards buffered input and resolves visual tiles
+QA PASS: button enabled: Resume
+QA PASS: button enabled: Expedition
+QA PASS: Expedition map opens from home
+QA PASS: first mission Play button is inside the visible map viewport
+QA PASS: button enabled: Play 0
+QA PASS: Expedition mission 1 active
+QA PASS: Expedition gameplay view visible
+QA PASS: mission HUD labels actions correctly
+QA PASS: Expedition slides all source tiles using pooled visuals
+QA PASS: Expedition win dialog
+QA PASS: button enabled: Daily Puzzle
+QA PASS: Daily button starts playable puzzle
+PREMIUM_SMOKE_SUCCESS
+
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: both pre-merge tiles are visible during the slide
+MOTION QA PASS: moving tiles render above board cells after rebuilding a board
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide begins at its source without a first-frame jump
+MOTION QA PASS: slide retains at least five visible interpolation frames at 60fps
+MOTION QA PASS: tiles travel through intermediate board positions
+MOTION QA PASS: merged tile has a visible settle pulse
+MOTION QA PASS: merged tiles receive a visible pooled highlight
+MOTION QA PASS: new tile grows in after contact
+MOTION QA PASS: merge commits the correct value once
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: tile scale settles exactly to one
+MOTION QA PASS: home plays a staggered entrance when returning from gameplay
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: home elements finish fully visible
+MOTION QA PASS: reduced motion disables home entrance
+MOTION QA PASS: reduced motion still merges correctly without waiting for animation
+PREMIUM_MOTION_SUCCESS

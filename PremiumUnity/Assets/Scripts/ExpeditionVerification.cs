@@ -95,7 +95,9 @@ public static class ExpeditionVerification {
    Check(manager.StartMission(ExpeditionCatalog.Get("expedition-01")),"start M1 for E6 dialog flow");
    Check(manager.Navigation.Screen==GameScreen.Expedition&&manager.Navigation.State==GameState.Playing,"playing screen active");
    Check(manager.RetryMission()&&manager.Expedition.mission.id=="expedition-01"&&manager.Expedition.actions==0,"RetryMission resets mission state cleanly");
-   Check(manager.Move(Direction.Left,0)&&manager.Move(Direction.Left,1),"play winning moves for M1");
+   Check(manager.Move(Direction.Left,0),"M1 first winning slide");
+   manager.ResolveAnimation();
+   Check(manager.Move(Direction.Left,1),"M1 second winning slide");
    manager.ResolveAnimation();
    Check(manager.Navigation.Dialog==GameDialog.Win&&manager.Navigation.State==GameState.Result,"winning mission opens GameDialog.Win");
    // E7: Daily Puzzle generation, completion, streaks, and share verification

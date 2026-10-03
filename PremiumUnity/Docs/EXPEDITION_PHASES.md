@@ -1,6 +1,6 @@
 # 2048 Expedition — Complete implementation phases
 
-Created: 2026-10-03. Status: planning only; Expedition features below are not implemented yet.
+Created: 2026-10-03. E1 foundation verified; later-phase implementation and release verification are tracked below. Native desktop checks do not establish physical Android/iOS release readiness.
 
 This is a new native Unity mode for Android and iOS. Existing Classic gameplay remains available: Level 1 reaches 2048 on 4×4, Level 2 reaches 4096 on 5×5, Level 3 reaches 8192 on 6×6. Expedition uses mission-specific objectives and a separate progression track.
 
@@ -51,7 +51,7 @@ These are the proposed first-version rules, so implementation and mission design
 
 ## E1 — Rules architecture and mode separation
 
-**Status: Pending. Dependencies: none.**
+**Status: Complete. Verified 2026-10-03: shared rules, isolated sessions/saves, deterministic reruns, 8,772,314 Classic assertions, 20,010 initial Expedition rule checks, 66 current native mode integration checks, 737 current native smoke checks, and 445 motion checks. Dependencies: none.**
 
 Deliverables:
 - Document `Classic` and `Expedition` session lifecycles and the rule contract above.
@@ -61,6 +61,8 @@ Deliverables:
 - Keep Classic `Board.target` validation intact. Mission completion belongs to the mission evaluator; do not fake Classic `won` or override the 2048/4096/8192 validator to make a small mission pass.
 - Define deterministic spawning independently of Unity animation/frame time. The initial campaign uses authored value/cell-priority spawn scripts with a canonical fallback order. Store the spawn cursor in snapshots.
 - Add mode navigation and separate Classic/Expedition resume entries. Starting a mission must preserve the saved Classic run.
+
+Verification record: [EXPEDITION_VERIFICATION.md](EXPEDITION_VERIFICATION.md).
 
 Exit checks:
 - Existing Classic rule and native smoke suites remain green.
@@ -212,7 +214,7 @@ Exit checks:
 
 ## E9 — Physical-device QA and release-candidate gate
 
-**Status: Completed. Verified: QA runbook authored in `Docs/EXPEDITION_RELEASE_QA.md`, automated suite passing with 8,794,746 total checks, and zero regressions on Classic.**
+**Status: Pending physical Android/iOS QA. Automated desktop/rule checks and the QA runbook exist; device performance, touch, lifecycle and release acceptance are not yet verified.**
 
 Deliverables:
 - Run the full campaign/daily flow on physical Android and iOS using user-produced packages. APK building is not an automatic phase action.
@@ -229,7 +231,7 @@ Exit checks:
 
 ## E10 — Release preparation and next chapters
 
-**Status: Completed. Verified: Complete 10-mission campaign, offline Daily puzzle, dual persistence, release QA checklist, and test suites ready for production.**
+**Status: Pending. Campaign/Daily code and a release checklist exist. Signed packages, device acceptance and store preparation are not yet verified.**
 
 Deliverables:
 - Player-facing name/tagline and store artwork demonstrating locks, objectives and journey progression.

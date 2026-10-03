@@ -301,8 +301,45 @@ public class PremiumSmokeRunner : MonoBehaviour {
      Call("Move",Direction.Right);Call("QueueMove",Direction.Down);Call("OnApplicationPause",true);
      Check(!Get<Direction?>("queuedMove").HasValue && !Get<bool>("animating"),"backgrounding discards buffered input and resolves visual tiles");
      Call("OnApplicationPause",false);Click("Resume");Call("ShowHome");
-     Debug.Log("PREMIUM_SMOKE_SUCCESS");Finish(0);
+     stage=21;
      break;
+    case 21:
+     var homeMotion=Get<GameObject>("home").GetComponent<PremiumHomeMotion>();
+     if(homeMotion!=null && homeMotion.IsRevealing){stage=21;return;}
+     ScreenCapture.CaptureScreenshot("/tmp/premium-home-v2.png");stage=26;break;
+    case 26:
+     Click("Expedition");Check(manager.Navigation.Screen==GameScreen.ExpeditionMap,"Expedition map opens from home");stage=27;break;
+    case 27:
+     var map=Get<GameObject>("expeditionMap");var viewport=map.transform.Find("Map Viewport") as RectTransform;
+     var play=viewport.Find("Map Content/Mission Card 0/Play 0") as RectTransform;
+     var bounds=RectTransformUtility.CalculateRelativeRectTransformBounds(viewport,play);
+     Check(bounds.min.y>=viewport.rect.yMin && bounds.max.y<=viewport.rect.yMax,"first mission Play button is inside the visible map viewport");
+     ScreenCapture.CaptureScreenshot("/tmp/premium-expedition-map.png");stage=28;break;
+    case 28:
+     Click("Play 0");stage=22;break;
+    case 22:
+     Check(manager.Navigation.Screen==GameScreen.Expedition,"Expedition mission 1 active");
+     Check(Get<GameObject>("game").activeSelf,"Expedition gameplay view visible");
+     Check(Get<GameObject>("game").transform.Find("SCORE/Caption").GetComponent<Text>().text=="ACTIONS","mission HUD labels actions correctly");
+     ScreenCapture.CaptureScreenshot("/tmp/premium-expedition-game.png");stage=29;break;
+    case 29:
+     Call("Move",Direction.Left);
+     Check(Get<System.Collections.Generic.List<RectTransform>>("activeGhosts").Count==3,"Expedition slides all source tiles using pooled visuals");stage=23;break;
+    case 23:
+     Call("Move",Direction.Left);stage=24;break;
+    case 24:
+     manager.ResolveAnimation();Check(manager.Navigation.Dialog==GameDialog.Win,"Expedition win dialog");
+     stage=32;break;
+    case 32:
+     var dialogGroup=Get<RectTransform>("modalPanel").GetComponent<CanvasGroup>();if(dialogGroup!=null && dialogGroup.alpha<.99f){stage=32;return;}
+     ScreenCapture.CaptureScreenshot("/tmp/premium-expedition-win.png");stage=30;break;
+    case 30:
+     manager.Home();Click("Daily Puzzle");
+     Check(manager.Mode==GameMode.Expedition && manager.Expedition.mission.id.StartsWith("daily-"),"Daily button starts playable puzzle");stage=25;break;
+    case 25:
+     ScreenCapture.CaptureScreenshot("/tmp/premium-daily-game.png");stage=31;break;
+    case 31:
+     manager.Home();Debug.Log("PREMIUM_SMOKE_SUCCESS");Finish(0);break;
    }
   } catch (Exception e) {
    Debug.LogError("PREMIUM_SMOKE_FAILED: " + e);

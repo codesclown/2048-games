@@ -81,4 +81,4 @@ The development-only `PhaseOneVerification` checks native file recovery, v1 migr
 `-premiumMotionSmoke` on a development player verifies real slide/merge frames across all board sizes/directions, pooled tile draw order, home entrance and reduced motion. See `Docs/motion-checks.log` for the restored-animation regression evidence.
 
 ## Expedition roadmap
-See [Docs/EXPEDITION_PHASES.md](Docs/EXPEDITION_PHASES.md) for the planned E1–E10 mission/locked-cell mode. This is a design and implementation plan; Expedition features are not implemented yet.
+See [Docs/EXPEDITION_PHASES.md](Docs/EXPEDITION_PHASES.md) for E1–E10 tracking and [Docs/EXPEDITION_ARCHITECTURE.md](Docs/EXPEDITION_ARCHITECTURE.md) for mode/session ownership. Expedition campaign and Daily entry points now exist in the native runtime. E1 foundations are verified; physical Android/iOS release checks remain pending.

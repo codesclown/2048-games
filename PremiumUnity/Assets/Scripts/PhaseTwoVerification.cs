@@ -101,11 +101,18 @@ public static class PhaseTwoVerification {
   }
 
   var frameGo = new GameObject("FrameTest", typeof(RectTransform));
+  var frameRect=frameGo.GetComponent<RectTransform>();frameRect.sizeDelta=new Vector2(156,76);
   var frame = frameGo.AddComponent<PremiumSelectionFrame>();
+  Check(frameGo.GetComponent<CanvasRenderer>() != null,"new rounded frame automatically has its required CanvasRenderer");
   vh.Clear();
   var frameMethod = typeof(PremiumSelectionFrame).GetMethod("OnPopulateMesh", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance, null, new[] { typeof(VertexHelper) }, null);
   frameMethod.Invoke(frame, new object[] { vh });
-  Check(vh.currentVertCount == 16, "selection frame generates 16 outline vertices");
+  var outlineMesh=new Mesh();vh.FillMesh(outlineMesh);var vertices=outlineMesh.vertices;var triangles=outlineMesh.triangles;float area=0;bool contained=true;
+  foreach(var vertex in vertices)contained &= Mathf.Abs(vertex.x)<=78.01f && Mathf.Abs(vertex.y)<=38.01f;
+  for(int i=0;i<triangles.Length;i+=3)area+=Vector3.Cross(vertices[triangles[i+1]]-vertices[triangles[i]],vertices[triangles[i+2]]-vertices[triangles[i]]).magnitude*.5f;
+  Check(contained,"rounded selection outline stays within the tile boundary");
+  Check(area>0 && area<156*76*.25f,"selection outline renders a thin border without filling the tile");
+  UnityEngine.Object.DestroyImmediate(outlineMesh);
 
   var btnGo = new GameObject("ButtonTest", typeof(RectTransform), typeof(Image), typeof(Button));
   var ctrl = btnGo.AddComponent<PremiumControl>();

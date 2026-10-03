@@ -11,26 +11,26 @@ public static class PremiumTheme {
     public static UnityEngine.Color Hex(string hex) => ParseColor(hex);
 
     // Ink, parchment and amber: one restrained palette across every native screen.
-    public static UnityEngine.Color Background => ParseColor("192327");    // Deepest midnight obsidian
-    public static UnityEngine.Color Surface => ParseColor("223035");       // Glass card surface
-    public static UnityEngine.Color SurfaceElevated => ParseColor("2B3A3F"); // Active/Elevated card
-    public static UnityEngine.Color SurfaceHover => ParseColor("35474C");   // Highlighted container
-    public static UnityEngine.Color Border => ParseColor("3A4B50");         // Subtle card stroke
-    public static UnityEngine.Color BorderLight => ParseColor("667A7C");    // Glowing active stroke
-    public static UnityEngine.Color BorderElevated => ParseColor("52676A"); // Active elevated stroke
-    public static UnityEngine.Color DialogBackground => ParseColor("223035"); // Modal dialog body
-    public static UnityEngine.Color GoldBorder => ParseColor("E5BB7A");     // Radiant gold modal stroke
+    public static UnityEngine.Color Background => ParseColor("101B2A");    // Deepest midnight obsidian
+    public static UnityEngine.Color Surface => ParseColor("1B2C3B");       // Glass card surface
+    public static UnityEngine.Color SurfaceElevated => ParseColor("263A4B"); // Active/Elevated card
+    public static UnityEngine.Color SurfaceHover => ParseColor("304A5C");   // Highlighted container
+    public static UnityEngine.Color Border => ParseColor("3C5363");         // Subtle card stroke
+    public static UnityEngine.Color BorderLight => ParseColor("7E9AA8");    // Glowing active stroke
+    public static UnityEngine.Color BorderElevated => ParseColor("567485"); // Active elevated stroke
+    public static UnityEngine.Color DialogBackground => ParseColor("1B2C3B"); // Modal dialog body
+    public static UnityEngine.Color GoldBorder => ParseColor("EDC487");     // Radiant gold modal stroke
     
     public static UnityEngine.Color Text => ParseColor("F4F0E8");           // Crisp pure white
     public static UnityEngine.Color TextSecondary => ParseColor("DFE6E2");  // High-legibility light silver
-    public static UnityEngine.Color Muted => ParseColor("B1BEBA");          // Elegant slate/lavender
-    public static UnityEngine.Color Subdued => ParseColor("82938F");        // Subtle hints/dividers
+    public static UnityEngine.Color Muted => ParseColor("A8B9C7");          // Elegant slate/lavender
+    public static UnityEngine.Color Subdued => ParseColor("748C9D");        // Subtle hints/dividers
 
-    public static UnityEngine.Color Gold => ParseColor("E5BB7A");           // Royal gold gradient top
+    public static UnityEngine.Color Gold => ParseColor("EDC487");           // Royal gold gradient top
     public static UnityEngine.Color GoldDark => ParseColor("CFA064");       // Rich amber gradient bottom
-    public static UnityEngine.Color Accent => ParseColor("E5BB7A");         // Gold brand accent
+    public static UnityEngine.Color Accent => ParseColor("EDC487");         // Gold brand accent
     public static UnityEngine.Color AccentGlow => ParseColor("E5BB7A44");    // Glow highlight
-    public static UnityEngine.Color Ink => ParseColor("080A12");            // Deep contrast text on gold
+    public static UnityEngine.Color Ink => ParseColor("101722");            // Deep contrast text on gold
 
     public static UnityEngine.Color Cyan => ParseColor("9DBBB0");           // Undo / Action blue
     public static UnityEngine.Color Purple => ParseColor("B4A38E");         // Swap / Magic violet
@@ -38,6 +38,29 @@ public static class PremiumTheme {
     public static UnityEngine.Color Emerald => ParseColor("9DBBB0");        // Victory green
 
     static readonly Dictionary<string, Sprite> spriteCache = new Dictionary<string, Sprite>();
+
+    // Cached white material is tinted by each surface: bevels and rims survive state changes.
+    public static Sprite SurfaceSprite(bool primary = false) {
+        string key = primary ? "surface-primary-v2" : "surface-v2";
+        if (spriteCache.TryGetValue(key, out var cached) && cached != null) return cached;
+        const int size = 96, radius = 18;
+        var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        texture.wrapMode = TextureWrapMode.Clamp; texture.filterMode = FilterMode.Bilinear;
+        float half = size * .5f;
+        for (int y = 0; y < size; y++) for (int x = 0; x < size; x++) {
+            float px = x + .5f - half, py = y + .5f - half;
+            float qx = Mathf.Abs(px) - (half - radius), qy = Mathf.Abs(py) - (half - radius);
+            float distance = Mathf.Sqrt(Mathf.Max(qx, 0) * Mathf.Max(qx, 0) + Mathf.Max(qy, 0) * Mathf.Max(qy, 0)) + Mathf.Min(Mathf.Max(qx, qy), 0) - radius;
+            float alpha = Mathf.Clamp01(.5f - distance);
+            float tone = Mathf.Lerp(primary ? .86f : .91f, 1f, (float)y / (size - 1));
+            if (distance > -1.4f) tone = py > 0 ? 1f : (primary ? .72f : .68f);
+            else if (primary && py > half - 3) tone = 1f;
+            texture.SetPixel(x, y, new UnityEngine.Color(tone, tone, tone, alpha));
+        }
+        texture.Apply();
+        var sprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect, new Vector4(radius, radius, radius, radius));
+        spriteCache[key] = sprite; return sprite;
+    }
 
     public static Sprite CreateRoundedCard(int size, int radius, UnityEngine.Color fill, UnityEngine.Color border, float borderWidth = 1.5f) {
         string key = $"card_{size}_{radius}_{ColorUtility.ToHtmlStringRGBA(fill)}_{ColorUtility.ToHtmlStringRGBA(border)}_{borderWidth}";

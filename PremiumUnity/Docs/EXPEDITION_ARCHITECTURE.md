@@ -1,20 +1,20 @@
 # Expedition E1 — Rules and session lifecycle
 
-E1 provides the rules/service foundation. Mission gameplay screens and campaign entry buttons ship in E4; the polished Home mode selector ships in E6. No incomplete campaign is exposed in the current Classic UI.
+This document records the E1 rules/service foundation. Later-phase code now also exists in this workspace: campaign entry, journey map, mission gameplay, objectives/tools and Daily Puzzle. Verify the current native UI separately; E1 service checks alone do not establish campaign or mobile release readiness.
 
 ## Ownership
 
 - `IGameSession`: mode, dimension, numbered cells and score, independent of Unity.
 - `BoardMovement`: one movement/merge implementation used by Classic `Board` and `ExpeditionSession`. Processes directional lines as segments separated by terrain. Emits original tile motions, merge destinations and score gain for presentation.
 - `GameController`: existing gesture owner; no second input controller.
-- `GameNavigation`: mode route and animation, selection, pause and background gates. Classic uses `GameScreen.Game`; Expedition reserves `GameScreen.Expedition` for its E4 presenter. The Classic presenter ignores Expedition change events.
+- `GameNavigation`: mode route and animation, selection, pause and background gates. Classic uses `GameScreen.Game`; Expedition reserves `GameScreen.Expedition` for its E4 presenter. The presenter now routes Expedition events to its mission view; it does not animate the Classic board for those events.
 - `GameManager`: owns both sessions; `ActiveSession` selects the interface for the active mode. `CanResumeClassic` and `CanResumeExpedition` are independent resume entries. `Resume(GameMode)` selects the route. Starting a mission does not replace `Session`, alter Classic stock or count a Classic game played.
 
 ## Lifecycle
 
 Classic: start → slide → random spawn → save → animation → target/result → resume or next level. Its existing 2048/4096/8192 target validation, tools, score records and continuation remain unchanged.
 
-Expedition foundation: validate and copy an authored mission → start its own session → snapshot → shared slide → scripted spawn → save → animation gate → Home/resume. Definition copies include stable ID and content version; changes to caller-owned arrays cannot change an active mission. Failed slides consume neither actions nor spawn steps. Each successful slide increments actions; E3 will enforce the authored action limit, evaluate mission goals, finalize results and add mission tools.
+Expedition foundation: validate and copy an authored mission → start its own session → snapshot → shared slide → scripted spawn → save → animation gate → Home/resume. Definition copies include stable ID and content version; changes to caller-owned arrays cannot change an active mission. Failed slides consume neither actions nor spawn steps. Each successful slide increments actions; E3 owns the authored action limit, mission evaluation, finalized results and mission tools; those later-phase implementations now exist in this workspace.
 
 The snapshot carries cells, terrain, score, spawn cursor and latched goal IDs. Action/tool spending belongs to the live session, so E3 undo must not refund it. History is bounded at 15 snapshots. Typed turn events reserve damage/open/objective/result events for E2/E3; E1 emits slide, merge and spawn events only. A mission never uses Classic `won` or `Board.target`.
 

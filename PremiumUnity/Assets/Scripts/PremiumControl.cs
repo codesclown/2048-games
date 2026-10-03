@@ -15,18 +15,29 @@ public sealed class PremiumControl : MonoBehaviour {
   if(manager.HighContrast && Tone==ControlTone.Secondary)background=PremiumTheme.Background;
   if(locked)background=PremiumTheme.Color("1C2C43");
   if(selected)background=PremiumTheme.Accent;
-  surface.color=background;
+  surface.sprite=PremiumTheme.SurfaceSprite(Tone==ControlTone.Primary || selected);
+  surface.type=Image.Type.Sliced;surface.color=background;
+  var depth=GetComponent<Shadow>();if(depth==null){depth=gameObject.AddComponent<Shadow>();depth.effectDistance=new Vector2(0,-3);depth.useGraphicAlpha=true;}
+  depth.effectColor=new Color(0,0,0,button!=null && !button.interactable?.12f:.3f);
   var foreground=(Tone==ControlTone.Primary || selected)?PremiumTheme.Ink:PremiumTheme.Text;
   foreach(var label in GetComponentsInChildren<Text>())label.color=foreground;
   foreach(var icon in GetComponentsInChildren<PremiumIcon>())icon.color=foreground;
  }
 }
+[RequireComponent(typeof(CanvasRenderer))]
 public sealed class PremiumSelectionFrame : MaskableGraphic {
  public override Texture mainTexture => Texture2D.whiteTexture;
  protected override void OnPopulateMesh(VertexHelper mesh) {
-  mesh.Clear();var r=rectTransform.rect;float t=3;
-  Quad(mesh,new Rect(r.xMin,r.yMin,r.width,t));Quad(mesh,new Rect(r.xMin,r.yMax-t,r.width,t));Quad(mesh,new Rect(r.xMin,r.yMin,t,r.height));Quad(mesh,new Rect(r.xMax-t,r.yMin,t,r.height));
+  mesh.Clear();var rect=rectTransform.rect;float radius=Mathf.Min(14,Mathf.Min(rect.width,rect.height)*.5f),thickness=2;
+  const int steps=8,points=4*(steps+1);
+  for(int corner=0;corner<4;corner++) {
+   var center=new Vector2(corner==0 || corner==3?rect.xMax-radius:rect.xMin+radius,corner<2?rect.yMax-radius:rect.yMin+radius);
+   for(int step=0;step<=steps;step++) {
+    float angle=(corner*90f+step*90f/steps)*Mathf.Deg2Rad;var direction=new Vector2(Mathf.Cos(angle),Mathf.Sin(angle));
+    mesh.AddVert(center+direction*radius,color,new Vector2(.5f,.5f));mesh.AddVert(center+direction*Mathf.Max(0,radius-thickness),color,new Vector2(.5f,.5f));
+   }
+  }
+  for(int i=0;i<points;i++){int a=i*2,b=((i+1)%points)*2;mesh.AddTriangle(a,b,b+1);mesh.AddTriangle(a,b+1,a+1);}
  }
- void Quad(VertexHelper mesh,Rect r){int start=mesh.currentVertCount;mesh.AddVert(new Vector2(r.xMin,r.yMin),color,new Vector2(0.5f,0.5f));mesh.AddVert(new Vector2(r.xMin,r.yMax),color,new Vector2(0.5f,0.5f));mesh.AddVert(new Vector2(r.xMax,r.yMax),color,new Vector2(0.5f,0.5f));mesh.AddVert(new Vector2(r.xMax,r.yMin),color,new Vector2(0.5f,0.5f));mesh.AddTriangle(start,start+1,start+2);mesh.AddTriangle(start,start+2,start+3);}
 }
 }

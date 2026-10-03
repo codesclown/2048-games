@@ -218,20 +218,10 @@ public sealed class PremiumIcon : Image {
   return -Mathf.Sqrt(dX) * Mathf.Sign(dY);
  }
 
- protected override void OnPopulateMesh(VertexHelper mesh) {
-  if (sprite == null) sprite = GetSprite(kind);
-  base.OnPopulateMesh(mesh);
-  if (mesh.currentVertCount == 0) {
-   // Fallback safety for tests or headless environments
-   var r = rectTransform.rect;
-   int start = mesh.currentVertCount;
-   mesh.AddVert(new Vector2(r.xMin, r.yMin), color, new Vector2(0, 0));
-   mesh.AddVert(new Vector2(r.xMin, r.yMax), color, new Vector2(0, 1));
-   mesh.AddVert(new Vector2(r.xMax, r.yMax), color, new Vector2(1, 1));
-   mesh.AddVert(new Vector2(r.xMax, r.yMin), color, new Vector2(1, 0));
-   mesh.AddTriangle(start, start + 1, start + 2);
-   mesh.AddTriangle(start, start + 2, start + 3);
-  }
+ protected override void OnEnable() {
+  // Prepare the sprite before uGUI starts its rebuild, never inside OnPopulateMesh.
+  if(sprite==null)sprite=GetSprite(kind);
+  base.OnEnable();
  }
 }
 }

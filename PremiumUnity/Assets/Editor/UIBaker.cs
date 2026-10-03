@@ -22,7 +22,7 @@ public static class UIBaker {
  static void Bake(string name,GameDialog dialog,bool gameplay,bool master) {
   var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
   var view=new GameObject("Preview source").AddComponent<PremiumGame>();view.BuildEditorPreview(dialog,gameplay);
-  var canvas=view.GetComponentInChildren<Canvas>();var canvasGo=canvas.gameObject;canvasGo.transform.SetParent(null,false);canvasGo.name="Canvas_"+name;
+  var canvas=view.GetComponentInChildren<Canvas>();var canvasGo=canvas.gameObject;canvasGo.transform.SetParent(null,false);canvasGo.name="Canvas_"+name;canvasGo.tag="EditorOnly";
   PersistSprites(canvasGo);
   var scaler=canvas.GetComponent<CanvasScaler>();scaler.enabled=true;scaler.uiScaleMode=CanvasScaler.ScaleMode.ScaleWithScreenSize;scaler.referenceResolution=new Vector2(540,960);scaler.matchWidthOrHeight=0f;
   canvasGo.AddComponent<PremiumPreviewCanvas>();
