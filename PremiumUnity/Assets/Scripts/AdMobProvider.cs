@@ -12,13 +12,13 @@ public sealed class AdMobProvider : RewardProvider {
  float retryAt,rewardLoadedAt;
  public override bool IsReady=>completion==null && rewarded!=null && rewarded.CanShowAd();
  
- [Header("Production Ad Unit IDs (Leave empty to use official Google test IDs)")]
- [SerializeField] string customAndroidBannerId;
- [SerializeField] string customAndroidRewardId;
+ [Header("Production Ad Unit IDs")]
+ [SerializeField] string customAndroidBannerId = "ca-app-pub-7544180796220594/4014784048";
+ [SerializeField] string customAndroidRewardId = "ca-app-pub-7544180796220594/1388620701";
 
  string BannerId {
   get {
-   if (!string.IsNullOrEmpty(customAndroidBannerId) && Application.platform == RuntimePlatform.Android) return customAndroidBannerId;
+   if (!Application.isEditor && !string.IsNullOrEmpty(customAndroidBannerId) && Application.platform == RuntimePlatform.Android) return customAndroidBannerId;
    string pref = PlayerPrefs.GetString("AdMob_AndroidBannerId", "");
    if (!string.IsNullOrEmpty(pref) && Application.platform == RuntimePlatform.Android) return pref;
    return Application.platform==RuntimePlatform.IPhonePlayer?"ca-app-pub-3940256099942544/2934735716":"ca-app-pub-3940256099942544/6300978111";
@@ -26,7 +26,7 @@ public sealed class AdMobProvider : RewardProvider {
  }
  string RewardId {
   get {
-   if (!string.IsNullOrEmpty(customAndroidRewardId) && Application.platform == RuntimePlatform.Android) return customAndroidRewardId;
+   if (!Application.isEditor && !string.IsNullOrEmpty(customAndroidRewardId) && Application.platform == RuntimePlatform.Android) return customAndroidRewardId;
    string pref = PlayerPrefs.GetString("AdMob_AndroidRewardId", "");
    if (!string.IsNullOrEmpty(pref) && Application.platform == RuntimePlatform.Android) return pref;
    return Application.platform==RuntimePlatform.IPhonePlayer?"ca-app-pub-3940256099942544/1712485313":"ca-app-pub-3940256099942544/5224354917";
