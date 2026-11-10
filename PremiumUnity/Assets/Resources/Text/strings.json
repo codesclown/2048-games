@@ -659,6 +659,130 @@
     {
       "en": "Watch ad · Rewind 5 moves",
       "es": "Ver anuncio · Deshacer 5 movimientos"
+    },
+    {
+      "en": "Swipe up, down, left or right to move",
+      "es": "Desliza arriba, abajo, izquierda o derecha para mover"
+    },
+    {
+      "en": "Tutorial",
+      "es": "Tutorial"
+    },
+    {
+      "en": "Rate app",
+      "es": "Valorar app"
+    },
+    {
+      "en": "Share app",
+      "es": "Compartir app"
+    },
+    {
+      "en": "I'm playing 2048 Saga: Tile Adventures! My best score is {0}. Can you beat it?",
+      "es": "¡Estoy jugando a 2048 Saga: Tile Adventures! Mi mejor puntuación es {0}. ¿Puedes superarla?"
+    },
+    {
+      "en": "I'm playing 2048 Saga: Tile Adventures. Swipe, merge and reach 2048 with me!",
+      "es": "Estoy jugando a 2048 Saga: Tile Adventures. ¡Desliza, combina y llega a 2048 conmigo!"
+    },
+    {
+      "en": "Share via",
+      "es": "Compartir con"
+    },
+    {
+      "en": "Swipe to move",
+      "es": "Desliza para mover"
+    },
+    {
+      "en": "Merge matching tiles",
+      "es": "Combina fichas iguales"
+    },
+    {
+      "en": "Use your power-ups",
+      "es": "Usa tus potenciadores"
+    },
+    {
+      "en": "Pause, settings & saves",
+      "es": "Pausa, ajustes y guardado"
+    },
+    {
+      "en": "Swipe up, down, left or right. Every tile slides as far as it can.",
+      "es": "Desliza arriba, abajo, izquierda o derecha. Cada ficha se mueve hasta donde puede."
+    },
+    {
+      "en": "Two tiles with the same number join into one. Keep merging to reach 2048.",
+      "es": "Dos fichas con el mismo número se unen en una. Sigue combinando hasta llegar a 2048."
+    },
+    {
+      "en": "Tools unlock after 2 moves. Hold 128 / 256 / 512 tiles to earn more.",
+      "es": "Las herramientas se desbloquean tras 2 movimientos. Ten fichas de 128 / 256 / 512 para ganar más."
+    },
+    {
+      "en": "Your board saves automatically, so you can stop at any time.",
+      "es": "Tu tablero se guarda automáticamente, así que puedes parar cuando quieras."
+    },
+    {
+      "en": "SWIPE RIGHT",
+      "es": "DESLIZA A LA DERECHA"
+    },
+    {
+      "en": "Take back your last move",
+      "es": "Deshaz tu último movimiento"
+    },
+    {
+      "en": "Trade two neighbouring tiles",
+      "es": "Intercambia dos fichas vecinas"
+    },
+    {
+      "en": "Remove one tile",
+      "es": "Quita una ficha"
+    },
+    {
+      "en": "Pause, levels and how to play",
+      "es": "Pausa, niveles y cómo jugar"
+    },
+    {
+      "en": "Start a fresh board",
+      "es": "Empieza un tablero nuevo"
+    },
+    {
+      "en": "Sound, haptics and accessibility",
+      "es": "Sonido, vibración y accesibilidad"
+    },
+    {
+      "en": "Step {0} of {1}",
+      "es": "Paso {0} de {1}"
+    },
+    {
+      "en": "Let's play",
+      "es": "¡A jugar!"
+    },
+    {
+      "en": "Skip",
+      "es": "Omitir"
+    },
+    {
+      "en": "Next",
+      "es": "Siguiente"
+    },
+    {
+      "en": "Enjoying 2048 Saga?",
+      "es": "¿Te gusta 2048 Saga?"
+    },
+    {
+      "en": "If you like the game, a quick rating on Google Play helps other puzzle fans find it.",
+      "es": "Si te gusta el juego, una valoración rápida en Google Play ayuda a otros fans de los puzles a encontrarlo."
+    },
+    {
+      "en": "Rate now",
+      "es": "Valorar ahora"
+    },
+    {
+      "en": "Maybe later",
+      "es": "Quizás más tarde"
+    },
+    {
+      "en": "Each mission gives you a few Undo, Swap and Delete tools. Use them wisely to reach the goal.",
+      "es": "Cada misión te da algunas herramientas de Deshacer, Cambiar y Eliminar. Úsalas con cabeza para cumplir el objetivo."
     }
   ]
 }

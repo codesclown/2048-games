@@ -22,6 +22,13 @@ public sealed class GameManager : MonoBehaviour {
  public string Language {get;private set;}="en";
  public bool Sound {get;private set;}=true;
  public bool Haptics {get;private set;}=true;
+ // Players with earlier progress (from before the tutorial existed) are treated as having seen it.
+ public bool TutorialSeen {get;private set;}
+ // Rating prompt: first asked after RatingFirstAsk games, "Maybe later" waits RatingSnooze more games, rating or "No thanks" ends it.
+ public const int RatingFirstAsk=5,RatingSnooze=5;
+ public bool RatingDone {get;private set;}
+ public int RatingAskAfter {get;private set;}=RatingFirstAsk;
+ public bool ShouldAskForRating {get{return !RatingDone && TutorialSeen && Statistics!=null && Statistics.played>=RatingAskAfter;}}
  public readonly GameNavigation Navigation=new GameNavigation();
  public bool HasUnsavedChanges {get;private set;}
  public GamePersistence Persistence {get;private set;}
@@ -36,6 +43,8 @@ public sealed class GameManager : MonoBehaviour {
   expeditionPersistence=new ExpeditionPersistence(prefix,preferences);var expeditionSave=expeditionPersistence.Load();Expedition=expeditionSave.session;Campaign=expeditionSave.progress;Daily=expeditionSave.daily??new DailyProgress();
   Persistence=new GamePersistence(prefix,preferences);var save=Persistence.Load();HasUnsavedChanges=Persistence.ReadOnly || Persistence.NeedsCommit || expeditionPersistence.ReadOnly;
   Session=save.session;Statistics=save.stats;Sound=save.sound;Haptics=save.haptics;LargeText=save.largeText;ReducedMotion=save.reducedMotion;HighContrast=save.highContrast;Language=save.language=="es"?"es":"en";
+  TutorialSeen=save.tutorialSeen || save.session!=null || (save.stats!=null && save.stats.played>0);
+  RatingDone=save.ratingDone;RatingAskAfter=save.ratingAskAfter>0?save.ratingAskAfter:RatingFirstAsk;
   if(Session!=null)foreach(var stock in Session.stock)stock.lastEarn=-1;
  }
  public void StartGame(int dimension) {
@@ -145,6 +154,9 @@ public sealed class GameManager : MonoBehaviour {
  public void ToggleLargeText(){if(Navigation.Suspended)return;LargeText=!LargeText;Commit(GameChange.Settings);}
  public void ToggleReducedMotion(){if(Navigation.Suspended)return;ReducedMotion=!ReducedMotion;Commit(GameChange.Settings);}
  public void ToggleHighContrast(){if(Navigation.Suspended)return;HighContrast=!HighContrast;Commit(GameChange.Settings);}
+ public void CompleteRating(){if(RatingDone)return;RatingDone=true;Save();}
+ public void PostponeRating(){if(RatingDone)return;RatingAskAfter=Statistics.played+RatingSnooze;Save();}
+ public void CompleteTutorial(){if(TutorialSeen)return;TutorialSeen=true;Save();}
  public void ToggleLanguage(){if(Navigation.Suspended)return;Language=Language=="en"?"es":"en";Commit(GameChange.Settings);}
  public void ResetProgress() {
   if(Navigation.Suspended || Navigation.Dialog!=GameDialog.ClearScores)return;
@@ -171,7 +183,7 @@ public sealed class GameManager : MonoBehaviour {
   bool expeditionFailed=false;
   if(expeditionPersistence!=null){try{expeditionPersistence.Save(new ExpeditionSave{session=Expedition,progress=Campaign,daily=Daily});}catch(Exception e){expeditionFailed=true;Debug.LogWarning("Expedition save failed: "+e.Message);}}
   if(Persistence==null)return;Record();
-  try{Persistence.Save(new GameSave{session=Session,stats=Statistics,sound=Sound,haptics=Haptics,largeText=LargeText,reducedMotion=ReducedMotion,highContrast=HighContrast,language=Language});HasUnsavedChanges=expeditionFailed || Persistence.ReadOnly || expeditionPersistence.ReadOnly;}
+  try{Persistence.Save(new GameSave{session=Session,stats=Statistics,sound=Sound,haptics=Haptics,largeText=LargeText,reducedMotion=ReducedMotion,highContrast=HighContrast,language=Language,tutorialSeen=TutorialSeen,ratingDone=RatingDone,ratingAskAfter=RatingAskAfter});HasUnsavedChanges=expeditionFailed || Persistence.ReadOnly || expeditionPersistence.ReadOnly;}
   catch(Exception e){HasUnsavedChanges=true;Debug.LogWarning("Game save failed; retrying at the next action or lifecycle boundary: "+e.Message);}
  }
  public void SetBackground(bool background){if(background){Navigation.Suspend();Save();}else Navigation.Foreground();}

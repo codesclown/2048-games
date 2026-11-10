@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Premium2048 {
-public enum IconKind {Menu,Sound,Mute,Restart,Undo,Swap,Delete,Settings,Play,Check,Lock,Trophy,Star,Map}
+public enum IconKind {Menu,Sound,Mute,Restart,Undo,Swap,Delete,Settings,Play,Check,Lock,Trophy,Star,Map,Share}
 
 public sealed class PremiumIcon : Image {
  static readonly Dictionary<IconKind,Sprite> cache = new Dictionary<IconKind,Sprite>();
@@ -184,6 +184,18 @@ public sealed class PremiumIcon : Image {
     d = Mathf.Min(d, Seg(p, new Vector2(0.65f, 0.45f), new Vector2(0.65f, -0.75f)));
     d = Mathf.Min(d, Seg(p, new Vector2(0.65f, -0.75f), new Vector2(0.20f, -0.55f)));
     break;
+
+   case IconKind.Share: {
+    Vector2 top = new Vector2(0.48f, 0.55f), mid = new Vector2(-0.48f, 0f), bottom = new Vector2(0.48f, -0.55f);
+    const float r = 0.2f;
+    d = Mathf.Min(d, Mathf.Abs((p - top).magnitude - r));
+    d = Mathf.Min(d, Mathf.Abs((p - mid).magnitude - r));
+    d = Mathf.Min(d, Mathf.Abs((p - bottom).magnitude - r));
+    Vector2 up = (top - mid).normalized * r, down = (bottom - mid).normalized * r;
+    d = Mathf.Min(d, Seg(p, mid + up, top - up));
+    d = Mathf.Min(d, Seg(p, mid + down, bottom - down));
+    break;
+   }
   }
   return d;
  }

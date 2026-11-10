@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Premium2048 {
 public enum GameScreen { Loading, Home, Game, Expedition, ExpeditionMap }
 public enum GameState { Loading, Menu, Playing, Animating, Selecting, Rewarding, Paused, Result }
-public enum GameDialog { None, Pause, Levels, Instructions, Scores, Settings, Restart, ClearScores, Win, Loss, Continue, VideoUnavailable, RewardVideo, ReplaceBoard, About, MissionBrief, FirstLockTutorial }
+public enum GameDialog { None, Pause, Levels, Instructions, Scores, Settings, Restart, ClearScores, Win, Loss, Continue, VideoUnavailable, RewardVideo, ReplaceBoard, About, MissionBrief, FirstLockTutorial, Tutorial, RatePrompt }
 
 // Owns navigation and input gates; the view only renders these decisions.
 public sealed class GameNavigation {
@@ -34,6 +34,7 @@ public sealed class GameNavigation {
    || dialog==GameDialog.ReplaceBoard && Dialog==GameDialog.Levels
    || dialog==GameDialog.Restart && Dialog==GameDialog.Pause
    || dialog==GameDialog.About && Dialog==GameDialog.Settings
+   || dialog==GameDialog.Tutorial && Dialog==GameDialog.Instructions
    || dialog==GameDialog.FirstLockTutorial && Dialog==GameDialog.None
    || (dialog==GameDialog.Continue || dialog==GameDialog.VideoUnavailable) && Dialog==GameDialog.Loss;
   if(child)history.Push(Dialog);else history.Clear();

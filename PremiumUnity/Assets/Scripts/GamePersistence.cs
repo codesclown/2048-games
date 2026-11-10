@@ -52,6 +52,9 @@ public sealed class NativeSaveStore : IPreferenceStore {
  public bool sound=true;
  public bool haptics=true;
  public bool largeText,reducedMotion,highContrast;
+ public bool tutorialSeen;
+ public bool ratingDone;
+ public int ratingAskAfter;
  public string language="en";
  public bool Valid(){return version==2 && (language==null || language=="en" || language=="es") && stats!=null && stats.Valid() && (session==null || session.Valid());}
 }

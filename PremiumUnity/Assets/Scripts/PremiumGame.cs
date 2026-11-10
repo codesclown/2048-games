@@ -30,7 +30,7 @@ public class PremiumGame : MonoBehaviour {
  bool ready,animating,appPaused,focusLost;
  GameScreen? presentedScreen; GameDialog presentedDialog; bool boardWasExpedition;
  Direction? queuedMove;
- int selected=-1,pendingDimension=4,powerFirst=-1,powerSecond=-1;int[] powerBefore;
+ int selected=-1,pendingDimension=4,powerFirst=-1,powerSecond=-1,tutorialStep;int[] powerBefore;
  Coroutine moveAnimation,scoreAnimation,boardPulseAnimation;AudioSource audioSource;AudioClip moveTone,mergeTone,clickTone,winTone,slideTone,undoTone,swapTone,deleteTone,lossTone,spawnTone;
  readonly Dictionary<int,AudioClip> mergeClips=new Dictionary<int,AudioClip>();
  int lastWidth,lastHeight;Rect lastSafe;float lastBannerHeight;
@@ -45,6 +45,9 @@ public class PremiumGame : MonoBehaviour {
   if((Array.IndexOf(Environment.GetCommandLineArgs(),"-premiumSmoke")>=0 || Array.IndexOf(Environment.GetCommandLineArgs(),"-premiumMotionSmoke")>=0)){persistenceNamespace="Premium2048.QA";new GamePersistence(persistenceNamespace).Reset();}
 #endif
   manager.Initialize(persistenceNamespace);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+  if(persistenceNamespace=="Premium2048.QA"){manager.CompleteTutorial();manager.CompleteRating();}
+#endif
   manager.Changed+=OnGameChanged;navigation.Changed+=OnNavigationChanged;
   Application.targetFrameRate=60;QualitySettings.vSyncCount=0;Application.runInBackground=false;Screen.sleepTimeout=SleepTimeout.SystemSetting;font=Resources.Load<Font>("Fonts/NotoSans-Regular");
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -62,7 +65,7 @@ public class PremiumGame : MonoBehaviour {
   deleteTone=PremiumAudio.Delete();lossTone=PremiumAudio.Loss();spawnTone=PremiumAudio.Spawn();
   winTone=PremiumAudio.Win();clickTone=PremiumAudio.Click();
   moveTone=slideTone;mergeTone=PremiumAudio.Merge(4);mergeClips[4]=mergeTone;
-  ready=true;ShowHome();FitScreen(true);
+  ready=true;manager.Home();FitScreen(true);
  }
  void Progress(float value,string text) {if(loadFill!=null)loadFill.fillAmount=value;if(loadText!=null)loadText.text=text+"\n"+Mathf.RoundToInt(value*100)+"%";}
  void Update() {
@@ -92,6 +95,7 @@ public class PremiumGame : MonoBehaviour {
  void OnGameChanged(GameChange change) {
   if(!ready)return;
   if(change==GameChange.Settings){ApplyPresentation();return;}
+  if(change==GameChange.NewGame && !manager.TutorialSeen && navigation.Dialog==GameDialog.None)ShowTutorial();
   if(manager.Mode==GameMode.Expedition){
    if(change==GameChange.Move && manager.ReducedMotion){StopScore();Refresh(false);PremiumHaptics.Trigger(HapticImpact.Light);manager.ResolveAnimation();return;}
    if(change==GameChange.Move){
@@ -217,8 +221,9 @@ public class PremiumGame : MonoBehaviour {
   if(grid!=null)FitScreen(true);
  }
  void NewGame(int dimension){if(rewardPending || navigation.Suspended)return;FinishAnimation();manager.StartGame(dimension);}
+ void ShowTutorial(){tutorialStep=0;navigation.Open(GameDialog.Tutorial);}
  void ShowGame(){manager.Resume();}
- void ShowHome(){manager.Home();}
+ void ShowHome(){manager.Home();if(manager.ShouldAskForRating && navigation.Screen==GameScreen.Home && navigation.Dialog==GameDialog.None)navigation.Open(GameDialog.RatePrompt);}
  void ShowExpeditionMap(){manager.ExpeditionMap();}
  void OnApplicationPause(bool paused){appPaused=paused;if(paused && audioSource!=null)audioSource.Stop();if(manager!=null){controller.Cancel();manager.SetBackground(appPaused || focusLost);}}
  void OnApplicationFocus(bool focused){focusLost=!focused;if(!focused && audioSource!=null)audioSource.Stop();if(manager!=null){controller.Cancel();manager.SetBackground(appPaused || focusLost);}}
@@ -298,7 +303,8 @@ public class PremiumGame : MonoBehaviour {
    powerStatuses[i].color=active?Hex("192327"):locked?PremiumTheme.Muted:available>0?PremiumTheme.Cyan:PremiumTheme.Muted;
   }
   cancelSelection.SetActive(selection>=0);FitScreen(true);
-  if(selection<0)SetText(hint,session.Unlocked?"Hold 128 / 256 / 512 to earn tools":"Tools unlock after {0} more moves",Math.Max(0,2-session.moves));
+  if(selection<0 && session.moves==0)SetText(hint,"Swipe up, down, left or right to move");
+  else if(selection<0)SetText(hint,session.Unlocked?"Hold 128 / 256 / 512 to earn tools":"Tools unlock after {0} more moves",Math.Max(0,2-session.moves));
   else SetText(hint,selection==(int)Power.Swap?"Tap two different adjacent tiles":"Tap the tile to remove · Cancel to exit");
   foreach(var control in GetComponentsInChildren<PremiumControl>(true))if(control.AccessibleName=="Sound: On"){var icon=control.GetComponentInChildren<PremiumIcon>();if(icon!=null)icon.Kind=sound?IconKind.Sound:IconKind.Mute;}
   if(results && navigation.State!=GameState.Animating)manager.ShowResult();
@@ -349,7 +355,14 @@ public class PremiumGame : MonoBehaviour {
    case GameDialog.Instructions:
     Modal("How to play","Simple moves. Thoughtful choices.");
     BuildInstructions();
-    Button("Close",modalPanel,new Vector2(0,-285),new Vector2(200,72),CloseModal,true);break;
+    Button("Close",modalPanel,new Vector2(-118,-285),new Vector2(210,72),CloseModal,true);
+    Button("Tutorial",modalPanel,new Vector2(118,-285),new Vector2(210,72),ShowTutorial);break;
+   case GameDialog.Tutorial:RenderTutorial();break;
+   case GameDialog.RatePrompt:
+    Modal("Enjoying 2048 Saga?","If you like the game, a quick rating on Google Play helps other puzzle fans find it.");
+    DialogButton("Rate now",10,()=>{manager.CompleteRating();CloseModal();PremiumStoreActions.RateApp();},true);
+    DialogButton("Maybe later",-66,CloseModal);
+    DialogButton("No thanks",-142,()=>{manager.CompleteRating();CloseModal();});break;
    case GameDialog.Scores:
     Modal("Your records","Every personal best, saved on this device.");
     string[] modeNames=new[]{"CLASSIC 4×4","ADVANCED 5×5","EXPERT 6×6"};
@@ -388,8 +401,10 @@ public class PremiumGame : MonoBehaviour {
     SettingRow("High contrast",-164,manager.HighContrast,manager.ToggleHighContrast);
     var languageButton=Button("Language",modalPanel,new Vector2(0,-242),new Vector2(456,72),manager.ToggleLanguage);
     SetText(languageButton.GetComponentInChildren<Text>(),"Language · {0}",manager.Language=="es"?"Español":"English");
-    Button("Close",modalPanel,new Vector2(-118,-320),new Vector2(210,72),CloseModal,true);
-    Button("About",modalPanel,new Vector2(118,-320),new Vector2(210,72),()=>navigation.Open(GameDialog.About));break;
+    StoreButton("Rate app",-118,IconKind.Star,()=>{manager.CompleteRating();PremiumStoreActions.RateApp();});
+    StoreButton("Share app",118,IconKind.Share,ShareApp);
+    Button("Close",modalPanel,new Vector2(-118,-398),new Vector2(210,72),CloseModal,true);
+    Button("About",modalPanel,new Vector2(118,-398),new Vector2(210,72),()=>navigation.Open(GameDialog.About));break;
    case GameDialog.About:
     Modal("2048 Saga","Tile Adventures — A strategic puzzle journey.");
     Brand(modalPanel,new Vector2(0,100),.9f);
@@ -975,7 +990,7 @@ public class PremiumGame : MonoBehaviour {
   ghostPool.RemoveAll(tile=>tile==null);
   for(int i=ghostPool.Count;i<count;i++){var ghost=CreateTile(grid,0,2);ghost.gameObject.SetActive(false);ghostPool.Add(ghost);}
  }
- bool CompactDialog => navigation.Dialog==GameDialog.Restart || navigation.Dialog==GameDialog.ClearScores || navigation.Dialog==GameDialog.ReplaceBoard || navigation.Dialog==GameDialog.Continue || navigation.Dialog==GameDialog.VideoUnavailable;
+ bool CompactDialog => navigation.Dialog==GameDialog.RatePrompt || navigation.Dialog==GameDialog.Restart || navigation.Dialog==GameDialog.ClearScores || navigation.Dialog==GameDialog.ReplaceBoard || navigation.Dialog==GameDialog.Continue || navigation.Dialog==GameDialog.VideoUnavailable;
  void Modal(string title,string description) {
   modal.transform.SetAsLastSibling();modal.SetActive(true);
   var oldCelebration=modalPanel.GetComponent<PremiumCelebration>();if(oldCelebration!=null)ReleaseObject(oldCelebration);
@@ -1026,7 +1041,7 @@ public class PremiumGame : MonoBehaviour {
   AddIcon(button.transform,new Vector2(196,0),24,IconKind.Play,current?Gold:Hex("B1BEBA"));
  }
  void SettingRow(string title,float y,bool enabled,Action action) {
-  var button=Button(title,modalPanel,new Vector2(0,y),new Vector2(456,72),action);var label=button.GetComponentInChildren<Text>();label.rectTransform.anchoredPosition=new Vector2(-45,0);label.rectTransform.sizeDelta=new Vector2(320,50);label.alignment=TextAnchor.MiddleLeft;Size(label,20);
+  var button=Button(title,modalPanel,new Vector2(0,y),new Vector2(456,64),action);var label=button.GetComponentInChildren<Text>();label.rectTransform.anchoredPosition=new Vector2(-45,0);label.rectTransform.sizeDelta=new Vector2(320,50);label.alignment=TextAnchor.MiddleLeft;Size(label,20);
   var status=Label("Setting state",button.transform,enabled?"ON":"OFF",new Vector2(142,0),new Vector2(75,45),17);status.color=enabled?Gold:PremiumTheme.Muted;
   var track=Panel("Toggle",button.transform,new Vector2(192,0),new Vector2(40,24),enabled?Gold:PremiumTheme.Border);var knob=Panel("Knob",track.transform,new Vector2(enabled?8:-8,0),new Vector2(18,18),enabled?Ink:PremiumTheme.TextSecondary);knob.sprite=PremiumTheme.CreateRoundedCard(32,16,Color.white,Color.clear,0);
  }
@@ -1065,7 +1080,73 @@ public class PremiumGame : MonoBehaviour {
   var scroll=view.gameObject.AddComponent<ScrollRect>();scroll.viewport=view;scroll.content=content;scroll.horizontal=false;scroll.movementType=ScrollRect.MovementType.Clamped;scroll.inertia=!manager.ReducedMotion;scroll.scrollSensitivity=22;
   Label("Scroll hint",modalPanel,"Scroll to read all rules",new Vector2(0,-252),new Vector2(456,28),14).color=PremiumTheme.Muted;
  }
- void CloseModal(){navigation.Back();}
+ void CloseModal(){if(navigation.Dialog==GameDialog.Tutorial)manager.CompleteTutorial();else if(navigation.Dialog==GameDialog.RatePrompt)manager.PostponeRating();navigation.Back();}
+ void StoreButton(string name,float x,IconKind icon,Action action){
+  var button=Button(name,modalPanel,new Vector2(x,-320),new Vector2(210,72),action);
+  var label=button.GetComponentInChildren<Text>();label.rectTransform.anchoredPosition=new Vector2(18,0);label.rectTransform.sizeDelta=new Vector2(160,60);Size(label,19);
+  AddIcon(button.transform,new Vector2(-78,0),22,icon,Gold);
+ }
+ void ShareApp(){
+  long top=0;foreach(long value in stats.best)top=Math.Max(top,value);
+  string message=top>0?T("I'm playing 2048 Saga: Tile Adventures! My best score is {0}. Can you beat it?",top.ToString("N0")):T("I'm playing 2048 Saga: Tile Adventures. Swipe, merge and reach 2048 with me!");
+  PremiumStoreActions.ShareApp("2048 Saga: Tile Adventures",message,T("Share via"));
+ }
+ static readonly string[] TutorialTitles={"Swipe to move","Merge matching tiles","Use your power-ups","Pause, settings & saves"};
+ static readonly string[] TutorialTexts={
+  "Swipe up, down, left or right. Every tile slides as far as it can.",
+  "Two tiles with the same number join into one. Keep merging to reach 2048.",
+  "Tools unlock after 2 moves. Hold 128 / 256 / 512 tiles to earn more.",
+  "Your board saves automatically, so you can stop at any time."};
+ void RenderTutorial(){
+  int step=Mathf.Clamp(tutorialStep,0,TutorialTitles.Length-1);bool last=step==TutorialTitles.Length-1;
+  Modal(TutorialTitles[step],step==2 && manager.Mode==GameMode.Expedition?"Each mission gives you a few Undo, Swap and Delete tools. Use them wisely to reach the goal.":TutorialTexts[step]);
+  var visual=Rect("Tutorial visual",modalPanel,new Vector2(0,120),new Vector2(456,210));
+  switch(step){
+   case 0:
+    TutorialRow(visual,62,new[]{2,0,4,0},62);
+    var swipe=Label("Swipe direction",visual,"SWIPE RIGHT",new Vector2(-20,0),new Vector2(260,30),16);swipe.color=Gold;Emphasis(swipe);swipe.alignment=TextAnchor.MiddleRight;
+    AddIcon(visual,new Vector2(128,0),18,IconKind.Play,Gold);
+    TutorialRow(visual,-62,new[]{0,0,2,4},62);break;
+   case 1:
+    TutorialEquation(visual,52,2,4);TutorialEquation(visual,-52,1024,2048);break;
+   case 2:
+    TutorialFeature(visual,-152,IconKind.Undo,"Undo","Take back your last move");
+    TutorialFeature(visual,0,IconKind.Swap,"Swap","Trade two neighbouring tiles");
+    TutorialFeature(visual,152,IconKind.Delete,"Delete","Remove one tile");break;
+   default:
+    TutorialFeature(visual,-152,IconKind.Menu,"Menu","Pause, levels and how to play");
+    TutorialFeature(visual,0,IconKind.Restart,"Restart","Start a fresh board");
+    TutorialFeature(visual,152,IconKind.Settings,"Settings","Sound, haptics and accessibility");break;
+  }
+  var progress=Label("Tutorial progress",modalPanel,"Step {0} of {1}",new Vector2(0,-20),new Vector2(456,26),14,step+1,TutorialTitles.Length);progress.color=PremiumTheme.Muted;
+  if(last){
+   Button("Back",modalPanel,new Vector2(-118,-100),new Vector2(210,72),()=>{tutorialStep--;RenderDialog();});
+   Button("Let's play",modalPanel,new Vector2(118,-100),new Vector2(210,72),CloseModal,true);
+  } else {
+   Button("Skip",modalPanel,new Vector2(-118,-100),new Vector2(210,72),CloseModal);
+   Button("Next",modalPanel,new Vector2(118,-100),new Vector2(210,72),()=>{tutorialStep++;RenderDialog();},true);
+  }
+ }
+ void TutorialTile(Transform parent,Vector2 position,int value,float size){
+  var cell=Panel(value>0?"Tutorial tile":"Tutorial empty",parent,position,Vector2.one*size,value>0?Color.white:Hex("314247"));
+  if(value<=0)return;
+  cell.sprite=TileSprite(value);cell.type=Image.Type.Simple;
+  var number=Label("Value",cell.transform,"{0}",Vector2.zero,Vector2.one*(size-6),value>=1000?17:value>=100?20:24,value);Emphasis(number);number.color=TileText(value);
+ }
+ void TutorialRow(Transform parent,float y,int[] values,float size){for(int i=0;i<values.Length;i++)TutorialTile(parent,new Vector2((i-1.5f)*(size+8),y),values[i],size);}
+ void TutorialEquation(Transform parent,float y,int value,int result){
+  TutorialTile(parent,new Vector2(-150,y),value,70);
+  Label("Plus",parent,"+",new Vector2(-75,y),new Vector2(40,40),28).color=PremiumTheme.Muted;
+  TutorialTile(parent,new Vector2(0,y),value,70);
+  Label("Equals",parent,"=",new Vector2(75,y),new Vector2(40,40),28).color=PremiumTheme.Muted;
+  TutorialTile(parent,new Vector2(150,y),result,70);
+ }
+ void TutorialFeature(Transform parent,float x,IconKind icon,string title,string detail){
+  var emblem=Panel("Feature emblem",parent,new Vector2(x,56),new Vector2(72,72),PremiumTheme.SurfaceElevated);
+  AddIcon(emblem.transform,Vector2.zero,32,icon,Gold);
+  var heading=Label("Feature name",parent,title,new Vector2(x,-4),new Vector2(144,28),18);Emphasis(heading);
+  var text=Label("Feature detail",parent,detail,new Vector2(x,-56),new Vector2(140,64),14);text.color=PremiumTheme.Muted;
+ }
 #if UNITY_EDITOR
  public void BuildEditorPreview(GameDialog dialog, bool gameplay, bool savedHome=false) {
   manager=gameObject.AddComponent<GameManager>();controller=gameObject.AddComponent<GameController>();

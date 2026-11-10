@@ -132,6 +132,7 @@ public class PremiumSmokeRunner : MonoBehaviour {
      Click("Settings");
      Check(Get<GameObject>("modal").activeSelf, "settings modal opened");
      ScreenCapture.CaptureScreenshot("/tmp/premium-settings.png");
+     {bool rate=false,share=false;foreach(var b in game.GetComponentsInChildren<Button>()){if(b.name=="Rate app")rate=true;if(b.name=="Share app")share=true;}Check(rate && share,"settings offers rate and share");}
      Click("About");Check(manager.Navigation.Dialog==GameDialog.About,"about screen opens from settings");
      Click("Back");Check(manager.Navigation.Dialog==GameDialog.Settings,"about returns to the settings screen");
      Click("Haptic feedback");
@@ -261,6 +262,10 @@ public class PremiumSmokeRunner : MonoBehaviour {
       if (text.name == "Rules") Check(text.preferredHeight <= text.rectTransform.rect.height, "instructions fit dialog");
      }
      ScreenCapture.CaptureScreenshot("/tmp/premium-instructions.png");
+     Click("Tutorial");Check(manager.Navigation.Dialog==GameDialog.Tutorial,"tutorial opens from how to play");
+     Click("Next");Click("Next");Click("Next");
+     ScreenCapture.CaptureScreenshot("/tmp/premium-tutorial.png");
+     Click("Let's play");Check(manager.Navigation.Dialog==GameDialog.Instructions && manager.TutorialSeen,"tutorial returns to how to play and is remembered");
      Click("Close");
      Call("ShowScores");
      break;
